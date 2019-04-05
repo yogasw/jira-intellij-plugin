@@ -7,7 +7,6 @@ import com.intellij.jira.util.BodyResult;
 import com.intellij.jira.util.EmptyResult;
 import com.intellij.jira.util.Result;
 import com.intellij.tasks.jira.JiraRepository;
-import com.intellij.util.containers.ContainerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,7 @@ public class JiraRestApi {
             return this.jiraRestClient.findIssues(searchQuery);
         } catch (Exception e) {
             log.error("No issues found");
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 
@@ -52,7 +51,7 @@ public class JiraRestApi {
             return this.jiraRestClient.findIssues();
         } catch (Exception e) {
             log.error("No issues found");
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 
@@ -62,7 +61,7 @@ public class JiraRestApi {
             return jiraRestClient.getTransitions(issueId);
         } catch (Exception e) {
             log.error(String.format("No transitions was found for issue '%s'", issueId));
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 
@@ -82,7 +81,7 @@ public class JiraRestApi {
             return jiraRestClient.getAssignableUsers(issueKey);
         } catch (Exception e) {
             log.error("Error fetching users to assign");
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 
@@ -125,7 +124,7 @@ public class JiraRestApi {
             return jiraRestClient.getIssuePriorities();
         } catch (Exception e) {
             e.printStackTrace();
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 
@@ -157,7 +156,7 @@ public class JiraRestApi {
             return jiraRestClient.getIssueLinkTypes();
         } catch (Exception e) {
             e.printStackTrace();
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 
@@ -166,7 +165,7 @@ public class JiraRestApi {
             return jiraRestClient.getGroups();
         } catch (Exception e) {
             e.printStackTrace();
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 
@@ -183,7 +182,7 @@ public class JiraRestApi {
             return jiraRestClient.getProjectRoles(projectKey);
         } catch (Exception e) {
             e.printStackTrace();
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
     }
 

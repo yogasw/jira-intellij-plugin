@@ -1,13 +1,13 @@
 package com.intellij.jira.rest;
 
 import com.intellij.jira.rest.model.JiraGroup;
-import com.intellij.util.containers.ContainerUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JiraGroupsWrapper {
 
-    private List<JiraGroup> groups = ContainerUtil.emptyList();
+    private List<JiraGroup> groups = new ArrayList<>();
 
     public JiraGroupsWrapper() { }
 

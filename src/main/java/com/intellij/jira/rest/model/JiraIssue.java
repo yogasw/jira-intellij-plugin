@@ -1,8 +1,8 @@
 package com.intellij.jira.rest.model;
 
 import com.intellij.jira.rest.JiraIssueCommentsWrapper;
-import com.intellij.util.containers.ContainerUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -117,9 +117,9 @@ public class JiraIssue {
         private JiraIssueUser creator;
         private JiraIssueUser reporter;
         private JiraIssueCommentsWrapper comment;
-        private List<JiraIssueLink> issuelinks = ContainerUtil.emptyList();
+        private List<JiraIssueLink> issuelinks = new ArrayList<>();
         private JiraProject project;
-        private List<JiraProjectVersion> versions = ContainerUtil.emptyList();
+        private List<JiraProjectVersion> versions = new ArrayList<>();
 
         public Fields() { }
 
