@@ -10,11 +10,15 @@ import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.intellij.jira.util.JiraLabelUtil.BOLD;
 import static com.intellij.jira.util.JiraLabelUtil.ITALIC;
 
 public class JiraIssueCommentListCellRenderer extends DefaultJiraListCellRender {
+
+    private static final Pattern BODY_NAME_PATTERN = Pattern.compile("(\\[~(\\w+)])");
 
     private JBPanel commentPanel;
     private JBLabel authorLabel;
@@ -70,8 +74,21 @@ public class JiraIssueCommentListCellRenderer extends DefaultJiraListCellRender 
 
         authorLabel.setText(comment.getAuthor().getDisplayName());
         createdLabel.setText(JiraIssueUtil.getCreated(comment));
-        commentArea.setText(comment.getBody());
+        commentArea.setText(getPrettyBody(comment.getBody()));
 
         return this;
     }
+
+
+
+    private String getPrettyBody(String body){
+        Matcher m = BODY_NAME_PATTERN.matcher(body);
+        if(m.find()){
+            body = body.replace(m.group(1), m.group(2));
+        }
+
+        return body;
+    }
+
+
 }
