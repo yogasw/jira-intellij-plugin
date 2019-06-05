@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherProjectManager;
+import com.intellij.jira.components.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.util.SimpleSelectableList;
@@ -29,12 +29,13 @@ import static com.intellij.openapi.ui.Messages.OK_BUTTON;
 public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
     private final Project myProject;
-    private final JQLSearcherProjectManager myManager;
+    private final JQLSearcherManager myManager;
 
     private SimpleSelectableList<JQLSearcher> mySearchers;
 
-    private final ColumnInfo<JQLSearcher, String> ALIAS_COLUMN = new AliasSearcherColumnInfo();
-    private final ColumnInfo<JQLSearcher, String> JQL_COLUMN = new JQLSearcherColumnInfo();
+    private final ColumnInfo<JQLSearcher, String> ALIAS_COLUMN = new AliasColumnInfo();
+    private final ColumnInfo<JQLSearcher, String> JQL_COLUMN = new JQLColumnInfo();
+    private final ColumnInfo<JQLSearcher, String> SHARED_COLUMN = new SharedrColumnInfo();
 
 
     private TableView<JQLSearcher> myTable;
@@ -43,7 +44,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     public ConfigureJQLSearchersDialog(@NotNull Project project) {
         super(project, false);
         this.myProject = project;
-        this.myManager = project.getComponent(JQLSearcherProjectManager.class);
+        this.myManager = JQLSearcherManager.getInstance();
 
         init();
     }
@@ -53,14 +54,14 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     protected void init() {
         mySearchers = new SimpleSelectableList<>();
 
-        myModel = new ListTableModel(new ColumnInfo[]{ALIAS_COLUMN, JQL_COLUMN}, new ArrayList());
-        for(JQLSearcher searcher : myManager.getSearchers()){
+        myModel = new ListTableModel(new ColumnInfo[]{ALIAS_COLUMN, JQL_COLUMN, SHARED_COLUMN}, new ArrayList());
+        for(JQLSearcher searcher : myManager.getSearchers(myProject)){
             JQLSearcher clone = searcher.clone();
             mySearchers.add(clone);
             myModel.addRow(clone);
         }
 
-        mySearchers.selectItem(myManager.getSelectedSearcherIndex());
+        mySearchers.selectItem(myManager.getSelectedSearcherIndex(myProject));
         myTable = new TableView<>(myModel);
 
 
@@ -76,18 +77,21 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
                         .setAddAction(button -> {
                             NewJQLSearcherDialog dlg = new NewJQLSearcherDialog(myProject, false);
                             if (dlg.showAndGet()) {
-                                mySearchers.add(dlg.getJqlSearcher(), dlg.isSelectedSearcher());
-                                myModel.addRow(dlg.getJqlSearcher());
+                                JQLSearcher newJqlSearcher = dlg.getJqlSearcher();
+                                newJqlSearcher.setShared(dlg.isSharedSearcher());
+                                mySearchers.add(newJqlSearcher, dlg.isSelectedSearcher());
+                                myModel.addRow(newJqlSearcher);
                                 myModel.fireTableDataChanged();
                             }
                         })
                         .setEditAction(button -> {
                             int selRow = myTable.getSelectedRow();
-                            boolean isDefaultSearcher = selRow == mySearchers.getSelectedItemIndex();
+                            boolean isDefaultSearcher = (selRow == mySearchers.getSelectedItemIndex());
                             JQLSearcher selectedSearcher = getSelectedJQLSearcher();
                             EditJQLSearcherDialog dlg = new EditJQLSearcherDialog(myProject, selectedSearcher, isDefaultSearcher, false);
 
                             if (dlg.showAndGet()) {
+                                selectedSearcher.setShared(dlg.isSharedSearcher());
                                 mySearchers.update(selRow, selectedSearcher, dlg.isSelectedSearcher());
                                 myModel.fireTableDataChanged();
                             }
@@ -102,8 +106,6 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
                         })
                         .disableUpDownActions().createPanel(), BorderLayout.CENTER);
 
-
-
         return myPanel;
     }
 
@@ -115,7 +117,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
-        myManager.setSearchers(mySearchers);
+        myManager.setSearchers(myProject, mySearchers);
         new RefreshIssuesTask(myProject).queue();
 
         super.doOKAction();
@@ -145,11 +147,11 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     }
 
 
-    private abstract class SearcherColumnInfo extends ColumnInfo<JQLSearcher, String>{
+    private abstract class BaseColumnInfo extends ColumnInfo<JQLSearcher, String>{
 
         private final JQLSearcherTableCellRenderer JQL_SEARCHER_RENDERER = new JQLSearcherTableCellRenderer();
 
-        public SearcherColumnInfo(String name) {
+        public BaseColumnInfo(String name) {
             super(name);
         }
 
@@ -161,9 +163,9 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     }
 
 
-    private class AliasSearcherColumnInfo extends SearcherColumnInfo{
+    private class AliasColumnInfo extends BaseColumnInfo {
 
-        public AliasSearcherColumnInfo() {
+        public AliasColumnInfo() {
             super("Alias");
         }
 
@@ -174,9 +176,9 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
         }
     }
 
-    private class JQLSearcherColumnInfo extends SearcherColumnInfo{
+    private class JQLColumnInfo extends BaseColumnInfo {
 
-        public JQLSearcherColumnInfo() {
+        public JQLColumnInfo() {
             super("JQL");
         }
 
@@ -187,6 +189,18 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
         }
     }
 
+    private class SharedrColumnInfo extends BaseColumnInfo {
+
+        public SharedrColumnInfo() {
+            super("Shared");
+        }
+
+        @Nullable
+        @Override
+        public String valueOf(JQLSearcher jqlSearcher) {
+            return jqlSearcher.isShared() ? "Yes" : "No";
+        }
+    }
 
 
 

@@ -26,6 +26,7 @@ public class JQLSearcherEditor {
     private final Project myProject;
     private final JQLSearcher mySearcher;
     private boolean mySelectedSearcher;
+    private boolean mySharedSearcher;
 
     private JBLabel myAliasLabel;
     private JBTextField myAliasField;
@@ -34,6 +35,7 @@ public class JQLSearcherEditor {
     private EditorTextField mySearchQueryField;
 
     private JCheckBox myDefaultSearcherCheckBox;
+    private JCheckBox mySharedSearcherCheckBox;
 
     private JPanel myPanel;
 
@@ -42,6 +44,7 @@ public class JQLSearcherEditor {
         this.myProject = project;
         this.mySearcher = searcher;
         this.mySelectedSearcher = selected;
+        this.mySharedSearcher = searcher.isShared();
 
         init();
     }
@@ -59,11 +62,16 @@ public class JQLSearcherEditor {
         this.myDefaultSearcherCheckBox.setBorder(JBUI.Borders.emptyRight(4));
         this.myDefaultSearcherCheckBox.setSelected(mySelectedSearcher);
 
+        this.mySharedSearcherCheckBox = new JCheckBox("Share");
+        this.mySharedSearcherCheckBox.setBorder(JBUI.Borders.emptyRight(4));
+        this.mySharedSearcherCheckBox.setSelected(mySharedSearcher);
+
 
         this.myPanel = FormBuilder.createFormBuilder()
                         .addLabeledComponent(this.myAliasLabel, this.myAliasField)
                         .addLabeledComponent(this.mySearchLabel, this.mySearchQueryField)
                         .addComponent(myDefaultSearcherCheckBox)
+                        .addComponent(mySharedSearcherCheckBox)
                         .getPanel();
 
     }
@@ -100,4 +108,7 @@ public class JQLSearcherEditor {
         return myDefaultSearcherCheckBox.isSelected();
     }
 
+    public boolean isSharedSearcher(){
+        return mySharedSearcherCheckBox.isSelected();
+    }
 }

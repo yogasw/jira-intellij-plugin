@@ -14,21 +14,23 @@ public class JQLSearcher {
 
     private String alias;
     private String jql;
+    @Attribute("shared")
+    private boolean shared;
 
     public JQLSearcher() {
         this.alias = "";
         this.jql = "";
     }
 
-    public JQLSearcher(@Nullable String alias, String jql) {
+    public JQLSearcher(@Nullable String alias, String jql, boolean shared) {
         setAlias(alias);
         setJql(jql);
+        setShared(shared);
     }
 
     public JQLSearcher(JQLSearcher other){
-        this(other.getAlias(), other.getJql());
+        this(other.getAlias(), other.getJql(), other.isShared());
     }
-
 
 
     @Attribute("alias")
@@ -49,7 +51,13 @@ public class JQLSearcher {
         this.jql = trim(jql);
     }
 
+    public boolean isShared() {
+        return shared;
+    }
 
+    public void setShared(boolean shared) {
+        this.shared = shared;
+    }
 
     @Override
     public String toString() {

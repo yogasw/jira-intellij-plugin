@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherProjectManager;
+import com.intellij.jira.components.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.rest.model.jql.JQLSearcherEditor;
 import com.intellij.jira.tasks.RefreshIssuesTask;
@@ -58,8 +58,9 @@ public class EditJQLSearcherDialog extends DialogWrapper {
     protected void doOKAction() {
         myEditor.apply();
         if(myApplyOkAction && nonNull(myProject)){
-            JQLSearcherProjectManager jqlManager = getJqlSearcherManager();
-            jqlManager.update(myOldSearcher.getAlias(), mySearcher, myEditor.isSelectedSearcher());
+            JQLSearcherManager jqlManager = getJqlSearcherManager();
+            mySearcher.setShared(myEditor.isSharedSearcher());
+            jqlManager.update(myProject, myOldSearcher.getAlias(), mySearcher, myEditor.isSelectedSearcher());
             if(myApplyOkAction){
                 new RefreshIssuesTask(myProject).queue();
             }
@@ -77,8 +78,8 @@ public class EditJQLSearcherDialog extends DialogWrapper {
     }
 
 
-    public JQLSearcherProjectManager getJqlSearcherManager(){
-        return myProject.getComponent(JQLSearcherProjectManager.class);
+    public JQLSearcherManager getJqlSearcherManager(){
+        return JQLSearcherManager.getInstance();
     }
 
 
@@ -90,4 +91,7 @@ public class EditJQLSearcherDialog extends DialogWrapper {
         return myEditor.isSelectedSearcher();
     }
 
+    public boolean isSharedSearcher(){
+        return myEditor.isSharedSearcher();
+    }
 }

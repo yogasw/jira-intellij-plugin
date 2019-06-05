@@ -30,6 +30,12 @@
         <component>
             <implementation-class>com.intellij.jira.components.JiraNotificationManager</implementation-class>
         </component>
+        <component>
+            <implementation-class>com.intellij.jira.components.JQLSearcherManager</implementation-class>
+        </component>
+        <component>
+            <implementation-class>com.intellij.jira.components.JQLSearcherApplicationManager</implementation-class>
+        </component>
     </application-components>
 
     <project-components>
