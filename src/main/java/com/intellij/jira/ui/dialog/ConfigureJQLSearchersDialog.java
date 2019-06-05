@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.components.JQLSearcherProjectManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.util.SimpleSelectableList;
@@ -29,7 +29,7 @@ import static com.intellij.openapi.ui.Messages.OK_BUTTON;
 public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
     private final Project myProject;
-    private final JQLSearcherManager myManager;
+    private final JQLSearcherProjectManager myManager;
 
     private SimpleSelectableList<JQLSearcher> mySearchers;
 
@@ -43,7 +43,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     public ConfigureJQLSearchersDialog(@NotNull Project project) {
         super(project, false);
         this.myProject = project;
-        this.myManager = project.getComponent(JQLSearcherManager.class);
+        this.myManager = project.getComponent(JQLSearcherProjectManager.class);
 
         init();
     }

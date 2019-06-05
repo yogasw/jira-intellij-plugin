@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.components.JQLSearcherProjectManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.rest.model.jql.JQLSearcherEditor;
 import com.intellij.jira.tasks.RefreshIssuesTask;
@@ -58,7 +58,7 @@ public class EditJQLSearcherDialog extends DialogWrapper {
     protected void doOKAction() {
         myEditor.apply();
         if(myApplyOkAction && nonNull(myProject)){
-            JQLSearcherManager jqlManager = getJqlSearcherManager();
+            JQLSearcherProjectManager jqlManager = getJqlSearcherManager();
             jqlManager.update(myOldSearcher.getAlias(), mySearcher, myEditor.isSelectedSearcher());
             if(myApplyOkAction){
                 new RefreshIssuesTask(myProject).queue();
@@ -77,8 +77,8 @@ public class EditJQLSearcherDialog extends DialogWrapper {
     }
 
 
-    public JQLSearcherManager getJqlSearcherManager(){
-        return myProject.getComponent(JQLSearcherManager.class);
+    public JQLSearcherProjectManager getJqlSearcherManager(){
+        return myProject.getComponent(JQLSearcherProjectManager.class);
     }
 
 

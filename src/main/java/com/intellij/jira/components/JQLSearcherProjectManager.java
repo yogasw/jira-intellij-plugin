@@ -18,8 +18,8 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-@State(name = "JQLSearcherManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
-public class JQLSearcherManager implements ProjectComponent, PersistentStateComponent<JQLSearcherManager.Config> {
+@State(name = "JQLSearcherProjectManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
+public class JQLSearcherProjectManager implements ProjectComponent, PersistentStateComponent<JQLSearcherProjectManager.Config> {
 
     private final static JQLSearcher DEFAULT_JQL = new JQLSearcher("Assigned to me", "assignee = currentUser()");
     private final Project myProject;
@@ -90,7 +90,7 @@ public class JQLSearcherManager implements ProjectComponent, PersistentStateComp
         notifyObservers();
     }
 
-    protected JQLSearcherManager(Project project) {
+    protected JQLSearcherProjectManager(Project project) {
         this.myProject = project;
         this.mySearchers.add(DEFAULT_JQL);
     }

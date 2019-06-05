@@ -5,7 +5,7 @@ import com.intellij.jira.actions.ConfigureJiraServersAction;
 import com.intellij.jira.actions.GoToIssuePopupAction;
 import com.intellij.jira.actions.JQLSearcherActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.components.JQLSearcherProjectManager;
 import com.intellij.jira.components.JiraActionManager;
 import com.intellij.jira.components.JiraIssueUpdater;
 import com.intellij.jira.events.JiraIssueEventListener;
@@ -179,7 +179,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
     }
 
     private String getDefaultJQLSearcher(){
-        return myProject.getComponent(JQLSearcherManager.class).getSelectedSearcher().getJql();
+        return myProject.getComponent(JQLSearcherProjectManager.class).getSelectedSearcher().getJql();
     }
 
 }

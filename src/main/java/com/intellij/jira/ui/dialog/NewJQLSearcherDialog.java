@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.components.JQLSearcherProjectManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public class NewJQLSearcherDialog extends EditJQLSearcherDialog {
     protected void doOKAction() {
         myEditor.apply();
         if(myApplyOkAction && nonNull(myProject)){
-            JQLSearcherManager jqlManager = getJqlSearcherManager();
+            JQLSearcherProjectManager jqlManager = getJqlSearcherManager();
             jqlManager.add(mySearcher, myEditor.isSelectedSearcher());
         }
 

@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.components.JQLSearcherProjectManager;
 import com.intellij.jira.components.JQLSearcherObserver;
 import com.intellij.jira.events.JQLSearcherEventListener;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
@@ -65,8 +65,8 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
     }
 
 
-    private JQLSearcherManager getJQLSearcherManager(){
-        return myProject.getComponent(JQLSearcherManager.class);
+    private JQLSearcherProjectManager getJQLSearcherManager(){
+        return myProject.getComponent(JQLSearcherProjectManager.class);
     }
 
     private JQLSearcherObserver getJQLSearcherObserver(){

@@ -1,7 +1,7 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.components.JQLSearcherProjectManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.dialog.EditJQLSearcherDialog;
@@ -22,7 +22,7 @@ public class EditJQLSearcherAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
         if(nonNull(project)){
-            JQLSearcher deafaultJQLSearcher = project.getComponent(JQLSearcherManager.class).getSelectedSearcher();
+            JQLSearcher deafaultJQLSearcher = project.getComponent(JQLSearcherProjectManager.class).getSelectedSearcher();
 
             EditJQLSearcherDialog dialog = new EditJQLSearcherDialog(project, deafaultJQLSearcher);
             dialog.show();
@@ -38,7 +38,7 @@ public class EditJQLSearcherAction extends AnAction {
         } else {
             JiraServerManager manager = project.getComponent(JiraServerManager.class);
             if(manager.hasJiraServerConfigured()){
-                if(project.getComponent(JQLSearcherManager.class).hasSelectedSearcher()){
+                if(project.getComponent(JQLSearcherProjectManager.class).hasSelectedSearcher()){
                     event.getPresentation().setEnabled(true);
                 }
                 else{
