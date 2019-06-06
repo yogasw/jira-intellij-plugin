@@ -14,9 +14,6 @@ import static java.util.Objects.isNull;
 
 public class JQLSearcherManager implements BaseComponent {
 
-    private SimpleSelectableList<JQLSearcher> mySearchers = new SimpleSelectableList<>();
-
-
     public static JQLSearcherManager getInstance(){
         return ApplicationManager.getApplication().getComponent(JQLSearcherManager.class);
     }
@@ -26,16 +23,16 @@ public class JQLSearcherManager implements BaseComponent {
     }
 
     public JQLSearcher getSelectedSearcher(Project project){
-        return getSimpleSelectableList(project).hasSelectedItem() ? getSimpleSelectableList(project).getSelectedItem() : null;
+        SimpleSelectableList<JQLSearcher> simpleSelectableList = getSimpleSelectableList(project);
+        return simpleSelectableList.hasSelectedItem() ? simpleSelectableList.getSelectedItem() : null;
     }
 
     public int getSelectedSearcherIndex(Project project){
         return getSimpleSelectableList(project).getSelectedItemIndex();
     }
 
-
-    public boolean hasSelectedSearcher(){
-        return mySearchers.hasSelectedItem();
+    public boolean hasSelectedSearcher(Project project){
+        return getSimpleSelectableList(project).hasSelectedItem();
     }
 
     public void setSearchers(Project project, SimpleSelectableList<JQLSearcher> searcherList) {
@@ -46,6 +43,7 @@ public class JQLSearcherManager implements BaseComponent {
     public void add(Project project, JQLSearcher searcher, boolean selected){
         SimpleSelectableList<JQLSearcher> simpleSelectableList = getSimpleSelectableList(project);
         simpleSelectableList.add(searcher, selected);
+
         updateProjectSearchers(project, simpleSelectableList);
         updateApplicationSearchers(simpleSelectableList);
     }
@@ -58,6 +56,7 @@ public class JQLSearcherManager implements BaseComponent {
 
         SimpleSelectableList<JQLSearcher> simpleSelectableList = getSimpleSelectableList(project);
         simpleSelectableList.update(simpleSelectableList.getItems().indexOf(oldSearcher), updatedSearcher, selected);
+
         updateProjectSearchers(project, simpleSelectableList);
         updateApplicationSearchers(simpleSelectableList);
     }

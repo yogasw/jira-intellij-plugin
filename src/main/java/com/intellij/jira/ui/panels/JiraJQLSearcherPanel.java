@@ -44,7 +44,7 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
         }
 
         myComboBox = new ComboBox(myComboBoxItems, 300);
-        if(getJQLSearcherManager().hasSelectedSearcher()){
+        if(getJQLSearcherManager().hasSelectedSearcher(myProject)){
             myComboBox.setSelectedIndex(getJQLSearcherManager().getSelectedSearcherIndex(myProject));
         }
 
