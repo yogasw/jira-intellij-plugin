@@ -8,19 +8,37 @@ import java.util.Collections;
 import java.util.List;
 
 public class SimpleSelectableList<E>{
-    private final static int UNSELECTED = -1;
-    private final static Integer MIN_SELECTED = 0;
-    private final static Integer MAX_SELECTED = Integer.MAX_VALUE;
+    private static final int UNSELECTED = -1;
+    private static final Integer MIN_SELECTED = 0;
+    private static final Integer MAX_SELECTED = Integer.MAX_VALUE;
 
     private List<E> items;
     private int selectedItem;
 
     public SimpleSelectableList() {
-        super();
-        this.items = new ArrayList<>();
-        this.selectedItem = UNSELECTED;
+        this(new ArrayList<>(), UNSELECTED);
     }
 
+    private SimpleSelectableList(List<E> items){
+        this(items, MIN_SELECTED);
+    }
+
+    private SimpleSelectableList(List<E> items, int selectedItem){
+        this.items = items;
+        selectItem(selectedItem);
+    }
+
+    public static <E> SimpleSelectableList<E> empty(){
+        return new SimpleSelectableList<>();
+    }
+
+    public static <E> SimpleSelectableList<E> of(List<E> items){
+        return new SimpleSelectableList<>(items);
+    }
+
+    public static <E> SimpleSelectableList<E> of(List<E> items, int selectedItem){
+        return new SimpleSelectableList<>(items, selectedItem);
+    }
 
     public boolean add(E item){
         if(items.isEmpty()){
@@ -53,8 +71,8 @@ public class SimpleSelectableList<E>{
 
     public void update(int index, E item, boolean selected){
         if(index >= MIN_SELECTED && index <= getLastSelectableItemIndex()){
-            items.remove(index);
-            items.add(index, item);
+            this.items.remove(index);
+            this.items.add(index, item);
             updateSelectedItem(index, selected);
         }
 
@@ -65,11 +83,11 @@ public class SimpleSelectableList<E>{
     }
 
     public E remove(int index){
-        if(index < 0 || index > items.size()){
+        if(index < 0 || index > getLastSelectableItemIndex()){
             return null;
         }
 
-        E element = items.remove(index);
+        E element = this.items.remove(index);
         if(this.selectedItem > getLastSelectableItemIndex()){
             selectItem(getSelectedItemIndex() - 1);
         }
@@ -77,7 +95,6 @@ public class SimpleSelectableList<E>{
         if(index < this.selectedItem){
             selectItem(index);
         }
-
 
         return element;
     }
@@ -124,8 +141,10 @@ public class SimpleSelectableList<E>{
     }
 
     public void selectItem(int selectedItem) {
-        if(selectedItem < MIN_SELECTED || selectedItem > MAX_SELECTED){
+        if(selectedItem < MIN_SELECTED ){
             this.selectedItem = UNSELECTED;
+        }else if(selectedItem > getLastSelectableItemIndex()){
+            this.selectedItem = getLastSelectableItemIndex();
         }else{
             this.selectedItem = selectedItem;
         }
@@ -136,11 +155,11 @@ public class SimpleSelectableList<E>{
     }
 
     public boolean hasSelectedItem(){
-        return getSelectedItemIndex() != UNSELECTED;
+        return selectedItem > UNSELECTED && selectedItem < this.items.size();
     }
 
     private int getLastSelectableItemIndex(){
-        return items.isEmpty() ? UNSELECTED : items.size() - 1;
+        return isEmpty() ? UNSELECTED : items.size() - 1;
     }
 
     private void unselectItem(int index){
