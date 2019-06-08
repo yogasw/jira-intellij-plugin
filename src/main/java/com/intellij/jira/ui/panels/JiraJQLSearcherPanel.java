@@ -22,6 +22,7 @@ import static java.util.Objects.nonNull;
 public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventListener {
 
     private final Project myProject;
+    private final JQLSearcherManager myManager;
 
     private ComboBox<JQLSearcher> myComboBox;
     private CollectionComboBoxModel<JQLSearcher> myComboBoxItems;
@@ -29,6 +30,7 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
     public JiraJQLSearcherPanel(@NotNull Project project) {
         super(new BorderLayout());
         this.myProject = project;
+        this.myManager = JQLSearcherManager.getInstance();
 
         init();
         installListeners();
@@ -38,14 +40,14 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
         setBorder(JBUI.Borders.empty(2, 4));
 
         myComboBoxItems = new CollectionComboBoxModel(new ArrayList());
-        for(JQLSearcher searcher : getJQLSearcherManager().getSearchers(myProject)){
+        for(JQLSearcher searcher : myManager.getSearchers(myProject)){
             JQLSearcher clone = searcher.clone();
             myComboBoxItems.add(clone);
         }
 
         myComboBox = new ComboBox(myComboBoxItems, 300);
-        if(getJQLSearcherManager().hasSelectedSearcher(myProject)){
-            myComboBox.setSelectedIndex(getJQLSearcherManager().getSelectedSearcherIndex(myProject));
+        if(myManager.hasSelectedSearcher(myProject)){
+            myComboBox.setSelectedIndex(myManager.getSelectedSearcherIndex(myProject));
         }
 
         add(myComboBox, BorderLayout.WEST);
@@ -55,18 +57,13 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
         this.myComboBox.addActionListener(e -> {
             JQLSearcher selectedItem = (JQLSearcher) this.myComboBox.getSelectedItem();
             if(nonNull(selectedItem)){
-                getJQLSearcherManager().update(myProject, selectedItem.getAlias(), selectedItem, true);
+                myManager.update(myProject, selectedItem.getAlias(), selectedItem, true);
                 SwingUtilities.invokeLater(() -> new RefreshIssuesTask(myProject).queue());
             }
         });
 
         getJQLSearcherObserver().addListener(this);
 
-    }
-
-
-    private JQLSearcherManager getJQLSearcherManager(){
-        return JQLSearcherManager.getInstance();
     }
 
     private JQLSearcherObserver getJQLSearcherObserver(){
@@ -79,11 +76,11 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
 
         if(!searchers.isEmpty()){
             myComboBoxItems.add(searchers);
-            if(myComboBox.getSelectedIndex() != getJQLSearcherManager().getSelectedSearcherIndex(myProject)){
-                myComboBox.setSelectedIndex(getJQLSearcherManager().getSelectedSearcherIndex(myProject));
+            int selectedSearcherIndex = myManager.getSelectedSearcherIndex(myProject);
+            if(myComboBox.getSelectedIndex() != selectedSearcherIndex){
+                myComboBox.setSelectedIndex(selectedSearcherIndex);
             }
-        }
-        else {
+        } else {
             myComboBoxItems.setSelectedItem(null);
         }
 

@@ -39,8 +39,10 @@ import static java.util.Objects.nonNull;
 
 public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueEventListener {
 
-    private JiraRestApi myJiraRestApi;
-    private Project myProject;
+    private final JiraRestApi myJiraRestApi;
+    private final Project myProject;
+    private final JQLSearcherManager myManager;
+
     private JiraIssueTableView issueTable;
     private JiraIssueDetailsPanel issueDetailsPanel;
 
@@ -48,6 +50,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
         super(false, true);
         this.myJiraRestApi = server;
         this.myProject = project;
+        this.myManager = JQLSearcherManager.getInstance();
         init();
     }
 
@@ -179,7 +182,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
     }
 
     private String getDefaultJQLSearcher(){
-        return JQLSearcherManager.getInstance().getSelectedSearcher(myProject).getJql();
+        return myManager.getSelectedSearcher(myProject).getJql();
     }
 
 }

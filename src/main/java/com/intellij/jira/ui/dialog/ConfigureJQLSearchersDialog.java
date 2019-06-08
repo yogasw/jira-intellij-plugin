@@ -52,7 +52,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
     @Override
     protected void init() {
-        mySearchers = new SimpleSelectableList<>();
+        mySearchers = SimpleSelectableList.empty();
 
         myModel = new ListTableModel(new ColumnInfo[]{ALIAS_COLUMN, JQL_COLUMN, SHARED_COLUMN}, new ArrayList());
         for(JQLSearcher searcher : myManager.getSearchers(myProject)){
@@ -201,7 +201,5 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
             return jqlSearcher.isShared() ? "Yes" : "No";
         }
     }
-
-
 
 }

@@ -5,6 +5,7 @@ import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.BaseComponent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -36,16 +37,16 @@ public class JQLSearcherManager implements BaseComponent {
     }
 
     public void setSearchers(Project project, SimpleSelectableList<JQLSearcher> searcherList) {
-        updateProjectSearchers(project, searcherList);
         updateApplicationSearchers(searcherList);
+        updateProjectSearchers(project, searcherList);
     }
 
     public void add(Project project, JQLSearcher searcher, boolean selected){
         SimpleSelectableList<JQLSearcher> simpleSelectableList = getSimpleSelectableList(project);
         simpleSelectableList.add(searcher, selected);
 
-        updateProjectSearchers(project, simpleSelectableList);
         updateApplicationSearchers(simpleSelectableList);
+        updateProjectSearchers(project, simpleSelectableList);
     }
 
     public void update(Project project, String oldAliasSearcher, JQLSearcher updatedSearcher, boolean selected){
@@ -57,8 +58,8 @@ public class JQLSearcherManager implements BaseComponent {
         SimpleSelectableList<JQLSearcher> simpleSelectableList = getSimpleSelectableList(project);
         simpleSelectableList.update(simpleSelectableList.getItems().indexOf(oldSearcher), updatedSearcher, selected);
 
-        updateProjectSearchers(project, simpleSelectableList);
         updateApplicationSearchers(simpleSelectableList);
+        updateProjectSearchers(project, simpleSelectableList);
     }
 
     @Nullable
@@ -71,7 +72,11 @@ public class JQLSearcherManager implements BaseComponent {
     private void updateProjectSearchers(Project project, SimpleSelectableList<JQLSearcher> searcherList){
         List<JQLSearcher> projectSearchers = searcherList.getItems().stream().filter(searcher -> !searcher.isShared()).collect(Collectors.toList());
         getJqlSearcherProjectManager(project).setSearchers(projectSearchers, searcherList.getSelectedItemIndex());
-        getJqlSearcherProjectManager(project).notifyObservers(searcherList.getItems());
+
+        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        for(Project p : openProjects){
+            getJqlSearcherProjectManager(p).notifyObservers(getSimpleSelectableList(p).getItems());
+        }
     }
 
     private void updateApplicationSearchers(SimpleSelectableList<JQLSearcher> searcherList){
@@ -88,10 +93,13 @@ public class JQLSearcherManager implements BaseComponent {
     }
 
     private SimpleSelectableList<JQLSearcher> getSimpleSelectableList(Project project){
-        SimpleSelectableList<JQLSearcher> selectableList = new SimpleSelectableList<>();
-        selectableList.addAll(getJqlSearcherApplicationManager().getSearchers());
-        selectableList.addAll(getJqlSearcherProjectManager(project).getSearchers());
-        selectableList.selectItem(getJqlSearcherProjectManager(project).getSelectedSearcherIndex());
+        SimpleSelectableList<JQLSearcher> selectableList = SimpleSelectableList.of(getJqlSearcherApplicationManager().getSearchers());
+
+        JQLSearcherProjectManager jqlSearcherProjectManager = getJqlSearcherProjectManager(project);
+        selectableList.addAll(jqlSearcherProjectManager.getSearchers());
+        if(jqlSearcherProjectManager.hasSelectedSearcher()){
+            selectableList.selectItem(jqlSearcherProjectManager.getSelectedSearcherIndex());
+        }
 
         return selectableList;
     }

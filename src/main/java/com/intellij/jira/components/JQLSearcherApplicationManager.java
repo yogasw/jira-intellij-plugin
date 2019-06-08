@@ -27,10 +27,6 @@ public class JQLSearcherApplicationManager implements BaseComponent, PersistentS
     private List<JQLSearcher> applicationSearchers = new ArrayList<>();
     private Config myConfig = new Config();
 
-    public JQLSearcherApplicationManager() {
-        this.applicationSearchers.add(DEFAULT_JQL);
-    }
-
     @Nullable
     @Override
     public Config getState() {
@@ -46,8 +42,12 @@ public class JQLSearcherApplicationManager implements BaseComponent, PersistentS
         Element element = config.searchers;
         List<JQLSearcher> searchers = loadSearchers(element);
         applicationSearchers.addAll(searchers);
-    }
 
+        if(applicationSearchers.isEmpty()){
+            applicationSearchers.add(DEFAULT_JQL);
+        }
+
+    }
 
     private List<JQLSearcher> loadSearchers(Element element) {
         List<JQLSearcher> searchers = new ArrayList<>();
@@ -81,11 +81,9 @@ public class JQLSearcherApplicationManager implements BaseComponent, PersistentS
         return ApplicationManager.getApplication().getComponent(JQLSearcherApplicationManager.class);
     }
 
-
     public static class Config{
         @Tag("searchers")
         public Element searchers;
     }
-
 
 }

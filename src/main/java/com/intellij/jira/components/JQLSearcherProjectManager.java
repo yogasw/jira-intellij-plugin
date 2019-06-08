@@ -10,6 +10,8 @@ import com.intellij.util.xmlb.annotations.Tag;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +21,11 @@ import static java.util.Objects.nonNull;
 @State(name = "JQLSearcherProjectManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
 public class JQLSearcherProjectManager implements ProjectComponent, PersistentStateComponent<JQLSearcherProjectManager.Config> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JQLSearcherProjectManager.class);
     private final Project myProject;
 
     private List<JQLSearcher> projectSearchers = new ArrayList<>();
-    private int mySelectedSearcher = 0;
+    private int mySelectedSearcher = -1;
 
     private Config myConfig = new Config();
 
@@ -58,7 +61,7 @@ public class JQLSearcherProjectManager implements ProjectComponent, PersistentSt
                     JQLSearcher searcher = XmlSerializer.deserialize(o, JQLSearcher.class);
                     searchers.add(searcher);
                 }catch (XmlSerializationException e) {
-                    //LOG.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         }
@@ -86,7 +89,6 @@ public class JQLSearcherProjectManager implements ProjectComponent, PersistentSt
     public void setSearchers(List<JQLSearcher> searcherList, int selected) {
         this.projectSearchers = searcherList;
         this.mySelectedSearcher = selected;
-        notifyObservers(searcherList);
     }
 
     public void notifyObservers(List<JQLSearcher> searchers){
