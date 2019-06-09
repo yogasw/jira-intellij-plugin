@@ -22,7 +22,7 @@ import static java.util.Objects.nonNull;
 public class JQLSearcherApplicationManager implements BaseComponent, PersistentStateComponent<JQLSearcherApplicationManager.Config> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JQLSearcherApplicationManager.class);
-    private static final JQLSearcher DEFAULT_JQL = new JQLSearcher("Assigned to me", "assignee = currentUser()", true);
+    public static final JQLSearcher DEFAULT_JQL = new JQLSearcher("Assigned to me", "assignee = currentUser()", true);
 
     private List<JQLSearcher> applicationSearchers = new ArrayList<>();
     private Config myConfig = new Config();
@@ -66,12 +66,22 @@ public class JQLSearcherApplicationManager implements BaseComponent, PersistentS
     }
 
     public List<JQLSearcher> getSearchers() {
-        return applicationSearchers;
+        return new ArrayList<>(applicationSearchers);
     }
 
     public void setSearchers(List<JQLSearcher> applicationSearchers) {
-        this.applicationSearchers = applicationSearchers;
+        this.applicationSearchers.clear();
+        for (JQLSearcher searcher : applicationSearchers){
+            add(searcher);
+        }
     }
+
+    private void add(JQLSearcher searcher){
+        if(searcher.isShared() && !applicationSearchers.contains(searcher)){
+            this.applicationSearchers.add(searcher);
+        }
+    }
+
 
     private JQLSearcher[] getSearchersAsArray(){
         return getSearchers().toArray(new JQLSearcher[0]);

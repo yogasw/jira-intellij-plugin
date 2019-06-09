@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.intellij.jira.components.JQLSearcherApplicationManager.DEFAULT_JQL;
 import static java.util.Objects.isNull;
 
 public class JQLSearcherManager implements BaseComponent {
@@ -25,7 +26,7 @@ public class JQLSearcherManager implements BaseComponent {
 
     public JQLSearcher getSelectedSearcher(Project project){
         SimpleSelectableList<JQLSearcher> simpleSelectableList = getSimpleSelectableList(project);
-        return simpleSelectableList.hasSelectedItem() ? simpleSelectableList.getSelectedItem() : null;
+        return simpleSelectableList.hasSelectedItem() ? simpleSelectableList.getSelectedItem() : DEFAULT_JQL;
     }
 
     public int getSelectedSearcherIndex(Project project){
@@ -72,10 +73,15 @@ public class JQLSearcherManager implements BaseComponent {
     private void updateProjectSearchers(Project project, SimpleSelectableList<JQLSearcher> searcherList){
         List<JQLSearcher> projectSearchers = searcherList.getItems().stream().filter(searcher -> !searcher.isShared()).collect(Collectors.toList());
         getJqlSearcherProjectManager(project).setSearchers(projectSearchers, searcherList.getSelectedItemIndex());
+        // Notify current project
+        getJqlSearcherProjectManager(project).notifyObservers(searcherList.getItems());
 
+        // Notify other projects
         Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
         for(Project p : openProjects){
-            getJqlSearcherProjectManager(p).notifyObservers(getSimpleSelectableList(p).getItems());
+            if(!p.equals(project)){
+                getJqlSearcherProjectManager(p).notifyObservers(getSimpleSelectableList(p).getItems());
+            }
         }
     }
 

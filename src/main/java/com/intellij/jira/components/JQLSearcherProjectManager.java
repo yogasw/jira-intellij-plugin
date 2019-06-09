@@ -71,7 +71,7 @@ public class JQLSearcherProjectManager implements ProjectComponent, PersistentSt
 
 
     public List<JQLSearcher> getSearchers() {
-        return projectSearchers;
+        return new ArrayList<>(projectSearchers);
     }
 
     public int getSelectedSearcherIndex(){
@@ -87,8 +87,17 @@ public class JQLSearcherProjectManager implements ProjectComponent, PersistentSt
     }
 
     public void setSearchers(List<JQLSearcher> searcherList, int selected) {
-        this.projectSearchers = searcherList;
+        this.projectSearchers.clear();
+        for (JQLSearcher searcher : searcherList){
+            add(searcher);
+        }
         this.mySelectedSearcher = selected;
+    }
+
+    private void add(JQLSearcher searcher){
+        if(!searcher.isShared() && !projectSearchers.contains(searcher)){
+            projectSearchers.add(searcher);
+        }
     }
 
     public void notifyObservers(List<JQLSearcher> searchers){
