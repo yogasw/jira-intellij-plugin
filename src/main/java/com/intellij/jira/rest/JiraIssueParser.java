@@ -8,6 +8,7 @@ import com.intellij.tasks.jira.JiraRepository;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class JiraIssueParser {
@@ -74,6 +75,10 @@ public class JiraIssueParser {
 
     public static List<String> parseRoles(String response){
         return new ArrayList<>(JiraRepository.GSON.fromJson(response, JsonObject.class).keySet());
+    }
+
+    public static LinkedHashMap<String, JiraPermission> parsePermissions(String response){
+        return JiraRepository.GSON.fromJson(response, JiraPermissionsWrapper.class).getPermissions();
     }
 
 }

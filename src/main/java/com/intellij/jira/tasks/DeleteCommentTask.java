@@ -9,7 +9,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-import static com.intellij.jira.rest.model.JiraPermission.COMMENT_DELETE_OWN;
+import static com.intellij.jira.rest.model.JiraPermissionType.DELETE_OWN_COMMENTS;
 
 public class DeleteCommentTask extends AbstractBackgroundableTask {
     private String issueKey;
@@ -25,7 +25,7 @@ public class DeleteCommentTask extends AbstractBackgroundableTask {
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
         // Check user permissions
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, COMMENT_DELETE_OWN);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, DELETE_OWN_COMMENTS);
         if(!hasPermission){
             throw new InvalidPermissionException("Jira", "You don't have permission to delete a comment");
         }

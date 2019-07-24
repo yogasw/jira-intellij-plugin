@@ -10,6 +10,7 @@ import org.apache.commons.httpclient.methods.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -140,11 +141,11 @@ public class JiraRestClient {
     }
 
 
-    public List<JiraIssueUser> findUsersWithPermissionOnIssue(String issueKey, JiraPermission permission) throws Exception {
-        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("user", "permission", SEARCH));
-        method.setQueryString(new NameValuePair[]{new NameValuePair("issueKey", issueKey), new NameValuePair("username", jiraRepository.getUsername()), new NameValuePair("permissions", permission.toString())});
+    public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey) throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("mypermissions"));
+        method.setQueryString(new NameValuePair[]{new NameValuePair("issueKey", issueKey)});
         String response = jiraRepository.executeMethod(method);
-        return parseUsers(response);
+        return parsePermissions(response);
     }
 
 

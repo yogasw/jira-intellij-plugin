@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.intellij.jira.rest.model.JiraPermission.LINK_ISSUE;
+import static com.intellij.jira.rest.model.JiraPermissionType.LINK_ISSUES;
 
 public class AddIssueLinkTask extends AbstractBackgroundableTask {
 
@@ -33,7 +33,7 @@ public class AddIssueLinkTask extends AbstractBackgroundableTask {
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
         // Check if user has permission to create links
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, LINK_ISSUE);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, LINK_ISSUES);
         if(!hasPermission){
             throw new InvalidPermissionException("Jira", "You don't have permission to create issue links");
         }

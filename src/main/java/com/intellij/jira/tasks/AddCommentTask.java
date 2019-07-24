@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.intellij.jira.rest.model.JiraPermission.COMMENT_ISSUE;
+import static com.intellij.jira.rest.model.JiraPermissionType.ADD_COMMENTS;
 
 public class AddCommentTask extends AbstractBackgroundableTask {
 
@@ -29,7 +29,7 @@ public class AddCommentTask extends AbstractBackgroundableTask {
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
         // Check user permissions
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, COMMENT_ISSUE);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, ADD_COMMENTS);
         if(!hasPermission){
             throw new InvalidPermissionException("Jira", "You don't have permission to add a comment");
         }

@@ -9,7 +9,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-import static com.intellij.jira.rest.model.JiraPermission.LINK_ISSUE;
+import static com.intellij.jira.rest.model.JiraPermissionType.LINK_ISSUES;
 
 public class DeleteIssueLinkTask extends AbstractBackgroundableTask{
     private String issueKey;
@@ -25,7 +25,7 @@ public class DeleteIssueLinkTask extends AbstractBackgroundableTask{
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
         // Check user permissions
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, LINK_ISSUE);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, LINK_ISSUES);
         if(!hasPermission){
             throw new InvalidPermissionException("Jira", "You don't have permission to delete an issue link");
         }

@@ -10,9 +10,7 @@ import com.intellij.tasks.jira.JiraRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JiraRestApi {
 
@@ -139,15 +137,20 @@ public class JiraRestApi {
 
     }
 
-    public boolean userHasPermissionOnIssue(String issueKey, JiraPermission permission){
-        List<JiraIssueUser> users = new ArrayList<>();
+    public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType permission){
+        LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
         try {
-            users = jiraRestClient.findUsersWithPermissionOnIssue(issueKey, permission);
+            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey);
         } catch (Exception e) {
             log.error("Current user has not permission to do this action");
         }
 
-        return !users.isEmpty();
+        JiraPermission jiraPermission = permissions.get(permission.toString());
+        if(Objects.isNull(jiraPermission)){
+            jiraPermission = permissions.get(permission.getOldPermission());
+        }
+
+        return Objects.isNull(jiraPermission) ? false : jiraPermission.isHavePermission();
     }
 
 
