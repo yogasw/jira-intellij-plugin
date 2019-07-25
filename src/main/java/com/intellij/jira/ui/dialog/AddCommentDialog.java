@@ -102,6 +102,7 @@ public class AddCommentDialog extends DialogWrapper {
         if(nonNull(project)){
             new AddCommentTask(project, issueKey, escapeComment(), (String) myComboBox.getSelectedItem()).queue();
         }
+
         close(0);
     }
 
@@ -109,11 +110,8 @@ public class AddCommentDialog extends DialogWrapper {
 
     }
 
-
     private String escapeComment(){
-        return commentArea.getText().replace("\n", "\\r\\n");
+        return commentArea.getText().replaceAll("\r\n", "\\\\n");
     }
-
-
 
 }
