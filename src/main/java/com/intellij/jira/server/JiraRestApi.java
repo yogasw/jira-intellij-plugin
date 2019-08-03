@@ -231,4 +231,8 @@ public class JiraRestApi {
         }
     }
 
+    public String getUsername(){
+        return jiraRestClient.getUsername();
+    }
+
 }

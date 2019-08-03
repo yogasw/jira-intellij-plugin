@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class JiraIssueUtil {
@@ -58,6 +59,10 @@ public class JiraIssueUtil {
     }
 
     public static String getPrettyBody(String body){
+        if(isNull(body)){
+            return "";
+        }
+
         Matcher m = BODY_NAME_PATTERN.matcher(body);
         if(m.find()){
             body = body.replace(m.group(1), m.group(2));

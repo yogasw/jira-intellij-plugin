@@ -60,7 +60,6 @@ public class JiraRestClient {
         return parseIssueTransitions(response);
     }
 
-
     public String transitIssue(String issueId, String transitionId, Map<String, FieldEditorInfo> fields) throws Exception {
         String requestBody = getTransitionRequestBody(transitionId, fields);
         PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueId, TRANSITIONS));
@@ -126,7 +125,6 @@ public class JiraRestClient {
         return method;
     }
 
-
     private static RequestEntity createJsonEntity(String requestBody) {
         try {
             return new StringRequestEntity(requestBody, "application/json", "UTF-8");
@@ -134,7 +132,6 @@ public class JiraRestClient {
             throw new AssertionError("UTF-8 encoding is not supported");
         }
     }
-
 
     public String deleteCommentToIssue(String issueKey, String commentId) throws Exception {
         DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "comment", commentId));
@@ -154,14 +151,12 @@ public class JiraRestClient {
         return jiraRepository.executeMethod(method);
     }
 
-
     public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("mypermissions"));
         method.setQueryString(new NameValuePair[]{new NameValuePair("issueKey", issueKey)});
         String response = jiraRepository.executeMethod(method);
         return parsePermissions(response);
     }
-
 
     public List<JiraIssueLinkType> getIssueLinkTypes() throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("issueLinkType"));
@@ -174,8 +169,6 @@ public class JiraRestClient {
         String response = jiraRepository.executeMethod(method);
         return parseGroups(response);
     }
-
-
 
     private String getTransitionRequestBody(String transitionId, Map<String, FieldEditorInfo> fields) {
         JsonObject transition = new JsonObject();
@@ -269,6 +262,10 @@ public class JiraRestClient {
         DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl("issueLink", issueLinkId));
         jiraRepository.executeMethod(method);
         return method.getStatusCode();
+    }
+
+    public String getUsername(){
+        return this.jiraRepository.getUsername();
     }
 
 }

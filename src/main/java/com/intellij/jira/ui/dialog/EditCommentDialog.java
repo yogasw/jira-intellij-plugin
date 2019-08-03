@@ -36,7 +36,6 @@ public class EditCommentDialog extends DialogWrapper {
     protected List<String> projectRoles;
 
     protected ComboBox<String> myComboBox;
-    private CollectionComboBoxModel<String> myComboBoxItems;
     protected JTextArea commentArea;
 
     private JiraIssueComment comment;
@@ -66,7 +65,7 @@ public class EditCommentDialog extends DialogWrapper {
 
         projectRoles.add(0, ALL_USERS);
 
-        myComboBoxItems = new CollectionComboBoxModel(projectRoles);
+        CollectionComboBoxModel<String> myComboBoxItems = new CollectionComboBoxModel(projectRoles);
         myComboBox = new ComboBox(myComboBoxItems);
 
         JiraIssueComment.Visibility visibility = comment.getVisibility();

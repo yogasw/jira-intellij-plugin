@@ -1,9 +1,12 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.components.JiraNotificationManager;
+import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.dialog.AddCommentDialog;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 
@@ -36,9 +39,16 @@ public class AddCommentDialogAction extends JiraIssueAction{
             return;
         }
 
+        boolean userHasPermission = jiraServer.userHasPermissionOnIssue(issueKey, JiraPermissionType.ADD_COMMENTS);
+        if(!userHasPermission){
+            Notifications.Bus.notify(JiraNotificationManager.getInstance().createNotificationError("Add comment failed", "You don't have permission to add comments."));
+            return;
+        }
+
         List<String> projectRoles = jiraServer.getProjectRoles(projectKey);
 
         AddCommentDialog commentDialog = new AddCommentDialog(project, issueKey, projectRoles);
         commentDialog.show();
     }
+
 }
