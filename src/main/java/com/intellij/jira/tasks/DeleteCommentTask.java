@@ -30,7 +30,7 @@ public class DeleteCommentTask extends AbstractBackgroundableTask {
             throw new InvalidPermissionException("Jira", "You don't have permission to delete a comment");
         }
 
-        Result result = jiraRestApi.deleteCommentToIssue(issueKey, commentId);
+        Result result = jiraRestApi.deleteIssueComment(issueKey, commentId);
         if(!result.isValid()) {
             throw new InvalidResultException("Error", "Issue comment has not been deleted");
         }

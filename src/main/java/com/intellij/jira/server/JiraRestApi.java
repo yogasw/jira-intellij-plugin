@@ -7,6 +7,7 @@ import com.intellij.jira.util.BodyResult;
 import com.intellij.jira.util.EmptyResult;
 import com.intellij.jira.util.Result;
 import com.intellij.tasks.jira.JiraRepository;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +95,19 @@ public class JiraRestApi {
         }
     }
 
+    @Nullable
+    public JiraIssueComment getComment(String issueKey, String commentId) {
+        JiraIssueComment comment = null;
+        try {
+            comment = jiraRestClient.getComment(issueKey, commentId);
+        } catch (Exception e) {
+            log.error(String.format("Comment with id = %s doesn't exists", commentId));
+        }
 
-    public Result addCommentToIssue(String body, String issueKey, String viewableBy){
+        return comment;
+    }
+
+    public Result addIssueComment(String body, String issueKey, String viewableBy){
         try {
             JiraIssueComment comment = jiraRestClient.addCommentToIssue(body, issueKey, viewableBy);
             return BodyResult.ok(comment);
@@ -105,8 +117,18 @@ public class JiraRestApi {
         }
     }
 
+    public Result editIssueComment(String issueKey, String commentId, String body, String viewableBy){
+        try {
+            JiraIssueComment comment = jiraRestClient.editIssueComment(issueKey, commentId, body, viewableBy);
+            return BodyResult.ok(comment);
+        } catch (Exception e) {
+            log.error(String.format("Error editing comment in issue '%s'", issueKey));
+            return BodyResult.error();
+        }
+    }
 
-    public Result deleteCommentToIssue(String issueKey, String commentId) {
+
+    public Result deleteIssueComment(String issueKey, String commentId) {
         try {
             String response = jiraRestClient.deleteCommentToIssue(issueKey, commentId);
             return EmptyResult.create(response);
@@ -208,4 +230,5 @@ public class JiraRestApi {
             return BodyResult.error();
         }
     }
+
 }

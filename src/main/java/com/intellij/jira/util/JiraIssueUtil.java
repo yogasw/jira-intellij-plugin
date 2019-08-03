@@ -8,11 +8,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.nonNull;
 
 public class JiraIssueUtil {
 
+    private static final Pattern BODY_NAME_PATTERN = Pattern.compile("(\\[~(\\w+)])");
 
     public static String getKey(@NotNull JiraIssue jiraIssue) {
         return jiraIssue.getKey();
@@ -54,10 +57,21 @@ public class JiraIssueUtil {
         return getPrettyDateTime(comment.getCreated());
     }
 
+    public static String getPrettyBody(String body){
+        Matcher m = BODY_NAME_PATTERN.matcher(body);
+        if(m.find()){
+            body = body.replace(m.group(1), m.group(2));
+        }
+
+        return body;
+    }
+
+    public static String escapeComment(String body){
+        return body.replaceAll("\r\n", "\\\\n");
+    }
 
     private static String getPrettyDateTime(Date date){
         return DateFormatUtil.formatPrettyDateTime(date);
     }
-
 
 }

@@ -26,6 +26,7 @@ public class JiraRestClient {
     private static final String ISSUE = "issue";
     private static final String TRANSITIONS = "transitions";
     private static final String SEARCH = "search";
+    private static final String COMMENT = "comment";
 
     private JiraRepository jiraRepository;
 
@@ -96,10 +97,23 @@ public class JiraRestClient {
         return jiraRepository.executeMethod(method);
     }
 
+    public JiraIssueComment getComment(String issueKey, String commentId) throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, COMMENT, commentId));
+        String response = jiraRepository.executeMethod(method);
+        return parseIssueComment(response);
+    }
 
     public JiraIssueComment addCommentToIssue(String body, String issueKey, String viewableBy) throws Exception {
         String requestBody = prepareCommentBody(body, viewableBy);
-        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "comment"));
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, COMMENT));
+        method.setRequestEntity(createJsonEntity(requestBody));
+        String response = jiraRepository.executeMethod(method);
+        return parseIssueComment(response);
+    }
+
+    public JiraIssueComment editIssueComment(String issueKey, String commentId, String body, String viewableBy) throws Exception {
+        String requestBody = prepareCommentBody(body, viewableBy);
+        PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, COMMENT, commentId));
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
         return parseIssueComment(response);
@@ -256,5 +270,6 @@ public class JiraRestClient {
         jiraRepository.executeMethod(method);
         return method.getStatusCode();
     }
+
 }
 

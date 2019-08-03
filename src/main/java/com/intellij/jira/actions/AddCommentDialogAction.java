@@ -14,13 +14,13 @@ import static java.util.Objects.isNull;
 public class AddCommentDialogAction extends JiraIssueAction{
     private static final ActionProperties properties = ActionProperties.of("Add a comment",  AllIcons.General.Add);
 
-    private String issueKey;
     private String projectKey;
+    private String issueKey;
 
-    public AddCommentDialogAction(String issueKey, String projectKey) {
+    public AddCommentDialogAction(String projectKey, String issueKey) {
         super(properties);
-        this.issueKey = issueKey;
         this.projectKey = projectKey;
+        this.issueKey = issueKey;
     }
 
     @Override

@@ -10,17 +10,19 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.intellij.jira.rest.model.JiraPermissionType.ADD_COMMENTS;
+import static com.intellij.jira.rest.model.JiraPermissionType.EDIT_OWN_COMMENTS;
 
-public class AddCommentTask extends AbstractBackgroundableTask {
+public class EditCommentTask extends AbstractBackgroundableTask {
 
     private String issueKey;
+    private String commentId;
     private String body;
     private String viewableBy;
 
-    public AddCommentTask(@Nullable Project project, String issueKey, String body, String viewableBy) {
-        super(project, "Adding a comment");
+    public EditCommentTask(@Nullable Project project, String issueKey, String commentId, String body, String viewableBy) {
+        super(project, "Editing comment");
         this.issueKey = issueKey;
+        this.commentId = commentId;
         this.body = body;
         this.viewableBy = viewableBy;
     }
@@ -29,14 +31,14 @@ public class AddCommentTask extends AbstractBackgroundableTask {
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
         // Check user permissions
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, ADD_COMMENTS);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, EDIT_OWN_COMMENTS);
         if(!hasPermission){
-            throw new InvalidPermissionException("Jira", "You don't have permission to add a comment");
+            throw new InvalidPermissionException("Jira", "You don't have permission to edit comments");
         }
 
-        Result result = jiraRestApi.addIssueComment(body, issueKey, viewableBy);
+        Result result = jiraRestApi.editIssueComment(issueKey, commentId, body, viewableBy);
         if(!result.isValid()) {
-            throw new InvalidResultException("Error", "Issue comment has not been added");
+            throw new InvalidResultException("Error", "Issue comment has not been updated");
         }
 
         // Retrieve updated issue
@@ -51,7 +53,7 @@ public class AddCommentTask extends AbstractBackgroundableTask {
 
     @Override
     public void onSuccess() {
-        showNotification("Jira", "Comment added successfully");
+        showNotification("Jira", "Comment edited successfully");
     }
 
 }

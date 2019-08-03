@@ -12,17 +12,14 @@ import com.intellij.util.ui.UI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import static com.intellij.jira.util.JiraIssueUtil.getPrettyBody;
 import static com.intellij.jira.util.JiraLabelUtil.BOLD;
 import static com.intellij.jira.util.JiraLabelUtil.ITALIC;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class JiraIssueCommentListCellRenderer extends DefaultJiraListCellRender {
-
-    private static final Pattern BODY_NAME_PATTERN = Pattern.compile("(\\[~(\\w+)])");
 
     private JBPanel commentPanel;
     private JBLabel authorLabel;
@@ -87,17 +84,5 @@ public class JiraIssueCommentListCellRenderer extends DefaultJiraListCellRender 
 
         return this;
     }
-
-
-
-    private String getPrettyBody(String body){
-        Matcher m = BODY_NAME_PATTERN.matcher(body);
-        if(m.find()){
-            body = body.replace(m.group(1), m.group(2));
-        }
-
-        return body;
-    }
-
 
 }
