@@ -1,6 +1,5 @@
 package com.intellij.jira.tasks;
 
-import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.exceptions.InvalidResultException;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.server.JiraRestApi;
@@ -8,8 +7,6 @@ import com.intellij.jira.util.Result;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-
-import static com.intellij.jira.rest.model.JiraPermissionType.LINK_ISSUES;
 
 public class DeleteIssueLinkTask extends AbstractBackgroundableTask{
     private String issueKey;
@@ -24,11 +21,6 @@ public class DeleteIssueLinkTask extends AbstractBackgroundableTask{
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
-        // Check user permissions
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, LINK_ISSUES);
-        if(!hasPermission){
-            throw new InvalidPermissionException("Jira", "You don't have permission to delete an issue link");
-        }
 
         Result result = jiraRestApi.deleteIssueLink(issueLinkId);
         if(!result.isValid()) {

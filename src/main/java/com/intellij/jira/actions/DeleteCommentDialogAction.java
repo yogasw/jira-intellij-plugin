@@ -1,21 +1,19 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.jira.components.JiraNotificationManager;
+import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.rest.model.JiraIssueComment;
 import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
-import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.dialog.DeleteCommentDialog;
 import com.intellij.jira.util.JiraIssueCommentFactory;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-public class DeleteCommentDialogAction extends JiraIssueAction {
+public class DeleteCommentDialogAction extends JiraIssueDialogAction {
 
     private static final ActionProperties properties = ActionProperties.of("Delete comment",  AllIcons.General.Remove);
 
@@ -29,32 +27,19 @@ public class DeleteCommentDialogAction extends JiraIssueAction {
     }
 
     @Override
-    public void actionPerformed(AnActionEvent e) {
-        Project project = e.getProject();
-        if(isNull(project)){
-            return;
-        }
-
-        JiraServerManager jiraServerManager = project.getComponent(JiraServerManager.class);
-        JiraRestApi jiraServer = jiraServerManager.getJiraRestApi();
-        if(isNull(jiraServer)){
-            return;
-        }
-
+    public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
         JiraIssueComment commentToEdit = null;
-        // Check permissions
-        boolean userHasPermission = jiraServer.userHasPermissionOnIssue(issueKey, JiraPermissionType.DELETE_ALL_COMMENTS);
+
+        boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.DELETE_ALL_COMMENTS);
         if(!userHasPermission){
-            userHasPermission = jiraServer.userHasPermissionOnIssue(issueKey, JiraPermissionType.DELETE_OWN_COMMENTS);
+            userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.DELETE_OWN_COMMENTS);
             if(!userHasPermission){
-                Notifications.Bus.notify(JiraNotificationManager.getInstance().createNotificationError("Deleted comment failed", "You don't have permission to delete comments."));
-                return;
+                throw new InvalidPermissionException("Deleted comment failed", "You don't have permission to delete comments");
             }
 
-            commentToEdit = jiraServer.getComment(issueKey, commentFactory.create().getId());
-            if(nonNull(commentToEdit) && !commentToEdit.getAuthor().getName().equals(jiraServer.getUsername())){
-                Notifications.Bus.notify(JiraNotificationManager.getInstance().createNotificationError("Deleted comment failed", "This comment not yours. You cannot delete it."));
-                return;
+            commentToEdit = jiraRestApi.getComment(issueKey, commentFactory.create().getId());
+            if(nonNull(commentToEdit) && !commentToEdit.getAuthor().getName().equals(jiraRestApi.getUsername())){
+                throw new InvalidPermissionException("Deleted comment failed", "This comment not yours. You cannot delete it");
             }
         }
 
@@ -66,4 +51,5 @@ public class DeleteCommentDialogAction extends JiraIssueAction {
     public void update(AnActionEvent e) {
         e.getPresentation().setEnabled(nonNull(commentFactory.create()));
     }
+
 }

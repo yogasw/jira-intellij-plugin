@@ -31,6 +31,8 @@ public class JiraIssueAssigneePopupAction extends JiraIssueAction {
             JiraServerManager jiraServerManager = project.getComponent(JiraServerManager.class);
             JiraRestApi jiraServer = jiraServerManager.getJiraRestApi();
             if(nonNull(jiraServer)){
+
+                // check permissions
                 List<JiraIssueUser> assignableUsers = jiraServer.getAssignableUsers(issueFactory.create().getKey());
                 JiraIssueAssignableUsersPopup popup = new JiraIssueAssignableUsersPopup(createActionGroup(assignableUsers), project);
                 popup.showInCenterOf(getComponent());

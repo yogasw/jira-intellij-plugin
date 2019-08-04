@@ -14,7 +14,6 @@ public abstract class JiraIssueAction extends AnAction implements DumbAware {
     public JiraIssueAction(@NotNull ActionProperties actionProperties) {
         super(actionProperties.getText(), actionProperties.getDescription(), actionProperties.getIcon());
         this.actionProperties = actionProperties;
-
     }
 
     public void registerComponent(JComponent component){
