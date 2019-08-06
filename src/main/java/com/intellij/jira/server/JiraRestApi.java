@@ -45,16 +45,6 @@ public class JiraRestApi {
         }
     }
 
-    public List<JiraIssue> getIssues() {
-        try {
-            return this.jiraRestClient.findIssues();
-        } catch (Exception e) {
-            log.error("No issues found");
-            return new ArrayList<>();
-        }
-    }
-
-
     public List<JiraIssueTransition> getTransitions(String issueId){
         try {
             return jiraRestClient.getTransitions(issueId);

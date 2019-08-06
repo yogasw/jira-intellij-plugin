@@ -18,10 +18,12 @@ import static java.util.stream.Collectors.toList;
 public class AddIssueLinkDialogAction extends JiraIssueDialogAction {
     private static final ActionProperties properties = ActionProperties.of("New Link",  AllIcons.General.Add);
 
+    private String projectKey;
     private String issueKey;
 
-    public AddIssueLinkDialogAction(String issueKey) {
+    public AddIssueLinkDialogAction(String projectKey, String issueKey) {
         super(properties);
+        this.projectKey = projectKey;
         this.issueKey = issueKey;
     }
 
@@ -33,7 +35,7 @@ public class AddIssueLinkDialogAction extends JiraIssueDialogAction {
         }
 
         List<JiraIssueLinkType> issueLinkTypes = jiraRestApi.getIssueLinkTypes();
-        List<String> issues = jiraRestApi.getIssues().stream().map(JiraIssue::getKey).collect(toList());
+        List<String> issues = jiraRestApi.getIssues("project=" + projectKey).stream().map(JiraIssue::getKey).collect(toList());
         issues.remove(issueKey);
 
         openIssueLinkDialog(project, issueLinkTypes, issues);

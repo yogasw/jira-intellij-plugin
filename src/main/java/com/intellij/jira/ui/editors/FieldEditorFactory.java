@@ -42,7 +42,7 @@ public class FieldEditorFactory {
         }else if("timetracking".equals(fieldType)){
             return new TimeTrackingFieldEditor(issue.getKey(), properties.isRequired());
         }else if("issuelinks".equals(fieldType)){
-            return new LinkedIssueFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+            return new LinkedIssueFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), issue.getProject().getKey());
         }else if("issuetype".equals(fieldType)){
             return new LabelFieldEditor(properties.getName(), issue.getIssuetype().getName(), issue.getKey());
         }

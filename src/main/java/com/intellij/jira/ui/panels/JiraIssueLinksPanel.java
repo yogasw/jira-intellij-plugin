@@ -27,13 +27,15 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 class JiraIssueLinksPanel extends SimpleToolWindowPanel {
 
+    private String projectKey;
     private String issueKey;
     private List<JiraIssueLink> issueLinks;
     private JBList<JiraIssueLink> issueLinkList;
     private JiraIssueLink issueLink;
 
-    JiraIssueLinksPanel(List<JiraIssueLink> issueLinks, String issueKey) {
+    JiraIssueLinksPanel(String projectKey, String issueKey, List<JiraIssueLink> issueLinks) {
         super(true, true);
+        this.projectKey = projectKey;
         this.issueKey = issueKey;
         this.issueLinks = issueLinks;
         initToolbar();
@@ -51,7 +53,7 @@ class JiraIssueLinksPanel extends SimpleToolWindowPanel {
 
     private ActionGroup createActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new AddIssueLinkDialogAction(issueKey));
+        group.add(new AddIssueLinkDialogAction(projectKey, issueKey));
         group.add(new DeleteIssueLinkDialogAction(issueKey, () -> issueLink));
 
         return group;

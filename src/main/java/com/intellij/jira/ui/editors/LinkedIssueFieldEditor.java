@@ -36,9 +36,11 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor {
 
     private JiraIssueLinkTypeInfo mySelectedLinkType;
     private String mySelectedIssue;
+    private String projectKey;
 
-    public LinkedIssueFieldEditor(String fieldName, String issueKey, boolean required) {
+    public LinkedIssueFieldEditor(String fieldName, String issueKey, boolean required, String projectKey) {
         super(fieldName, issueKey, required);
+        this.projectKey = projectKey;
     }
 
     @Override
@@ -56,7 +58,6 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor {
                 .addLabeledComponent(myLabel, myPanel)
                 .getPanel();
     }
-
 
     @Override
     public JsonElement getJsonValue() {
@@ -89,7 +90,7 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor {
     private class MyAddIssueLinkDialogAction extends AddIssueLinkDialogAction {
 
         public MyAddIssueLinkDialogAction() {
-            super(issueKey);
+            super(projectKey, issueKey);
         }
 
         @Override

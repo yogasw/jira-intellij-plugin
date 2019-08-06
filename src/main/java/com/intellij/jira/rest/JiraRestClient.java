@@ -48,11 +48,6 @@ public class JiraRestClient {
         return parseIssues(response);
     }
 
-    public List<JiraIssue> findIssues() throws Exception {
-        return findIssues(this.jiraRepository.getSearchQuery());
-    }
-
-
     public List<JiraIssueTransition> getTransitions(String issueId) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueId, TRANSITIONS));
         method.setQueryString(new NameValuePair[]{new NameValuePair("expand", "transitions.fields")});
