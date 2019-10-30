@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions";
+    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels";
 
     private String id;
     private String self;
@@ -94,12 +94,28 @@ public class JiraIssue {
         return fields.versions;
     }
 
+    public List<JiraIssueComponent> getComponents(){
+        return fields.components;
+    }
+
+    public List<String> getLabels(){
+        return fields.labels;
+    }
+
     public String getUrl(){
         return self.replaceFirst("(/rest([\\w/]+))", "/browse/" + getKey());
     }
 
     public boolean isResolved(){
         return getStatus().isDoneCategory();
+    }
+
+    public boolean hasComponents(){
+        return !getComponents().isEmpty();
+    }
+
+    public boolean hasLabels(){
+        return !getLabels().isEmpty();
     }
 
     public static class Fields{
@@ -120,6 +136,8 @@ public class JiraIssue {
         private List<JiraIssueLink> issuelinks = new ArrayList<>();
         private JiraProject project;
         private List<JiraProjectVersion> versions = new ArrayList<>();
+        private List<JiraIssueComponent> components = new ArrayList<>();
+        private List<String> labels = new ArrayList<>();
 
         public Fields() { }
 

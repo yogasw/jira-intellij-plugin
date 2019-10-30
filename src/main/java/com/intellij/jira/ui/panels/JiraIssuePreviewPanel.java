@@ -5,6 +5,7 @@ import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
 import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
 import com.intellij.jira.actions.TransitIssueDialogAction;
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
 import com.intellij.jira.util.JiraIconUtil;
 import com.intellij.jira.util.JiraIssueUtil;
@@ -84,10 +85,14 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         keyAndUpdatedPanel.add(issueAndProjectKeyPanel);
         keyAndUpdatedPanel.add(updatedLabel);
 
+        issueDetails.add(keyAndUpdatedPanel);
+
         // Summary
         JBPanel issueSummaryPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
         JBLabel summaryLabel = JiraLabelUtil.createLabel(issue.getSummary());
         issueSummaryPanel.add(summaryLabel, LINE_START);
+
+        issueDetails.add(issueSummaryPanel);
 
         // Type and Status
         JBPanel typeAndStatusPanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
@@ -110,6 +115,8 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         typeAndStatusPanel.add(typePanel);
         typeAndStatusPanel.add(statusPanel);
 
+        issueDetails.add(typeAndStatusPanel);
+
         // Priority and Assignee
         JBPanel priorityAndAssigneePanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
         JBPanel priorityPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
@@ -129,6 +136,8 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         priorityAndAssigneePanel.add(priorityPanel);
         priorityAndAssigneePanel.add(assigneePanel);
 
+        issueDetails.add(priorityAndAssigneePanel);
+
         // Versions
         JBPanel versionsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
         JBLabel versionsLabel = JiraLabelUtil.createLabel("Versions: ").withFont(BOLD);
@@ -137,6 +146,29 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         versionsPanel.add(versionsLabel, LINE_START);
         versionsPanel.add(versionsValueLabel, CENTER);
 
+        issueDetails.add(versionsPanel);
+
+        // Components
+        if(issue.hasComponents()){
+            JBPanel componentsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
+            JBLabel componentsLabel = JiraLabelUtil.createLabel("Components: ").withFont(BOLD);
+            JBLabel componentsValueLabel = JiraLabelUtil.createLabel(getComponentNames(issue.getComponents()));
+
+            componentsPanel.add(componentsLabel, LINE_START);
+            componentsPanel.add(componentsValueLabel, CENTER);
+
+            issueDetails.add(componentsPanel);
+        }
+
+        // Labels
+        if(issue.hasLabels()){
+            JBPanel labelsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
+
+            labelsPanel.add(JiraLabelUtil.createLabel("Labels: ").withFont(BOLD), LINE_START);
+            labelsPanel.add(JiraLabelUtil.createLabel(String.join(", ", issue.getLabels())), CENTER);
+
+            issueDetails.add(labelsPanel);
+        }
 
         // Description
         JBPanel issueDescriptionPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
@@ -148,15 +180,9 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         issueDescriptionPanel.add(descriptionLabel, PAGE_START);
         issueDescriptionPanel.add(descriptionArea, CENTER);
 
-        issueDetails.add(keyAndUpdatedPanel);
-        issueDetails.add(issueSummaryPanel);
-        issueDetails.add(typeAndStatusPanel);
-        issueDetails.add(priorityAndAssigneePanel);
-        issueDetails.add(versionsPanel);
         issueDetails.add(issueDescriptionPanel);
 
         previewPanel.add(ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);
-
 
         setContent(previewPanel);
     }
@@ -178,6 +204,12 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
 
         return versions.stream()
                 .map(JiraProjectVersion::getName)
+                .collect(Collectors.joining(", "));
+    }
+
+    private String getComponentNames(List<JiraIssueComponent> components){
+        return components.stream()
+                .map(JiraIssueComponent::getName)
                 .collect(Collectors.joining(", "));
     }
 
