@@ -22,7 +22,6 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
         setEmptyContent();
     }
 
-
     public void showIssue(@Nullable JiraIssue issue) {
         if(isNull(issue)){
             setEmptyContent();
@@ -31,6 +30,7 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
             tabbedPane.addTab("Preview", new JiraIssuePreviewPanel(issue));
             tabbedPane.addTab(String.format("Comments (%d)", issue.getComments().getTotal()), new JiraIssueCommentsPanel(issue));
             tabbedPane.addTab(String.format("Links (%d)", issue.getIssueLinks().size()), new JiraIssueLinksPanel(issue.getProject().getKey(), issue.getKey(), issue.getIssueLinks()));
+            tabbedPane.addTab(String.format("Work Log (%d)", issue.getWorklogs().size()), new JiraIssueWorklogsPanel(issue));
 
             tabbedPane.addChangeListener(e -> data.put(TAB_KEY, tabbedPane.getSelectedIndex()));
             tabbedPane.setSelectedIndex(data.getOrDefault(TAB_KEY, 0));
