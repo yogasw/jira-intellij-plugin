@@ -1,12 +1,14 @@
 package com.intellij.jira.rest;
 
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.intellij.jira.rest.model.*;
 import com.intellij.tasks.jira.JiraRepository;
-import com.intellij.util.containers.ContainerUtil;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class JiraIssueParser {
@@ -24,7 +26,7 @@ public class JiraIssueParser {
     public static List<JiraIssue> parseIssues(String response){
         JiraIssuesWrapper<JiraIssue> wrapper = JiraRepository.GSON.fromJson(response, ISSUES_WRAPPER_TYPE);
         if(wrapper == null){
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
         return wrapper.getIssues();
     }
@@ -32,7 +34,7 @@ public class JiraIssueParser {
     public static List<JiraIssueTransition> parseIssueTransitions(String response){
         JiraIssueTransitionsWrapper<JiraIssueTransition> wrapper = JiraRepository.GSON.fromJson(response, ISSUE_TRANSITION_WRAPPER_TYPE);
         if(wrapper == null){
-            return ContainerUtil.emptyList();
+            return new ArrayList<>();
         }
         return wrapper.getTransitions();
     }
@@ -51,6 +53,32 @@ public class JiraIssueParser {
 
     public static List<JiraIssuePriority> parseIssuePriorities(String response){
         return Arrays.asList(JiraRepository.GSON.fromJson(response, JiraIssuePriority[].class));
+    }
+
+    public static List<JiraIssueLinkType> parseIssueLinkTypes(String response){
+        JiraIssueLinkTypesWrapper wrapper = JiraRepository.GSON.fromJson(response, JiraIssueLinkTypesWrapper.class);
+        if(wrapper == null){
+            return new ArrayList<>();
+        }
+
+        return wrapper.getIssueLinkTypes();
+    }
+
+    public static List<JiraGroup> parseGroups(String response){
+        JiraGroupsWrapper wrapper = JiraRepository.GSON.fromJson(response, JiraGroupsWrapper.class);
+        if(wrapper == null){
+            return new ArrayList<>();
+        }
+
+        return wrapper.getGroups();
+    }
+
+    public static List<String> parseRoles(String response){
+        return new ArrayList<>(JiraRepository.GSON.fromJson(response, JsonObject.class).keySet());
+    }
+
+    public static LinkedHashMap<String, JiraPermission> parsePermissions(String response){
+        return JiraRepository.GSON.fromJson(response, JiraPermissionsWrapper.class).getPermissions();
     }
 
 }

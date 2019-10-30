@@ -1,14 +1,20 @@
 package com.intellij.jira.tasks;
 
-import com.intellij.jira.components.JiraIssueUpdater;
-import com.intellij.jira.exceptions.JiraServerConfigurationNotFoundException;
+import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.components.JiraNotificationManager;
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.jql.JQLSearcher;
+import com.intellij.jira.server.JiraRestApi;
+import com.intellij.jira.server.JiraServerManager;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
+import static java.util.Objects.nonNull;
 
 public class RefreshIssuesTask extends AbstractBackgroundableTask {
 
@@ -18,14 +24,23 @@ public class RefreshIssuesTask extends AbstractBackgroundableTask {
 
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
-        JiraServerManager jiraServerManager = myProject.getComponent(JiraServerManager.class);
-        Optional<JiraServer> jiraServer = jiraServerManager.getConfiguredJiraServer();
-        if(!jiraServer.isPresent()) {
-            throw new JiraServerConfigurationNotFoundException("Cannot connect to server for updating issues");
+
+        JiraRestApi jiraRestApi = myProject.getComponent(JiraServerManager.class).getJiraRestApi();
+
+        JQLSearcherManager jqlSearcherManager = JQLSearcherManager.getInstance();
+        JQLSearcher searcher = jqlSearcherManager.getSelectedSearcher(myProject);
+
+        List<JiraIssue> issues = new ArrayList<>();
+        if(nonNull(searcher) && nonNull(jiraRestApi)){
+            issues =  jiraRestApi.getIssues(searcher.getJql());
         }
 
-        List<JiraIssue> issues = jiraServer.get().getIssues();
-        JiraIssueUpdater.getInstance().update(issues);
+        getJiraIssueUpdater().update(issues);
+    }
+
+    @Override
+    public void showNotification(String title, String content) {
+        Notifications.Bus.notify(JiraNotificationManager.getInstance().createSilentNotification(title, content));
     }
 
     @Override

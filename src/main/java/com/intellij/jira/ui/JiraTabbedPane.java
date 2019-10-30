@@ -19,4 +19,5 @@ public class JiraTabbedPane extends JBTabbedPane {
     protected Insets getInsetsForTabComponent() {
         return JBUI.insets(0);
     }
+
 }

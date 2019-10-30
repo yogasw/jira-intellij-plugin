@@ -1,15 +1,15 @@
 package com.intellij.jira.rest.model;
 
 import com.intellij.jira.rest.JiraIssueCommentsWrapper;
-import com.intellij.util.containers.ContainerUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project";
+    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels";
 
     private String id;
     private String self;
@@ -90,12 +90,32 @@ public class JiraIssue {
         return fields.project;
     }
 
+    public List<JiraProjectVersion> getVersions(){
+        return fields.versions;
+    }
+
+    public List<JiraIssueComponent> getComponents(){
+        return fields.components;
+    }
+
+    public List<String> getLabels(){
+        return fields.labels;
+    }
+
     public String getUrl(){
         return self.replaceFirst("(/rest([\\w/]+))", "/browse/" + getKey());
     }
 
     public boolean isResolved(){
         return getStatus().isDoneCategory();
+    }
+
+    public boolean hasComponents(){
+        return !getComponents().isEmpty();
+    }
+
+    public boolean hasLabels(){
+        return !getLabels().isEmpty();
     }
 
     public static class Fields{
@@ -113,8 +133,11 @@ public class JiraIssue {
         private JiraIssueUser creator;
         private JiraIssueUser reporter;
         private JiraIssueCommentsWrapper comment;
-        private List<JiraIssueLink> issuelinks = ContainerUtil.emptyList();
+        private List<JiraIssueLink> issuelinks = new ArrayList<>();
         private JiraProject project;
+        private List<JiraProjectVersion> versions = new ArrayList<>();
+        private List<JiraIssueComponent> components = new ArrayList<>();
+        private List<String> labels = new ArrayList<>();
 
         public Fields() { }
 

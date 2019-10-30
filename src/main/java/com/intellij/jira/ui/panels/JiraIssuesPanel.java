@@ -1,13 +1,16 @@
 package com.intellij.jira.ui.panels;
 
 import com.google.common.util.concurrent.SettableFuture;
+import com.intellij.jira.actions.ConfigureJiraServersAction;
 import com.intellij.jira.actions.GoToIssuePopupAction;
+import com.intellij.jira.actions.JQLSearcherActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
+import com.intellij.jira.components.JQLSearcherManager;
 import com.intellij.jira.components.JiraActionManager;
 import com.intellij.jira.components.JiraIssueUpdater;
 import com.intellij.jira.events.JiraIssueEventListener;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.tasks.JiraServer;
+import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.table.JiraIssueListTableModel;
 import com.intellij.jira.ui.table.JiraIssueTableView;
 import com.intellij.jira.util.JiraPanelUtil;
@@ -15,10 +18,12 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.ScrollPaneFactory;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
@@ -29,17 +34,23 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 
 import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueEventListener {
 
-    private Optional<JiraServer> jiraServer;
+    private final JiraRestApi myJiraRestApi;
+    private final Project myProject;
+    private final JQLSearcherManager myManager;
+
     private JiraIssueTableView issueTable;
     private JiraIssueDetailsPanel issueDetailsPanel;
 
-    public JiraIssuesPanel(Optional<JiraServer> jiraServer) {
+    public JiraIssuesPanel(JiraRestApi server, Project project) {
         super(false, true);
-        this.jiraServer = jiraServer;
+        this.myJiraRestApi = server;
+        this.myProject = project;
+        this.myManager = JQLSearcherManager.getInstance();
         init();
     }
 
@@ -50,15 +61,15 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
     }
 
     private void addListeners() {
-        JiraIssueUpdater.getInstance().addListener(this);
+        myProject.getComponent(JiraIssueUpdater.class).addListener(this);
     }
 
     private void setContent() {
         JComponent content;
-        if(!jiraServer.isPresent()){
+        if(isNull(myJiraRestApi)){
             content = JiraPanelUtil.createPlaceHolderPanel("No Jira server found");
         }else{
-            List<JiraIssue> issues = jiraServer.get().getIssues();
+            List<JiraIssue> issues = myJiraRestApi.getIssues(getDefaultJQLSearcher());
             issueDetailsPanel = new JiraIssueDetailsPanel();
 
             issueTable = new JiraIssueTableView(issues);
@@ -69,6 +80,12 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
 
             JPanel issuesPanel = new JPanel(new BorderLayout());
             issuesPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
+
+            JPanel jqlPanel = new JBPanel(new BorderLayout());
+            jqlPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 1, 0));
+            jqlPanel.add(new JiraJQLSearcherPanel(myProject), BorderLayout.WEST);
+
+            issuesPanel.add(jqlPanel, BorderLayout.PAGE_START);
             issuesPanel.add(ScrollPaneFactory.createScrollPane(issueTable), BorderLayout.CENTER);
 
 
@@ -99,9 +116,10 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
     private ActionGroup createActionGroup(){
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
         group.add(JiraActionManager.getInstance().getJiraIssuesRefreshAction());
+        group.add(new JQLSearcherActionGroup());
         group.add(new GoToIssuePopupAction());
         group.add(Separator.getInstance());
-        group.add(ActionManager.getInstance().getAction("tasks.configure.servers"));
+        group.add(new ConfigureJiraServersAction());
         return group;
     }
 
@@ -163,5 +181,8 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
         return future;
     }
 
+    private String getDefaultJQLSearcher(){
+        return myManager.getSelectedSearcher(myProject).getJql();
+    }
 
 }

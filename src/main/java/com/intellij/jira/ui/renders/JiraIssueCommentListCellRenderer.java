@@ -4,15 +4,20 @@ import com.intellij.jira.rest.model.JiraIssueComment;
 import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UI;
 
 import javax.swing.*;
 import java.awt.*;
 
+import static com.intellij.jira.util.JiraIssueUtil.getPrettyBody;
 import static com.intellij.jira.util.JiraLabelUtil.BOLD;
 import static com.intellij.jira.util.JiraLabelUtil.ITALIC;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class JiraIssueCommentListCellRenderer extends DefaultJiraListCellRender {
 
@@ -43,10 +48,16 @@ public class JiraIssueCommentListCellRenderer extends DefaultJiraListCellRender 
 
         commentArea = new JTextArea();
         commentArea.setLineWrap(true);
+        commentArea.setWrapStyleWord(true);
         commentArea.setEditable(false);
+        commentArea.setColumns(90);
 
         subPanel.add(priorityPanel, BorderLayout.PAGE_START);
-        subPanel.add(commentArea, BorderLayout.PAGE_END);
+
+        JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(commentArea, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(UI.Borders.empty());
+
+        subPanel.add(scrollPane, BorderLayout.CENTER);
 
         commentPanel.add(subPanel, BorderLayout.CENTER);
 
@@ -69,8 +80,9 @@ public class JiraIssueCommentListCellRenderer extends DefaultJiraListCellRender 
 
         authorLabel.setText(comment.getAuthor().getDisplayName());
         createdLabel.setText(JiraIssueUtil.getCreated(comment));
-        commentArea.setText(comment.getBody());
+        commentArea.setText(getPrettyBody(comment.getBody()));
 
         return this;
     }
+
 }

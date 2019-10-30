@@ -24,4 +24,9 @@ public class JiraIssuePriority {
     public String getIconUrl() {
         return iconUrl;
     }
+
+    @Override
+    public String toString() {
+        return name ;
+    }
 }
