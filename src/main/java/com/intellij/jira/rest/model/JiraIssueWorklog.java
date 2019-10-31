@@ -20,5 +20,23 @@ public class JiraIssueWorklog {
 
     public JiraIssueWorklog() { }
 
+    public String getId() {
+        return id;
+    }
 
+    public JiraIssueUser getAuthor() {
+        return author;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public String getTimeSpent() {
+        return timeSpent;
+    }
+
+    public String getComment() {
+        return comment;
+    }
 }

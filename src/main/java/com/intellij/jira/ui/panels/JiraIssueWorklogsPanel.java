@@ -2,8 +2,9 @@ package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.rest.model.JiraIssueComment;
-import com.intellij.jira.ui.renders.JiraIssueCommentListCellRenderer;
+import com.intellij.jira.rest.model.JiraIssueWorklog;
+import com.intellij.jira.ui.JiraIssueWorklogListModel;
+import com.intellij.jira.ui.renders.JiraIssueWorklogListCellRender;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 import static java.awt.BorderLayout.CENTER;
@@ -24,11 +26,13 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
 
     private String issueKey;
-    private JBList<JiraIssueComment> issueWorklogList;
+    private List<JiraIssueWorklog> worklogs;
+    private JBList<JiraIssueWorklog> issueWorklogList;
 
     public JiraIssueWorklogsPanel(@NotNull JiraIssue issue) {
         super(true);
         this.issueKey = issue.getKey();
+        this.worklogs = issue.getWorklogs();
         initToolbar();
         initContent();
     }
@@ -56,9 +60,9 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
         JBPanel panel = new JBPanel(new BorderLayout());
 
         issueWorklogList = new JBList<>();
-        issueWorklogList.setEmptyText("No comments");
-      //  issueWorklogList.setModel(new JiraIssueCommentListModel(comments.getComments()));
-        issueWorklogList.setCellRenderer(new JiraIssueCommentListCellRenderer());
+        issueWorklogList.setEmptyText("No work logs");
+        issueWorklogList.setModel(new JiraIssueWorklogListModel(worklogs));
+        issueWorklogList.setCellRenderer(new JiraIssueWorklogListCellRender());
         issueWorklogList.setSelectionMode(SINGLE_SELECTION);
        /* issueWorklogList.addListSelectionListener(e -> {
             SwingUtilities.invokeLater(this::updateToolbarActions);
