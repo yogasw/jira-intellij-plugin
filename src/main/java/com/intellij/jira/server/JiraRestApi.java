@@ -227,7 +227,7 @@ public class JiraRestApi {
             Integer statusCode = jiraRestClient.deleteIssueLink(issueLinkId);
             return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
         } catch (Exception e) {
-            log.error("Error creating issue link");
+            log.error("Error deleting issue link");
             return BodyResult.error();
         }
     }
@@ -252,6 +252,16 @@ public class JiraRestApi {
             return BodyResult.ok(worklog);
         } catch (Exception e) {
             log.error(String.format("Error editing worklog in issue '%s'", issueKey));
+            return BodyResult.error();
+        }
+    }
+
+    public Result deleteIssueWorklog(String issueKey, String worklogId) {
+        try {
+            Integer statusCode = jiraRestClient.deleteIssueWorklog(issueKey, worklogId);
+            return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error deleting issue link");
             return BodyResult.error();
         }
     }

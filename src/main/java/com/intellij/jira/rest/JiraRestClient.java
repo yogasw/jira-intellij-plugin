@@ -298,5 +298,12 @@ public class JiraRestClient {
 
         return worklogObject.toString();
     }
+
+    public Integer deleteIssueWorklog(String issueKey, String worklogId) throws Exception {
+        DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, worklogId));
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
+    }
+
 }
 

@@ -1,6 +1,7 @@
 package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.actions.AddWorklogDialogAction;
+import com.intellij.jira.actions.DeleteWorklogDialogAction;
 import com.intellij.jira.actions.EditWorklogDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.model.JiraIssue;
@@ -55,7 +56,7 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
         group.add(new AddWorklogDialogAction(issueKey));
         group.add(new EditWorklogDialogAction(issueKey, () -> worklog));
-        //group.add(new DeleteWorklogDialogAction(issueKey, () -> comment));
+        group.add(new DeleteWorklogDialogAction(issueKey, () -> worklog));
 
         return group;
     }
