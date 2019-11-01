@@ -4,7 +4,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.*;
-import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
@@ -14,8 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.intellij.jira.rest.JiraIssueParser.*;
 import static com.intellij.jira.ui.dialog.AddCommentDialog.ALL_USERS;
@@ -23,7 +20,6 @@ import static com.intellij.jira.util.JiraGsonUtil.*;
 import static java.util.Objects.nonNull;
 
 public class JiraRestClient {
-    private static final Pattern TIME_SPENT_PATTERN = Pattern.compile("(\\d+)([wdhm])");
 
     private static final Integer MAX_ISSUES_RESULTS = 500;
     private static final Integer MAX_USERS_RESULTS = 200;
@@ -276,8 +272,8 @@ public class JiraRestClient {
         return parseIssueWorklog(response);
     }
 
-    public JiraIssueWorklog addIssueWorklog(String issueKey, String timeSpent) throws Exception {
-        String requestBody = prepareWorklogBody(timeSpent);
+    public JiraIssueWorklog addIssueWorklog(String issueKey, List<FieldEditorInfo> worklogFields) throws Exception {
+        String requestBody = prepareWorklogBody(worklogFields);
         PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG));
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
@@ -285,42 +281,22 @@ public class JiraRestClient {
         return parseIssueWorklog(response);
     }
     
-    private String prepareWorklogBody(String timeSpent){
-        JsonObject worklogObject = new JsonObject();
-        // TODO: 01/11/2019 cambiar started
-        worklogObject.add("started",  JiraGsonUtil.createPrimitive("2019-10-18T15:52:12.404+0000"));
-        worklogObject.add("timeSpentSeconds", JiraGsonUtil.createPrimitive(getTimeSpentValue(timeSpent)));
-        
-        return worklogObject.toString();
-    }
-    
-    private Integer getTimeSpentValue(String timeSpent){
-        int timeSpentInSeconds = 0;
-        for(String ts : timeSpent.split(" ")){
-            Matcher matcher = TIME_SPENT_PATTERN.matcher(ts);
-            if(matcher.find()){
-                Integer number = Integer.parseInt(matcher.group(1));
-                String letter = matcher.group(2);
-
-                switch (letter){
-                    case "w": timeSpentInSeconds += number * 144000; break;
-                    case "d": timeSpentInSeconds += number * 28800; break;
-                    case "h": timeSpentInSeconds += number * 3600; break;
-                    case "m": timeSpentInSeconds += number * 60; break;
-                }
-            }
-        }
-
-        return timeSpentInSeconds;
-    }
-
-    public JiraIssueWorklog updateIssueWorklog(String issueKey, String workLogId, String timeSpent) throws Exception {
-        String requestBody = prepareWorklogBody(timeSpent);
+    public JiraIssueWorklog updateIssueWorklog(String issueKey, String workLogId, List<FieldEditorInfo> worklogFields) throws Exception {
+        String requestBody = prepareWorklogBody(worklogFields);
         PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, workLogId));
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
 
         return parseIssueWorklog(response);
+    }
+
+    private String prepareWorklogBody(List<FieldEditorInfo> worklogFields){
+        JsonObject worklogObject = new JsonObject();
+        for(FieldEditorInfo editorInfo : worklogFields){
+            worklogObject.add(editorInfo.getName(),  editorInfo.getJsonValue());
+        }
+
+        return worklogObject.toString();
     }
 }
 

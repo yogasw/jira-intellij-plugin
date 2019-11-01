@@ -14,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
+import java.util.Objects;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
 import static com.intellij.openapi.util.text.StringUtil.*;
@@ -24,16 +26,23 @@ public class DateFieldEditor extends AbstractFieldEditor {
     private static final DateFormatter DATE_FORMATTER = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd"));
 
     private JPanel myPanel;
-    protected JFormattedTextField myFormattedTextField;
     protected JLabel myInfoLabel;
+    protected JFormattedTextField myFormattedTextField;
+    private String myFormattedTextFieldValue;
 
     public DateFieldEditor(String fieldName, String issueKey, boolean required) {
+        this(fieldName, null, issueKey, required);
+    }
+
+    public DateFieldEditor(String fieldName, Date fieldValue, String issueKey, boolean required) {
         super(fieldName, issueKey, required);
+        this.myFormattedTextFieldValue = Objects.nonNull(fieldValue) ? getDateFormatter().getFormat().format(fieldValue) : "";
     }
 
     @Override
     public JComponent createPanel() {
         myFormattedTextField.setFormatterFactory(new DefaultFormatterFactory(getDateFormatter()));
+        myFormattedTextField.setText(myFormattedTextFieldValue);
         myInfoLabel.setToolTipText(getToolTipMessage());
         myInfoLabel.setIcon(AllIcons.Actions.Help);
 
@@ -41,7 +50,6 @@ public class DateFieldEditor extends AbstractFieldEditor {
                 .addLabeledComponent(this.myLabel, this.myPanel)
                 .getPanel();
     }
-
 
     public DateFormatter getDateFormatter(){
         return DATE_FORMATTER;

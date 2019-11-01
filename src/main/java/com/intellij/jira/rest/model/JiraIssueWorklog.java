@@ -32,6 +32,10 @@ public class JiraIssueWorklog {
         return created;
     }
 
+    public Date getStarted() {
+        return started;
+    }
+
     public String getTimeSpent() {
         return timeSpent;
     }

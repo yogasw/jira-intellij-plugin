@@ -236,9 +236,9 @@ public class JiraRestApi {
         return jiraRestClient.getUsername();
     }
 
-    public Result addIssueWorklog(String issueKey, String timeSpent) {
+    public Result addIssueWorklog(String issueKey, List<FieldEditorInfo> worklogFields) {
         try {
-            JiraIssueWorklog worklog = jiraRestClient.addIssueWorklog(issueKey, timeSpent);
+            JiraIssueWorklog worklog = jiraRestClient.addIssueWorklog(issueKey, worklogFields);
             return BodyResult.ok(worklog);
         } catch (Exception e) {
             log.error(String.format("Error creating worklog in issue '%s'", issueKey));
@@ -246,9 +246,9 @@ public class JiraRestApi {
         }
     }
 
-    public Result editIssueWorklog(String issueKey, String workLogId, String timeSpent) {
+    public Result editIssueWorklog(String issueKey, String workLogId, List<FieldEditorInfo> worklogFields) {
         try {
-            JiraIssueWorklog worklog = jiraRestClient.updateIssueWorklog(issueKey, workLogId, timeSpent);
+            JiraIssueWorklog worklog = jiraRestClient.updateIssueWorklog(issueKey, workLogId, worklogFields);
             return BodyResult.ok(worklog);
         } catch (Exception e) {
             log.error(String.format("Error editing worklog in issue '%s'", issueKey));

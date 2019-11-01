@@ -40,7 +40,7 @@ public class JiraIssueWorklogListCellRender extends DefaultJiraListCellRender {
         }
 
         authorLabel.setText(worklog.getAuthor().getDisplayName());
-        createdLabel.setText(JiraIssueUtil.getPrettyDateTime(worklog.getCreated()));
+        createdLabel.setText(JiraIssueUtil.getPrettyDateTime(worklog.getStarted()));
         timeSpentLabel.setText(worklog.getTimeSpent());
 
         return this;

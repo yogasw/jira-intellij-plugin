@@ -1,37 +1,33 @@
 package com.intellij.jira.ui.dialog;
 
+import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.tasks.EditWorklogTask;
+import com.intellij.jira.ui.editors.DateTimeFieldEditor;
+import com.intellij.jira.ui.editors.TimeSpentEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
-import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.intellij.openapi.util.text.StringUtil.isEmpty;
-import static com.intellij.openapi.util.text.StringUtil.trim;
 import static java.util.Objects.nonNull;
 
 public class EditWorklogDialog extends DialogWrapper {
-
-    private static final Pattern TIME_SPENT_PATTERN = Pattern.compile("(\\d+[wdhm])(\\s{1}\\d+[wdhm])*");
-
-    private final static int DEFAULT_WIDTH = 300;
-    private final static int DEFAULT_HEIGHT = 24;
 
     protected final Project myProject;
     protected String issueKey;
     private JiraIssueWorklog worklog;
 
-    private JBLabel timeSpentLabel;
-    protected JBTextField timeSpentField;
+    protected TimeSpentEditor timeSpentEditor;
+    protected DateTimeFieldEditor startedEditor;
+
+    protected List<TransitionFieldHelper.FieldEditorInfo> worklogFields = new ArrayList<>();
 
     public EditWorklogDialog(@Nullable Project project, String issueKey, JiraIssueWorklog worklog) {
         super(project, false);
@@ -39,7 +35,7 @@ public class EditWorklogDialog extends DialogWrapper {
         this.issueKey = issueKey;
         this.worklog = worklog;
 
-        setTitle("Edit Work Log");
+        setTitle("Edit Log Work: " + issueKey);
         init();
     }
 
@@ -47,21 +43,23 @@ public class EditWorklogDialog extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
 
-        this.timeSpentLabel = new JBLabel("Time Spent: ", 4);
-        this.timeSpentField = new JBTextField(worklog.getTimeSpent());
-        this.timeSpentField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.timeSpentEditor = new TimeSpentEditor(this.issueKey, this.worklog.getTimeSpent());
+        this.startedEditor = new DateTimeFieldEditor("Date Started", this.worklog.getStarted(), this.issueKey, true);
+
+        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("timeSpentSeconds", timeSpentEditor));
+        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("started", startedEditor));
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(timeSpentLabel, timeSpentField)
+                .addComponent(timeSpentEditor.createPanel())
+                .addComponent(startedEditor.createPanel())
                 .getPanel();
     }
 
     @Nullable
     @Override
     public JComponent getPreferredFocusedComponent() {
-        return timeSpentField;
+        return timeSpentEditor.getMyTextField();
     }
-
 
     @NotNull
     @Override
@@ -72,13 +70,11 @@ public class EditWorklogDialog extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        String timeSpent = trim(timeSpentField.getText());
-        if(isEmpty(timeSpent)){
-            return new ValidationInfo("Time Spent is required", timeSpentField);
-        }
-
-        if(!TIME_SPENT_PATTERN.matcher(timeSpent).matches()){
-            return new ValidationInfo("Invalid time duration entered", timeSpentField);
+        for(TransitionFieldHelper.FieldEditorInfo info : worklogFields){
+            ValidationInfo fieldValidation = info.validateField();
+            if(nonNull(fieldValidation)){
+                return fieldValidation;
+            }
         }
 
         return null;
@@ -87,7 +83,7 @@ public class EditWorklogDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         if(nonNull(myProject)){
-            new EditWorklogTask(myProject, issueKey, worklog.getId(), timeSpentField.getText()).queue();
+            new EditWorklogTask(myProject, issueKey, worklog.getId(), worklogFields).queue();
         }
 
         close(0);

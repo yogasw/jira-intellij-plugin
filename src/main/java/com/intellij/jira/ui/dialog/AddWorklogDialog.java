@@ -14,7 +14,7 @@ public class AddWorklogDialog extends EditWorklogDialog {
 
     public AddWorklogDialog(@Nullable Project project, String issueKey) {
         super(project, issueKey, new JiraIssueWorklog());
-        setTitle("Add Work Log");
+        setTitle("Add Log Work: " + issueKey);
     }
 
     @NotNull
@@ -26,7 +26,7 @@ public class AddWorklogDialog extends EditWorklogDialog {
     @Override
     protected void doOKAction() {
         if(nonNull(myProject)){
-            new AddWorklogTask(myProject, issueKey, timeSpentField.getText()).queue();
+            new AddWorklogTask(myProject, issueKey, worklogFields).queue();
         }
 
         close(0);
