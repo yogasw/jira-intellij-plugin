@@ -1,5 +1,7 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.actions.AddWorklogDialogAction;
+import com.intellij.jira.actions.EditWorklogDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 import static java.awt.BorderLayout.CENTER;
@@ -27,6 +30,8 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
 
     private String issueKey;
     private List<JiraIssueWorklog> worklogs;
+    private JiraIssueWorklog worklog;
+
     private JBList<JiraIssueWorklog> issueWorklogList;
 
     public JiraIssueWorklogsPanel(@NotNull JiraIssue issue) {
@@ -48,9 +53,9 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
 
     private ActionGroup createActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-       // group.add(new AddCommentDialogAction(projectKey, issueKey));
-       // group.add(new EditCommentDialogAction(projectKey, issueKey, () -> comment));
-       // group.add(new DeleteCommentDialogAction(issueKey, () -> comment));
+        group.add(new AddWorklogDialogAction(issueKey));
+        group.add(new EditWorklogDialogAction(issueKey, () -> worklog));
+        //group.add(new DeleteWorklogDialogAction(issueKey, () -> comment));
 
         return group;
     }
@@ -64,13 +69,22 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
         issueWorklogList.setModel(new JiraIssueWorklogListModel(worklogs));
         issueWorklogList.setCellRenderer(new JiraIssueWorklogListCellRender());
         issueWorklogList.setSelectionMode(SINGLE_SELECTION);
-       /* issueWorklogList.addListSelectionListener(e -> {
+        issueWorklogList.addListSelectionListener(e -> {
             SwingUtilities.invokeLater(this::updateToolbarActions);
-        });*/
+        });
 
         panel.add(ScrollPaneFactory.createScrollPane(issueWorklogList, VERTICAL_SCROLLBAR_AS_NEEDED), CENTER);
 
         setContent(panel);
     }
+
+    private void updateToolbarActions() {
+        JiraIssueWorklog selectedWorklog = issueWorklogList.getSelectedValue();
+        if(!Objects.equals(worklog, selectedWorklog)){
+            worklog = selectedWorklog;
+            initToolbar();
+        }
+    }
+
 
 }

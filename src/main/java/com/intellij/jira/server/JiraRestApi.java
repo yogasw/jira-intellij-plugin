@@ -184,6 +184,17 @@ public class JiraRestApi {
         }
     }
 
+    public JiraIssueWorklog getWorklog(String issueKey, String worklogId){
+        JiraIssueWorklog worklog = null;
+        try {
+            worklog = jiraRestClient.getWorklog(issueKey, worklogId);
+        } catch (Exception e) {
+            log.error(String.format("WorkLog with id = %s doesn't exists", worklogId));
+        }
+
+        return worklog;
+    }
+
     public String getDefaultSearchQuery(){
         return jiraRestClient.getDefaultSearchQuery();
     }
@@ -225,4 +236,23 @@ public class JiraRestApi {
         return jiraRestClient.getUsername();
     }
 
+    public Result addIssueWorklog(String issueKey, String timeSpent) {
+        try {
+            JiraIssueWorklog worklog = jiraRestClient.addIssueWorklog(issueKey, timeSpent);
+            return BodyResult.ok(worklog);
+        } catch (Exception e) {
+            log.error(String.format("Error creating worklog in issue '%s'", issueKey));
+            return BodyResult.error();
+        }
+    }
+
+    public Result editIssueWorklog(String issueKey, String workLogId, String timeSpent) {
+        try {
+            JiraIssueWorklog worklog = jiraRestClient.updateIssueWorklog(issueKey, workLogId, timeSpent);
+            return BodyResult.ok(worklog);
+        } catch (Exception e) {
+            log.error(String.format("Error editing worklog in issue '%s'", issueKey));
+            return BodyResult.error();
+        }
+    }
 }
