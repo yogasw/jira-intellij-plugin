@@ -4,6 +4,7 @@ import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.tasks.EditWorklogTask;
 import com.intellij.jira.ui.editors.DateTimeFieldEditor;
+import com.intellij.jira.ui.editors.RemainingEstimateFieldEditor;
 import com.intellij.jira.ui.editors.TimeSpentEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -26,14 +27,17 @@ public class EditWorklogDialog extends DialogWrapper {
 
     protected TimeSpentEditor timeSpentEditor;
     protected DateTimeFieldEditor startedEditor;
+    protected RemainingEstimateFieldEditor remainingEstimateEditor;
 
     protected List<TransitionFieldHelper.FieldEditorInfo> worklogFields = new ArrayList<>();
+    private boolean showManualField;
 
-    public EditWorklogDialog(@Nullable Project project, String issueKey, JiraIssueWorklog worklog) {
+    public EditWorklogDialog(@Nullable Project project, String issueKey, JiraIssueWorklog worklog, boolean showManualField) {
         super(project, false);
         this.myProject = project;
         this.issueKey = issueKey;
         this.worklog = worklog;
+        this.showManualField = showManualField;
 
         setTitle("Edit Log Work: " + issueKey);
         init();
@@ -43,8 +47,9 @@ public class EditWorklogDialog extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
 
-        this.timeSpentEditor = new TimeSpentEditor(this.issueKey, this.worklog.getTimeSpent());
+        this.timeSpentEditor = new TimeSpentEditor(this.worklog.getTimeSpent(), this.issueKey, true);
         this.startedEditor = new DateTimeFieldEditor("Date Started", this.worklog.getStarted(), this.issueKey, true);
+        this.remainingEstimateEditor = new RemainingEstimateFieldEditor("Remaining Estimate", this.showManualField, this.issueKey, false);
 
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("timeSpentSeconds", timeSpentEditor));
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("started", startedEditor));
@@ -52,6 +57,7 @@ public class EditWorklogDialog extends DialogWrapper {
         return FormBuilder.createFormBuilder()
                 .addComponent(timeSpentEditor.createPanel())
                 .addComponent(startedEditor.createPanel())
+                .addComponent(remainingEstimateEditor.createPanel())
                 .getPanel();
     }
 
@@ -77,13 +83,13 @@ public class EditWorklogDialog extends DialogWrapper {
             }
         }
 
-        return null;
+        return remainingEstimateEditor.validate();
     }
 
     @Override
     protected void doOKAction() {
         if(nonNull(myProject)){
-            new EditWorklogTask(myProject, issueKey, worklog.getId(), worklogFields).queue();
+            new EditWorklogTask(myProject, issueKey, worklog.getId(), worklogFields, remainingEstimateEditor.getJsonValue()).queue();
         }
 
         close(0);

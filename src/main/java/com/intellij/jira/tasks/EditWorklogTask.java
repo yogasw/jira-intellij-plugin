@@ -1,5 +1,6 @@
 package com.intellij.jira.tasks;
 
+import com.google.gson.JsonElement;
 import com.intellij.jira.exceptions.InvalidResultException;
 import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.rest.model.JiraIssue;
@@ -16,19 +17,21 @@ public class EditWorklogTask extends AbstractBackgroundableTask {
     private String issueKey;
     private String workLogId;
     private List<TransitionFieldHelper.FieldEditorInfo> worklogFields;
+    private String remainingEstimate;
 
-    public EditWorklogTask(@NotNull Project project, String issueKey, String workLogId, List<TransitionFieldHelper.FieldEditorInfo> worklogFields) {
+    public EditWorklogTask(@NotNull Project project, String issueKey, String workLogId, List<TransitionFieldHelper.FieldEditorInfo> worklogFields, JsonElement remainingEstimateValue) {
         super(project, "Editing Work Log");
         this.issueKey = issueKey;
         this.workLogId = workLogId;
         this.worklogFields = worklogFields;
+        this.remainingEstimate = remainingEstimateValue.getAsString();
     }
 
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
 
-        Result result = jiraRestApi.editIssueWorklog(issueKey, workLogId, worklogFields);
+        Result result = jiraRestApi.editIssueWorklog(issueKey, workLogId, worklogFields, remainingEstimate);
         if(!result.isValid()) {
             throw new InvalidResultException("Error", "Issue Work Log has not been edited");
         }

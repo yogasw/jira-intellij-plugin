@@ -4,6 +4,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.*;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
@@ -272,18 +273,24 @@ public class JiraRestClient {
         return parseIssueWorklog(response);
     }
 
-    public JiraIssueWorklog addIssueWorklog(String issueKey, List<FieldEditorInfo> worklogFields) throws Exception {
+    public JiraIssueWorklog addIssueWorklog(String issueKey, List<FieldEditorInfo> worklogFields, String remainingEstimate) throws Exception {
         String requestBody = prepareWorklogBody(worklogFields);
         PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG));
+        if(StringUtil.isNotEmpty(remainingEstimate)){
+            method.setQueryString("adjustEstimate" + remainingEstimate);
+        }
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
         
         return parseIssueWorklog(response);
     }
     
-    public JiraIssueWorklog updateIssueWorklog(String issueKey, String workLogId, List<FieldEditorInfo> worklogFields) throws Exception {
+    public JiraIssueWorklog updateIssueWorklog(String issueKey, String workLogId, List<FieldEditorInfo> worklogFields, String remainingEstimate) throws Exception {
         String requestBody = prepareWorklogBody(worklogFields);
         PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, workLogId));
+        if(StringUtil.isNotEmpty(remainingEstimate)){
+            method.setQueryString("adjustEstimate" + remainingEstimate);
+        }
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
 

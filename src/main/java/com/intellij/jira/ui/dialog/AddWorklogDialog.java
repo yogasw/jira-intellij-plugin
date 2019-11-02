@@ -13,7 +13,7 @@ import static java.util.Objects.nonNull;
 public class AddWorklogDialog extends EditWorklogDialog {
 
     public AddWorklogDialog(@Nullable Project project, String issueKey) {
-        super(project, issueKey, new JiraIssueWorklog());
+        super(project, issueKey, new JiraIssueWorklog(), true);
         setTitle("Add Log Work: " + issueKey);
     }
 
@@ -26,7 +26,7 @@ public class AddWorklogDialog extends EditWorklogDialog {
     @Override
     protected void doOKAction() {
         if(nonNull(myProject)){
-            new AddWorklogTask(myProject, issueKey, worklogFields).queue();
+            new AddWorklogTask(myProject, issueKey, worklogFields, remainingEstimateEditor.getJsonValue()).queue();
         }
 
         close(0);

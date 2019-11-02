@@ -45,7 +45,7 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
 
         if(Objects.nonNull(worklogToEdit)){
 
-            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, worklogToEdit);
+            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, worklogToEdit, false);
             dialog.show();
         }
     }
