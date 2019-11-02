@@ -1,6 +1,7 @@
 package com.intellij.jira.ui.dialog;
 
 import com.intellij.jira.rest.model.JiraIssueComment;
+import com.intellij.jira.rest.model.JiraVisibility;
 import com.intellij.jira.tasks.EditCommentTask;
 import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
@@ -68,7 +69,7 @@ public class EditCommentDialog extends DialogWrapper {
         CollectionComboBoxModel<String> myComboBoxItems = new CollectionComboBoxModel(projectRoles);
         myComboBox = new ComboBox(myComboBoxItems);
 
-        JiraIssueComment.Visibility visibility = comment.getVisibility();
+        JiraVisibility visibility = comment.getVisibility();
         if(nonNull(visibility)){
             myComboBox.setSelectedIndex(projectRoles.indexOf(visibility.getValue()));
         }

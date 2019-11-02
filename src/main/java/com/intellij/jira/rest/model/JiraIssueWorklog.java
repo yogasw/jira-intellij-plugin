@@ -17,6 +17,7 @@ public class JiraIssueWorklog {
     private String timeSpentSeconds;
 
     private String comment;
+    private JiraVisibility visibility;
 
     public JiraIssueWorklog() { }
 
@@ -42,5 +43,9 @@ public class JiraIssueWorklog {
 
     public String getComment() {
         return comment;
+    }
+
+    public JiraVisibility getVisibility() {
+        return visibility;
     }
 }

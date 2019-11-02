@@ -1,5 +1,6 @@
 package com.intellij.jira.rest;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
@@ -300,7 +301,10 @@ public class JiraRestClient {
     private String prepareWorklogBody(List<FieldEditorInfo> worklogFields){
         JsonObject worklogObject = new JsonObject();
         for(FieldEditorInfo editorInfo : worklogFields){
-            worklogObject.add(editorInfo.getName(),  editorInfo.getJsonValue());
+            JsonElement jsonValue = editorInfo.getJsonValue();
+            if(!jsonValue.isJsonNull()){
+                worklogObject.add(editorInfo.getName(), jsonValue);
+            }
         }
 
         return worklogObject.toString();

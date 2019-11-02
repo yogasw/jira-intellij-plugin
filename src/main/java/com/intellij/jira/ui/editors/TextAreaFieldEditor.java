@@ -17,15 +17,21 @@ public class TextAreaFieldEditor extends AbstractFieldEditor {
     private JPanel myPanel;
     private JLabel myTextAreaLabel;
     protected JTextArea myTextArea;
-
+    private String myTextAreaValue;
 
     public TextAreaFieldEditor(String fieldName, String issueKey, boolean required) {
+        this(fieldName, "", issueKey, required);
+    }
+
+    public TextAreaFieldEditor(String fieldName, String fieldValue, String issueKey, boolean required) {
         super(fieldName, issueKey, required);
+        this.myTextAreaValue = fieldValue;
     }
 
     @Override
     public JComponent createPanel() {
         this.myTextArea.setBorder(BorderFactory.createLineBorder(JBColor.border()));
+        this.myTextArea.setText(this.myTextAreaValue);
         this.myTextAreaLabel.setText(myLabel.getText());
 
         return myPanel;

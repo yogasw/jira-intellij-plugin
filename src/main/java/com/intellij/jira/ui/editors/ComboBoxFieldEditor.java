@@ -18,7 +18,7 @@ import static java.util.Objects.nonNull;
 
 public class ComboBoxFieldEditor<T> extends AbstractFieldEditor {
 
-    private ComboBox<T> myComboBox;
+    protected ComboBox<T> myComboBox;
     private CollectionComboBoxModel<T> myComboBoxItems;
     private boolean isMultiSelect;
 
@@ -27,7 +27,6 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor {
         this.myComboBoxItems = new CollectionComboBoxModel<>(items);
         this.myComboBox = new ComboBox(myComboBoxItems, 300);
         this.isMultiSelect = isMultiSelect;
-
     }
 
     @Override
@@ -47,7 +46,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor {
         return createNameObject(getSelectedValue(), isMultiSelect);
     }
 
-    private String getSelectedValue(){
+    protected String getSelectedValue(){
         return nonNull(this.myComboBox.getSelectedItem()) ? this.myComboBox.getSelectedItem().toString() : "";
     }
 

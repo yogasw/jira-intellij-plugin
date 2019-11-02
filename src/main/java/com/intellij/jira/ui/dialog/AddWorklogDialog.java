@@ -8,13 +8,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.List;
 
 import static java.util.Objects.nonNull;
 
 public class AddWorklogDialog extends EditWorklogDialog {
 
-    public AddWorklogDialog(@Nullable Project project, String issueKey, JiraIssueTimeTracking timeTracking) {
-        super(project, issueKey, new JiraIssueWorklog(), timeTracking,true);
+    public AddWorklogDialog(@Nullable Project project, String issueKey, List<String> projectRoles, JiraIssueTimeTracking timeTracking) {
+        super(project, issueKey, projectRoles, new JiraIssueWorklog(), timeTracking,true);
         setTitle("Add Log Work: " + issueKey);
     }
 

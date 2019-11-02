@@ -31,6 +31,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
 
     private String issueKey;
+    private String projectKey;
     private List<JiraIssueWorklog> worklogs;
     private JiraIssueWorklog worklog;
     private JiraIssueTimeTracking timeTracking;
@@ -40,6 +41,7 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
     public JiraIssueWorklogsPanel(@NotNull JiraIssue issue) {
         super(true);
         this.issueKey = issue.getKey();
+        this.projectKey = issue.getProject().getKey();
         this.worklogs = issue.getWorklogs();
         this.timeTracking = issue.getTimetracking();
 
@@ -58,13 +60,13 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
 
     private ActionGroup createActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new AddWorklogDialogAction(issueKey, () -> timeTracking));
-        group.add(new EditWorklogDialogAction(issueKey, () -> worklog, () -> timeTracking));
+        group.add(new AddWorklogDialogAction(issueKey, projectKey, () -> timeTracking));
+        group.add(new EditWorklogDialogAction(issueKey, projectKey, () -> worklog, () -> timeTracking));
         group.add(new DeleteWorklogDialogAction(issueKey, () -> worklog, () -> timeTracking));
 
         return group;
     }
-    
+
     private void initContent(){
         JBPanel panel = new JBPanel(new BorderLayout());
 

@@ -4,9 +4,7 @@ import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.tasks.EditWorklogTask;
-import com.intellij.jira.ui.editors.DateTimeFieldEditor;
-import com.intellij.jira.ui.editors.RemainingEstimateFieldEditor;
-import com.intellij.jira.ui.editors.TimeSpentEditor;
+import com.intellij.jira.ui.editors.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -24,21 +22,26 @@ public class EditWorklogDialog extends DialogWrapper {
 
     protected final Project myProject;
     protected String issueKey;
+    protected List<String> projectRoles;
     private JiraIssueWorklog worklog;
 
     protected TimeSpentEditor timeSpentEditor;
     protected DateTimeFieldEditor startedEditor;
     protected RemainingEstimateFieldEditor remainingEstimateEditor;
+    protected TextAreaFieldEditor worklogCommentEditor;
+    protected VisibilityFieldEditor visibilityEditor;
 
     protected List<TransitionFieldHelper.FieldEditorInfo> worklogFields = new ArrayList<>();
 
     private JiraIssueTimeTracking timeTracking;
     private boolean showManualField;
 
-    public EditWorklogDialog(@Nullable Project project, String issueKey, JiraIssueWorklog worklog, JiraIssueTimeTracking timeTracking, boolean showManualField) {
+    public EditWorklogDialog(@Nullable Project project, String issueKey, List<String> projectRoles, JiraIssueWorklog worklog, JiraIssueTimeTracking timeTracking, boolean showManualField) {
         super(project, false);
         this.myProject = project;
         this.issueKey = issueKey;
+        this.projectRoles = projectRoles;
+        this.projectRoles.add(0, "All Users");
         this.worklog = worklog;
         this.timeTracking = timeTracking;
         this.showManualField = showManualField;
@@ -50,18 +53,23 @@ public class EditWorklogDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-
         this.timeSpentEditor = new TimeSpentEditor(this.worklog.getTimeSpent(), this.issueKey, true);
         this.startedEditor = new DateTimeFieldEditor("Date Started", this.worklog.getStarted(), this.issueKey, true);
         this.remainingEstimateEditor = new RemainingEstimateFieldEditor("Remaining Estimate", this.timeTracking, this.showManualField, this.issueKey, false);
+        this.worklogCommentEditor = new TextAreaFieldEditor("Work Description", this.worklog.getComment(), this.issueKey, false);
+        this.visibilityEditor = new VisibilityFieldEditor(this.projectRoles, this.worklog.getVisibility(), this.issueKey);
 
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("timeSpentSeconds", timeSpentEditor));
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("started", startedEditor));
+        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("comment", worklogCommentEditor));
+        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("visibility", visibilityEditor));
 
         return FormBuilder.createFormBuilder()
                 .addComponent(timeSpentEditor.createPanel())
                 .addComponent(startedEditor.createPanel())
                 .addComponent(remainingEstimateEditor.createPanel())
+                .addComponent(worklogCommentEditor.createPanel())
+                .addComponent(visibilityEditor.createPanel())
                 .getPanel();
     }
 

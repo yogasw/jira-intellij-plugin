@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 
 import static java.util.Objects.nonNull;
@@ -20,12 +21,14 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
     private static final ActionProperties properties = ActionProperties.of("Edit Work Log", AllIcons.Actions.Edit);
 
     private String issueKey;
+    private String projectKey;
     private JiraIssueWorklogFactory worklogFactory;
     private JiraIssuTimeTrackingFactory timetrackingFactory;
 
-    public EditWorklogDialogAction(String issueKey, JiraIssueWorklogFactory factory, JiraIssuTimeTrackingFactory timetrackingFactory) {
+    public EditWorklogDialogAction(String issueKey, String projectKey, JiraIssueWorklogFactory factory, JiraIssuTimeTrackingFactory timetrackingFactory) {
         super(properties);
         this.issueKey = issueKey;
+        this.projectKey = projectKey;
         this.worklogFactory = factory;
         this.timetrackingFactory = timetrackingFactory;
     }
@@ -47,7 +50,9 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
         }
 
         if(Objects.nonNull(worklogToEdit)){
-            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, worklogToEdit, timetrackingFactory.create(), false);
+            List<String> projectRoles = jiraRestApi.getProjectRoles(projectKey);
+
+            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, projectRoles, worklogToEdit, timetrackingFactory.create(), false);
             dialog.show();
         }
     }

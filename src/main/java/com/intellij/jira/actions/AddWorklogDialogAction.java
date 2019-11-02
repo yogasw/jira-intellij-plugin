@@ -10,16 +10,20 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class AddWorklogDialogAction extends JiraIssueDialogAction {
 
     private static final ActionProperties properties = ActionProperties.of("Add Log Work",  AllIcons.General.Add);
 
     private String issueKey;
+    private String projectKey;
     private JiraIssuTimeTrackingFactory timetrackingFactory;
 
-    public AddWorklogDialogAction(String issueKey, JiraIssuTimeTrackingFactory timetrackingFactory) {
+    public AddWorklogDialogAction(String issueKey, String projectKey, JiraIssuTimeTrackingFactory timetrackingFactory) {
         super(properties);
         this.issueKey = issueKey;
+        this.projectKey = projectKey;
         this.timetrackingFactory = timetrackingFactory;
     }
 
@@ -30,7 +34,8 @@ public class AddWorklogDialogAction extends JiraIssueDialogAction {
             throw new InvalidPermissionException("Add log work failed", "You don't have permission to log work");
         }
 
-        AddWorklogDialog dialog = new AddWorklogDialog(project, issueKey, timetrackingFactory.create());
+        List<String> projectRoles = jiraRestApi.getProjectRoles(projectKey);
+        AddWorklogDialog dialog = new AddWorklogDialog(project, issueKey, projectRoles, timetrackingFactory.create());
         dialog.show();
     }
 }

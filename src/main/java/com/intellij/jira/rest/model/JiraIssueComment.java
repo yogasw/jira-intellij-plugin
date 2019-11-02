@@ -10,7 +10,7 @@ public class JiraIssueComment {
     private String body;
     private Date created;
     private Date updated;
-    private Visibility visibility;
+    private JiraVisibility visibility;
 
     public JiraIssueComment() { }
 
@@ -30,23 +30,9 @@ public class JiraIssueComment {
         return id;
     }
 
-    public Visibility getVisibility() {
+    public JiraVisibility getVisibility() {
         return visibility;
     }
 
-    public class Visibility{
-        private String type;
-        private String value;
-
-        public Visibility() { }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
 
 }
