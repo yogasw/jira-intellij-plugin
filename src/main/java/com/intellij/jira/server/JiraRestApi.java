@@ -256,9 +256,9 @@ public class JiraRestApi {
         }
     }
 
-    public Result deleteIssueWorklog(String issueKey, String worklogId) {
+    public Result deleteIssueWorklog(String issueKey, String worklogId, String remainingEstimate) {
         try {
-            Integer statusCode = jiraRestClient.deleteIssueWorklog(issueKey, worklogId);
+            Integer statusCode = jiraRestClient.deleteIssueWorklog(issueKey, worklogId, remainingEstimate);
             return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
         } catch (Exception e) {
             log.error("Error deleting issue link");

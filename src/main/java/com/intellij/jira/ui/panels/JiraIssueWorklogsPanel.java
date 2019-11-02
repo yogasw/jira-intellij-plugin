@@ -60,12 +60,11 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
         group.add(new AddWorklogDialogAction(issueKey, () -> timeTracking));
         group.add(new EditWorklogDialogAction(issueKey, () -> worklog, () -> timeTracking));
-        group.add(new DeleteWorklogDialogAction(issueKey, () -> worklog));
+        group.add(new DeleteWorklogDialogAction(issueKey, () -> worklog, () -> timeTracking));
 
         return group;
     }
-
-
+    
     private void initContent(){
         JBPanel panel = new JBPanel(new BorderLayout());
 

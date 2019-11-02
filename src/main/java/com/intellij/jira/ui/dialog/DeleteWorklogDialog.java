@@ -1,15 +1,17 @@
 package com.intellij.jira.ui.dialog;
 
+import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.tasks.DeleteWorklogTask;
+import com.intellij.jira.ui.editors.RemainingEstimateFieldEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 
 import static java.util.Objects.nonNull;
 
@@ -17,13 +19,17 @@ public class DeleteWorklogDialog extends DialogWrapper {
 
     private Project project;
     private String issueKey;
-    private String commentId;
+    private String worklogId;
 
-    public DeleteWorklogDialog(Project project, String issueKey, String commentId) {
+    private RemainingEstimateFieldEditor remainingEstimateFieldEditor;
+    private JiraIssueTimeTracking timeTracking;
+
+    public DeleteWorklogDialog(Project project, String issueKey, String worklogId, JiraIssueTimeTracking timeTracking) {
         super(project, false);
         this.project = project;
         this.issueKey = issueKey;
-        this.commentId = commentId;
+        this.worklogId = worklogId;
+        this.timeTracking = timeTracking;
         init();
     }
 
@@ -36,13 +42,13 @@ public class DeleteWorklogDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JBPanel panel = new JBPanel(new BorderLayout());
-        JBLabel label = new JBLabel("You are going to delete this work log. This cannot be undone.");
-        panel.add(label, BorderLayout.CENTER);
+        this.remainingEstimateFieldEditor = new RemainingEstimateFieldEditor("Remaining Estimate", this.timeTracking, true, this.issueKey, false);
 
-        return panel;
+        return FormBuilder.createFormBuilder()
+                .addComponent(new JBLabel("You are going to delete this work log. This cannot be undone."))
+                .addComponent(remainingEstimateFieldEditor.createPanel())
+                .getPanel();
     }
-
 
     @NotNull
     @Override
@@ -50,12 +56,18 @@ public class DeleteWorklogDialog extends DialogWrapper {
         return new Action[]{new DeleteWorklogExecuteAction(), myCancelAction};
     }
 
+    @Nullable
+    @Override
+    protected ValidationInfo doValidate() {
+        return remainingEstimateFieldEditor.validate();
+    }
 
     @Override
     protected void doOKAction() {
         if(nonNull(project)){
-            new DeleteWorklogTask(project, issueKey, commentId).queue();
+            new DeleteWorklogTask(project, issueKey, worklogId, remainingEstimateFieldEditor.getJsonValue()).queue();
         }
+
         close(0);
     }
 

@@ -277,7 +277,7 @@ public class JiraRestClient {
         String requestBody = prepareWorklogBody(worklogFields);
         PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG));
         if(StringUtil.isNotEmpty(remainingEstimate)){
-            method.setQueryString("adjustEstimate" + remainingEstimate);
+            method.setQueryString("adjustEstimate=" + remainingEstimate);
         }
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
@@ -289,7 +289,7 @@ public class JiraRestClient {
         String requestBody = prepareWorklogBody(worklogFields);
         PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, workLogId));
         if(StringUtil.isNotEmpty(remainingEstimate)){
-            method.setQueryString("adjustEstimate" + remainingEstimate);
+            method.setQueryString("adjustEstimate=" + remainingEstimate);
         }
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
@@ -306,8 +306,12 @@ public class JiraRestClient {
         return worklogObject.toString();
     }
 
-    public Integer deleteIssueWorklog(String issueKey, String worklogId) throws Exception {
+    public Integer deleteIssueWorklog(String issueKey, String worklogId, String remainingEstimate) throws Exception {
         DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, worklogId));
+        if(StringUtil.isNotEmpty(remainingEstimate)){
+            method.setQueryString("adjustEstimate=" + remainingEstimate);
+        }
+
         jiraRepository.executeMethod(method);
         return method.getStatusCode();
     }

@@ -6,6 +6,7 @@ import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.DeleteWorklogDialog;
+import com.intellij.jira.util.JiraIssuTimeTrackingFactory;
 import com.intellij.jira.util.JiraIssueWorklogFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -19,11 +20,13 @@ public class DeleteWorklogDialogAction extends JiraIssueDialogAction {
 
     private String issueKey;
     private JiraIssueWorklogFactory worklogFactory;
+    private JiraIssuTimeTrackingFactory timeTrackingFactory;
 
-    public DeleteWorklogDialogAction(String issueKey, JiraIssueWorklogFactory factory) {
+    public DeleteWorklogDialogAction(String issueKey, JiraIssueWorklogFactory factory, JiraIssuTimeTrackingFactory timeTrackingFactory) {
         super(properties);
         this.issueKey = issueKey;
         this.worklogFactory = factory;
+        this.timeTrackingFactory = timeTrackingFactory;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class DeleteWorklogDialogAction extends JiraIssueDialogAction {
             }
         }
 
-        DeleteWorklogDialog dialog = new DeleteWorklogDialog(project, issueKey, worklogToDelete.getId());
+        DeleteWorklogDialog dialog = new DeleteWorklogDialog(project, issueKey, worklogToDelete.getId(), timeTrackingFactory.create());
         dialog.show();
     }
 
