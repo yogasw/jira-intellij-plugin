@@ -5,6 +5,7 @@ import com.intellij.jira.actions.DeleteWorklogDialogAction;
 import com.intellij.jira.actions.EditWorklogDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.ui.JiraIssueWorklogListModel;
 import com.intellij.jira.ui.renders.JiraIssueWorklogListCellRender;
@@ -32,6 +33,7 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
     private String issueKey;
     private List<JiraIssueWorklog> worklogs;
     private JiraIssueWorklog worklog;
+    private JiraIssueTimeTracking timeTracking;
 
     private JBList<JiraIssueWorklog> issueWorklogList;
 
@@ -39,6 +41,8 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
         super(true);
         this.issueKey = issue.getKey();
         this.worklogs = issue.getWorklogs();
+        this.timeTracking = issue.getTimetracking();
+
         initToolbar();
         initContent();
     }
@@ -54,8 +58,8 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
 
     private ActionGroup createActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new AddWorklogDialogAction(issueKey));
-        group.add(new EditWorklogDialogAction(issueKey, () -> worklog));
+        group.add(new AddWorklogDialogAction(issueKey, () -> timeTracking));
+        group.add(new EditWorklogDialogAction(issueKey, () -> worklog, () -> timeTracking));
         group.add(new DeleteWorklogDialogAction(issueKey, () -> worklog));
 
         return group;

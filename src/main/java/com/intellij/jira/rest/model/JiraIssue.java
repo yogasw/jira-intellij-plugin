@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels,worklog";
+    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels,worklog,timetracking";
 
     private String id;
     private String self;
@@ -87,6 +87,10 @@ public class JiraIssue {
         return fields.worklog.getWorklogs();
     }
 
+    public JiraIssueTimeTracking getTimetracking(){
+        return fields.timetracking;
+    }
+
     public List<JiraIssueLink> getIssueLinks(){
         return fields.issuelinks;
     }
@@ -139,6 +143,7 @@ public class JiraIssue {
         private JiraIssueUser reporter;
         private JiraIssueCommentsWrapper comment;
         private JiraIssueWorklogsWrapper worklog;
+        private JiraIssueTimeTracking timetracking;
         private List<JiraIssueLink> issuelinks = new ArrayList<>();
         private JiraProject project;
         private List<JiraProjectVersion> versions = new ArrayList<>();

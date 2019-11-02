@@ -1,6 +1,7 @@
 package com.intellij.jira.ui.dialog;
 
 import com.intellij.jira.helper.TransitionFieldHelper;
+import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.tasks.EditWorklogTask;
 import com.intellij.jira.ui.editors.DateTimeFieldEditor;
@@ -30,13 +31,16 @@ public class EditWorklogDialog extends DialogWrapper {
     protected RemainingEstimateFieldEditor remainingEstimateEditor;
 
     protected List<TransitionFieldHelper.FieldEditorInfo> worklogFields = new ArrayList<>();
+
+    private JiraIssueTimeTracking timeTracking;
     private boolean showManualField;
 
-    public EditWorklogDialog(@Nullable Project project, String issueKey, JiraIssueWorklog worklog, boolean showManualField) {
+    public EditWorklogDialog(@Nullable Project project, String issueKey, JiraIssueWorklog worklog, JiraIssueTimeTracking timeTracking, boolean showManualField) {
         super(project, false);
         this.myProject = project;
         this.issueKey = issueKey;
         this.worklog = worklog;
+        this.timeTracking = timeTracking;
         this.showManualField = showManualField;
 
         setTitle("Edit Log Work: " + issueKey);
@@ -49,7 +53,7 @@ public class EditWorklogDialog extends DialogWrapper {
 
         this.timeSpentEditor = new TimeSpentEditor(this.worklog.getTimeSpent(), this.issueKey, true);
         this.startedEditor = new DateTimeFieldEditor("Date Started", this.worklog.getStarted(), this.issueKey, true);
-        this.remainingEstimateEditor = new RemainingEstimateFieldEditor("Remaining Estimate", this.showManualField, this.issueKey, false);
+        this.remainingEstimateEditor = new RemainingEstimateFieldEditor("Remaining Estimate", this.timeTracking, this.showManualField, this.issueKey, false);
 
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("timeSpentSeconds", timeSpentEditor));
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("started", startedEditor));

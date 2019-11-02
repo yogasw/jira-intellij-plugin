@@ -1,6 +1,7 @@
 package com.intellij.jira.ui.editors;
 
 import com.google.gson.JsonElement;
+import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.util.ui.FormBuilder;
@@ -8,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class RemainingEstimateFieldEditor extends AbstractFieldEditor {
 
@@ -19,18 +21,20 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor {
     private TimeSpentEditor myNewTextFieldEditor;
     private TimeSpentEditor myManualTextFieldEditor;
 
+    private JiraIssueTimeTracking timeTracking;
     private boolean showManualField;
 
-    public RemainingEstimateFieldEditor(String fieldName, boolean showManualField, String issueKey, boolean required) {
+    public RemainingEstimateFieldEditor(String fieldName, JiraIssueTimeTracking timeTracking, boolean showManualField, String issueKey, boolean required) {
         super(fieldName, issueKey, required);
         this.showManualField = showManualField;
+        this.timeTracking = timeTracking;
     }
 
     @Override
     public JComponent createPanel() {
 
         this.autoButton = new JRadioButton("Adjust automatically", true);
-        this.leaveButton = new JRadioButton("Use existing estimate of 6 hours");
+        this.leaveButton = new JRadioButton(getTimeTrackingText());
         this.newButton = new JRadioButton();
         this.manualButton = new JRadioButton();
 
@@ -89,6 +93,10 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor {
        }
 
        return null;
+    }
+
+    private String getTimeTrackingText(){
+        return Objects.isNull(this.timeTracking) ? "Leave estimate unset" : "Use existing estimate of " + this.timeTracking.getRemainingEstimate();
     }
 
 }

@@ -6,6 +6,7 @@ import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.EditWorklogDialog;
+import com.intellij.jira.util.JiraIssuTimeTrackingFactory;
 import com.intellij.jira.util.JiraIssueWorklogFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -20,11 +21,13 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
 
     private String issueKey;
     private JiraIssueWorklogFactory worklogFactory;
+    private JiraIssuTimeTrackingFactory timetrackingFactory;
 
-    public EditWorklogDialogAction(String issueKey, JiraIssueWorklogFactory factory) {
+    public EditWorklogDialogAction(String issueKey, JiraIssueWorklogFactory factory, JiraIssuTimeTrackingFactory timetrackingFactory) {
         super(properties);
         this.issueKey = issueKey;
         this.worklogFactory = factory;
+        this.timetrackingFactory = timetrackingFactory;
     }
 
     @Override
@@ -44,8 +47,7 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
         }
 
         if(Objects.nonNull(worklogToEdit)){
-
-            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, worklogToEdit, false);
+            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, worklogToEdit, timetrackingFactory.create(), false);
             dialog.show();
         }
     }
