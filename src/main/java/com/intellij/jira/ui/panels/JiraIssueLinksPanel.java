@@ -3,55 +3,38 @@ package com.intellij.jira.ui.panels;
 import com.intellij.jira.actions.AddIssueLinkDialogAction;
 import com.intellij.jira.actions.DeleteIssueLinkDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
+import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueLink;
 import com.intellij.jira.ui.JiraIssueLinkListModel;
 import com.intellij.jira.ui.renders.JiraIssueLinkListCellRenderer;
 import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
-import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 import static java.awt.BorderLayout.CENTER;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-class JiraIssueLinksPanel extends SimpleToolWindowPanel {
+class JiraIssueLinksPanel extends AbstractJiraPanel {
 
-    private String projectKey;
-    private String issueKey;
-    private List<JiraIssueLink> issueLinks;
-    private JBList<JiraIssueLink> issueLinkList;
     private JiraIssueLink issueLink;
+    private JBList<JiraIssueLink> issueLinkList;
 
-    JiraIssueLinksPanel(String projectKey, String issueKey, List<JiraIssueLink> issueLinks) {
-        super(true, true);
-        this.projectKey = projectKey;
-        this.issueKey = issueKey;
-        this.issueLinks = issueLinks;
-        initToolbar();
-        initContent();
+    JiraIssueLinksPanel(@NotNull JiraIssue issue) {
+        super(true, issue);
+        initContent(issue.getIssueLinks());
     }
 
-    private void initToolbar() {
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(TOOL_WINDOW_ID, createActionGroup(), true);
-        actionToolbar.setTargetComponent(this);
-
-        Box toolBarBox = Box.createHorizontalBox();
-        toolBarBox.add(actionToolbar.getComponent());
-        setToolbar(toolBarBox);
-    }
-
-    private ActionGroup createActionGroup() {
+    @Override
+    public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
         group.add(new AddIssueLinkDialogAction(projectKey, issueKey));
         group.add(new DeleteIssueLinkDialogAction(issueKey, () -> issueLink));
@@ -59,8 +42,7 @@ class JiraIssueLinksPanel extends SimpleToolWindowPanel {
         return group;
     }
 
-
-    private void initContent() {
+    private void initContent(List<JiraIssueLink> issueLinks) {
         JBPanel panel = new JBPanel(new BorderLayout());
 
         issueLinkList = new JBList<>();
@@ -84,6 +66,5 @@ class JiraIssueLinksPanel extends SimpleToolWindowPanel {
             initToolbar();
         }
     }
-
 
 }

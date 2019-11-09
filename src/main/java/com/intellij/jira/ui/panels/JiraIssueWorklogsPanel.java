@@ -10,9 +10,6 @@ import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.ui.JiraIssueWorklogListModel;
 import com.intellij.jira.ui.renders.JiraIssueWorklogListCellRender;
 import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -23,42 +20,26 @@ import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
-import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 import static java.awt.BorderLayout.CENTER;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
+class JiraIssueWorklogsPanel extends AbstractJiraPanel {
 
-    private String issueKey;
-    private String projectKey;
-    private List<JiraIssueWorklog> worklogs;
     private JiraIssueWorklog worklog;
     private JiraIssueTimeTracking timeTracking;
 
     private JBList<JiraIssueWorklog> issueWorklogList;
 
-    public JiraIssueWorklogsPanel(@NotNull JiraIssue issue) {
-        super(true);
-        this.issueKey = issue.getKey();
-        this.projectKey = issue.getProject().getKey();
-        this.worklogs = issue.getWorklogs();
+    JiraIssueWorklogsPanel(@NotNull JiraIssue issue) {
+        super(issue);
         this.timeTracking = issue.getTimetracking();
 
-        initToolbar();
-        initContent();
+        initContent(issue.getWorklogs());
     }
 
-    private void initToolbar() {
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(TOOL_WINDOW_ID, createActionGroup(), true);
-        actionToolbar.setTargetComponent(this);
-
-        Box toolBarBox = Box.createHorizontalBox();
-        toolBarBox.add(actionToolbar.getComponent());
-        setToolbar(toolBarBox);
-    }
-
-    private ActionGroup createActionGroup() {
+    @Override
+    public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
         group.add(new AddWorklogDialogAction(issueKey, projectKey, () -> timeTracking));
         group.add(new EditWorklogDialogAction(issueKey, projectKey, () -> worklog, () -> timeTracking));
@@ -67,7 +48,7 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
         return group;
     }
 
-    private void initContent(){
+    private void initContent(List<JiraIssueWorklog> worklogs){
         JBPanel panel = new JBPanel(new BorderLayout());
 
         issueWorklogList = new JBList<>();
@@ -91,6 +72,5 @@ public class JiraIssueWorklogsPanel extends SimpleToolWindowPanel {
             initToolbar();
         }
     }
-
 
 }
