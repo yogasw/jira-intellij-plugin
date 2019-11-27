@@ -17,15 +17,20 @@ import static com.intellij.openapi.util.text.StringUtil.trim;
 public class TextFieldEditor extends AbstractFieldEditor {
 
     protected JBTextField myTextField;
+    private String currentValue;
 
-    public TextFieldEditor(String fieldName, String issueKey, boolean required) {
+    public TextFieldEditor(String fieldName, String issueKey, boolean required, Object currentValue) {
         super(fieldName, issueKey, required);
+        if (currentValue instanceof String) {
+            this.currentValue = currentValue.toString();
+        }
     }
 
     @Override
     public JComponent createPanel() {
         this.myTextField = new JBTextField();
         this.myTextField.setPreferredSize(UI.size(250, 24));
+        this.myTextField.setText(currentValue);
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(this.myLabel, this.myTextField)

@@ -26,17 +26,19 @@ public class FieldEditorFactory {
 
     public static FieldEditor create(JiraIssueFieldProperties properties, JiraIssue issue){
 
+        Object currentValue = issue.getValueForField(properties);
+
         if(properties.getSchema().isCustomField()){
             return createCustomFieldEditor(properties, issue);
         }
 
         String fieldType = properties.getSchema().getSystem();
         if(TEXT_FIELDS.contains(fieldType)){
-            return new TextFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+            return new TextFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), currentValue);
         }else if(TEXT_AREA_FIELDS.contains(fieldType)){
-            return new TextAreaFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+            return new TextAreaFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), currentValue);
         }else if(DATE_FIELDS.contains(fieldType)){
-            return new DateFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+            return new DateFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), currentValue);
         }else if(USER_PICKER_FIELDS.contains(fieldType)) {
             return new UserSelectFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
         }else if("timetracking".equals(fieldType)){
@@ -47,7 +49,7 @@ public class FieldEditorFactory {
             return new LabelFieldEditor(properties.getName(), issue.getIssuetype().getName(), issue.getKey());
         }
 
-        return createCustomComboBoxFieldEditor(properties, issue.getKey());
+        return createCustomComboBoxFieldEditor(properties, issue.getKey(), currentValue);
     }
 
     public static CommentFieldEditor createCommentFieldEditor(String issueKey){
@@ -55,7 +57,7 @@ public class FieldEditorFactory {
     }
 
 
-    private static FieldEditor createCustomComboBoxFieldEditor(JiraIssueFieldProperties properties, String issueKey){
+    private static FieldEditor createCustomComboBoxFieldEditor(JiraIssueFieldProperties properties, String issueKey, Object currentValue){
         List<?> items = new ArrayList<>();
         JsonArray values = properties.getAllowedValues();
         if(isNull(values) || isEmpty(values)){
@@ -78,7 +80,7 @@ public class FieldEditorFactory {
         }
 
 
-        return new ComboBoxFieldEditor(properties.getName(), items, issueKey, properties.isRequired(), isArray);
+        return new ComboBoxFieldEditor(properties.getName(), items, issueKey, properties.isRequired(), isArray, currentValue);
     }
 
     private static FieldEditor createCustomFieldEditor(JiraIssueFieldProperties properties, JiraIssue issue) {
@@ -90,13 +92,13 @@ public class FieldEditorFactory {
         if(!isArray){
             if("string".equals(type)){
                 if("textarea".equals(customFieldType)){
-                    return new TextAreaFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+                    return new TextAreaFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), null);
                 }
-                return new TextFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+                return new TextFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), null);
             }else if("number".equals(type)){
                 return new NumberFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
             }else if("date".equals(type)){
-                return new DateFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+                return new DateFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), null);
             }else if("datetime".equals(type)){
                 return new DateTimeFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
             }

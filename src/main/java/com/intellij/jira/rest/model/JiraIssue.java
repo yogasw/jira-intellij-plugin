@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels";
+    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels,fixVersions";
 
     private String id;
     private String self;
@@ -94,6 +94,10 @@ public class JiraIssue {
         return fields.versions;
     }
 
+    public List<JiraProjectVersion> getFixVersions(){
+        return fields.fixVersions;
+    }
+
     public List<JiraIssueComponent> getComponents(){
         return fields.components;
     }
@@ -118,6 +122,66 @@ public class JiraIssue {
         return !getLabels().isEmpty();
     }
 
+    public Object getValueForField(JiraIssueFieldProperties property) {
+        String field = property.getSchema().getSystem();
+
+        if (field.equals("summary")) {
+            return getSummary();
+        }
+        if (field.equals("description")) {
+            return getDescription();
+        }
+        if (field.equals("created")) {
+            return getCreated();
+        }
+        if (field.equals("updated")) {
+            return getUpdated();
+        }
+        if (field.equals("duedate")) {
+            return getDuedate();
+        }
+        if (field.equals("resolutiondate")) {
+            return getResolutiondate();
+        }
+        if (field.equals("assignee")) {
+            return getAssignee();
+        }
+        if (field.equals("reporter")) {
+            return getReporter();
+        }
+        if (field.equals("issuetype")) {
+            return getIssuetype();
+        }
+        if (field.equals("status")) {
+            return getStatus();
+        }
+        if (field.equals("priority")) {
+            return getPriority();
+        }
+        if (field.equals("comment")) {
+            return getComponents();
+        }
+        if (field.equals("issuelinks")) {
+            return getIssueLinks();
+        }
+        if (field.equals("project")) {
+            return getProject();
+        }
+        if (field.equals("versions")) {
+            return getVersions();
+        }
+        if (field.equals("components")) {
+            return getComponents();
+        }
+        if (field.equals("labels")) {
+            return getLabels();
+        }
+        if (field.equals("fixVersions")) {
+            return getFixVersions();
+        }
+        return null;
+    }
+
     public static class Fields{
 
         private String summary;
@@ -138,6 +202,7 @@ public class JiraIssue {
         private List<JiraProjectVersion> versions = new ArrayList<>();
         private List<JiraIssueComponent> components = new ArrayList<>();
         private List<String> labels = new ArrayList<>();
+        private List<JiraProjectVersion> fixVersions = new ArrayList<>();
 
         public Fields() { }
 

@@ -10,10 +10,12 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
 import static com.intellij.openapi.util.text.StringUtil.*;
@@ -26,14 +28,21 @@ public class DateFieldEditor extends AbstractFieldEditor {
     private JPanel myPanel;
     protected JFormattedTextField myFormattedTextField;
     protected JLabel myInfoLabel;
+    private Date currentValue;
 
-    public DateFieldEditor(String fieldName, String issueKey, boolean required) {
+    public DateFieldEditor(String fieldName, String issueKey, boolean required, Object currentValue) {
         super(fieldName, issueKey, required);
+        if (currentValue instanceof Date) {
+            this.currentValue = (Date) currentValue;
+        }
     }
 
     @Override
     public JComponent createPanel() {
         myFormattedTextField.setFormatterFactory(new DefaultFormatterFactory(getDateFormatter()));
+        if (currentValue != null) {
+            myFormattedTextField.setValue(currentValue);
+        }
         myInfoLabel.setToolTipText(getToolTipMessage());
         myInfoLabel.setIcon(AllIcons.Actions.Help);
 

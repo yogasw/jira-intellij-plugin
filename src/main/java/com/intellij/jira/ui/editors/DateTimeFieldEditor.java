@@ -24,7 +24,7 @@ public class DateTimeFieldEditor extends DateFieldEditor {
     private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.ss+0000";
 
     public DateTimeFieldEditor(String fieldName, String issueKey, boolean required) {
-        super(fieldName, issueKey, required);
+        super(fieldName, issueKey, required, null);
     }
 
     @Override
