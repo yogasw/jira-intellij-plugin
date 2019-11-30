@@ -75,7 +75,7 @@ public class JiraIssueUtil {
         return body.replaceAll("\r\n", "\\\\n");
     }
 
-    private static String getPrettyDateTime(Date date){
+    public static String getPrettyDateTime(Date date){
         return DateFormatUtil.formatPrettyDateTime(date);
     }
 

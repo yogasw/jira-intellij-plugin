@@ -184,6 +184,17 @@ public class JiraRestApi {
         }
     }
 
+    public JiraIssueWorklog getWorklog(String issueKey, String worklogId){
+        JiraIssueWorklog worklog = null;
+        try {
+            worklog = jiraRestClient.getWorklog(issueKey, worklogId);
+        } catch (Exception e) {
+            log.error(String.format("WorkLog with id = %s doesn't exists", worklogId));
+        }
+
+        return worklog;
+    }
+
     public String getDefaultSearchQuery(){
         return jiraRestClient.getDefaultSearchQuery();
     }
@@ -216,7 +227,7 @@ public class JiraRestApi {
             Integer statusCode = jiraRestClient.deleteIssueLink(issueLinkId);
             return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
         } catch (Exception e) {
-            log.error("Error creating issue link");
+            log.error("Error deleting issue link");
             return BodyResult.error();
         }
     }
@@ -225,4 +236,33 @@ public class JiraRestApi {
         return jiraRestClient.getUsername();
     }
 
+    public Result addIssueWorklog(String issueKey, List<FieldEditorInfo> worklogFields, String remainingEstimate) {
+        try {
+            JiraIssueWorklog worklog = jiraRestClient.addIssueWorklog(issueKey, worklogFields, remainingEstimate);
+            return BodyResult.ok(worklog);
+        } catch (Exception e) {
+            log.error(String.format("Error creating worklog in issue '%s'", issueKey));
+            return BodyResult.error();
+        }
+    }
+
+    public Result editIssueWorklog(String issueKey, String workLogId, List<FieldEditorInfo> worklogFields, String remainingEstimate) {
+        try {
+            JiraIssueWorklog worklog = jiraRestClient.updateIssueWorklog(issueKey, workLogId, worklogFields, remainingEstimate);
+            return BodyResult.ok(worklog);
+        } catch (Exception e) {
+            log.error(String.format("Error editing worklog in issue '%s'", issueKey));
+            return BodyResult.error();
+        }
+    }
+
+    public Result deleteIssueWorklog(String issueKey, String worklogId, String remainingEstimate) {
+        try {
+            Integer statusCode = jiraRestClient.deleteIssueWorklog(issueKey, worklogId, remainingEstimate);
+            return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error deleting issue link");
+            return BodyResult.error();
+        }
+    }
 }
