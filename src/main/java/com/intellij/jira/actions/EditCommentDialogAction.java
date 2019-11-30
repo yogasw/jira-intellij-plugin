@@ -32,7 +32,7 @@ public class EditCommentDialogAction extends JiraIssueDialogAction {
 
     @Override
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
-        JiraIssueComment commentToEdit = null;
+        JiraIssueComment commentToEdit = jiraRestApi.getComment(issueKey, commentFactory.create().getId());
         // Check permissions
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_ALL_COMMENTS);
         if(!userHasPermission){
@@ -41,7 +41,6 @@ public class EditCommentDialogAction extends JiraIssueDialogAction {
                 throw new InvalidPermissionException("Edited comment failed", "You don't have permission to edit comments");
             }
 
-            commentToEdit = jiraRestApi.getComment(issueKey, commentFactory.create().getId());
             if(nonNull(commentToEdit) && !commentToEdit.getAuthor().getName().equals(jiraRestApi.getUsername())){
                 throw new InvalidPermissionException("Edited comment failed", "This comment not yours. You cannot edit it.");
             }

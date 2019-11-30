@@ -13,15 +13,17 @@ import static com.intellij.jira.ui.editors.FieldEditorFactory.createCommentField
 
 public final class TransitionFieldHelper {
 
-
     public static FieldEditorInfo createFieldEditorInfo(JiraIssueFieldProperties properties, JiraIssue issueKey){
         return new FieldEditorInfo(properties, issueKey);
+    }
+
+    public static FieldEditorInfo createFieldEditorInfo(String jsonFieldName, FieldEditor fieldEditor){
+        return new FieldEditorInfo(jsonFieldName, fieldEditor);
     }
 
     public static FieldEditorInfo createCommentFieldEditorInfo(String issueKey){
         return new FieldEditorInfo("comment", createCommentFieldEditor(issueKey));
     }
-
 
     public static class FieldEditorInfo {
 
@@ -58,9 +60,5 @@ public final class TransitionFieldHelper {
         }
 
     }
-
-
-
-
 
 }

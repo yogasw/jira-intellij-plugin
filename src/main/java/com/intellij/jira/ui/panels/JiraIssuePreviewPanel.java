@@ -12,9 +12,6 @@ import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
@@ -27,7 +24,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 import static com.intellij.jira.util.JiraLabelUtil.*;
 import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
 import static java.awt.BorderLayout.*;
@@ -37,25 +33,26 @@ import static javax.swing.BoxLayout.Y_AXIS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
+class JiraIssuePreviewPanel extends AbstractJiraPanel {
 
     private JiraIssue issue;
 
     JiraIssuePreviewPanel(@NotNull JiraIssue issue) {
-        super(true, true);
+        super(true, issue);
         this.issue = issue;
         setBackground(JBColor.white);
-        initToolbar();
+
         initContent();
     }
 
-    private void initToolbar(){
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(TOOL_WINDOW_ID, createActionGroup(), true);
-        actionToolbar.setTargetComponent(this);
+    @Override
+    public ActionGroup getActionGroup() {
+        JiraIssueActionGroup group = new JiraIssueActionGroup(this);
+        group.add(new TransitIssueDialogAction(() -> issue));
+        group.add(new JiraIssueAssigneePopupAction(() -> issue));
+        group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
 
-        Box toolBarBox = Box.createHorizontalBox();
-        toolBarBox.add(actionToolbar.getComponent());
-        setToolbar(toolBarBox);
+        return group;
     }
 
     private void initContent() {
@@ -185,16 +182,6 @@ class JiraIssuePreviewPanel extends SimpleToolWindowPanel {
         previewPanel.add(ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);
 
         setContent(previewPanel);
-    }
-
-
-    private ActionGroup createActionGroup(){
-        JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new TransitIssueDialogAction(() -> issue));
-        group.add(new JiraIssueAssigneePopupAction(() -> issue));
-        group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
-
-        return group;
     }
 
     private String getVersionsNames(List<JiraProjectVersion> versions){

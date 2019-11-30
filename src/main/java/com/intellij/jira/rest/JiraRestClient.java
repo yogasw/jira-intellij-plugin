@@ -1,9 +1,11 @@
 package com.intellij.jira.rest;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.*;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
@@ -20,6 +22,7 @@ import static com.intellij.jira.util.JiraGsonUtil.*;
 import static java.util.Objects.nonNull;
 
 public class JiraRestClient {
+
     private static final Integer MAX_ISSUES_RESULTS = 500;
     private static final Integer MAX_USERS_RESULTS = 200;
 
@@ -27,6 +30,7 @@ public class JiraRestClient {
     private static final String TRANSITIONS = "transitions";
     private static final String SEARCH = "search";
     private static final String COMMENT = "comment";
+    private static final String WORKLOG = "worklog";
 
     private JiraRepository jiraRepository;
 
@@ -261,6 +265,59 @@ public class JiraRestClient {
 
     public String getUsername(){
         return this.jiraRepository.getUsername();
+    }
+
+    public JiraIssueWorklog getWorklog(String issueKey, String worklogId) throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, worklogId));
+        String response = jiraRepository.executeMethod(method);
+        
+        return parseIssueWorklog(response);
+    }
+
+    public JiraIssueWorklog addIssueWorklog(String issueKey, List<FieldEditorInfo> worklogFields, String remainingEstimate) throws Exception {
+        String requestBody = prepareWorklogBody(worklogFields);
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG));
+        if(StringUtil.isNotEmpty(remainingEstimate)){
+            method.setQueryString("adjustEstimate=" + remainingEstimate);
+        }
+        method.setRequestEntity(createJsonEntity(requestBody));
+        String response = jiraRepository.executeMethod(method);
+        
+        return parseIssueWorklog(response);
+    }
+    
+    public JiraIssueWorklog updateIssueWorklog(String issueKey, String workLogId, List<FieldEditorInfo> worklogFields, String remainingEstimate) throws Exception {
+        String requestBody = prepareWorklogBody(worklogFields);
+        PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, workLogId));
+        if(StringUtil.isNotEmpty(remainingEstimate)){
+            method.setQueryString("adjustEstimate=" + remainingEstimate);
+        }
+        method.setRequestEntity(createJsonEntity(requestBody));
+        String response = jiraRepository.executeMethod(method);
+
+        return parseIssueWorklog(response);
+    }
+
+    private String prepareWorklogBody(List<FieldEditorInfo> worklogFields){
+        JsonObject worklogObject = new JsonObject();
+        for(FieldEditorInfo editorInfo : worklogFields){
+            JsonElement jsonValue = editorInfo.getJsonValue();
+            if(!jsonValue.isJsonNull()){
+                worklogObject.add(editorInfo.getName(), jsonValue);
+            }
+        }
+
+        return worklogObject.toString();
+    }
+
+    public Integer deleteIssueWorklog(String issueKey, String worklogId, String remainingEstimate) throws Exception {
+        DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, worklogId));
+        if(StringUtil.isNotEmpty(remainingEstimate)){
+            method.setQueryString("adjustEstimate=" + remainingEstimate);
+        }
+
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
     }
 
 }

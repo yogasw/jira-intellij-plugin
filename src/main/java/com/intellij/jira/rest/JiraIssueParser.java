@@ -81,4 +81,8 @@ public class JiraIssueParser {
         return JiraRepository.GSON.fromJson(response, JiraPermissionsWrapper.class).getPermissions();
     }
 
+    public static JiraIssueWorklog parseIssueWorklog(String response){
+        return  JiraRepository.GSON.fromJson(response, JiraIssueWorklog.class);
+    }
+
 }
