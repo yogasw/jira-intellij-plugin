@@ -84,7 +84,7 @@ public class JiraIssue {
     }
 
     public List<JiraIssueWorklog> getWorklogs(){
-        return fields.worklog.getWorklogs();
+        return Objects.nonNull(fields.worklog) ? fields.worklog.getWorklogs() : new ArrayList<>();
     }
 
     public JiraIssueTimeTracking getTimetracking(){
