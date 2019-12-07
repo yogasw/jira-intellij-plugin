@@ -14,7 +14,9 @@ import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class TextAreaFieldEditor extends AbstractFieldEditor {
 
+    @SuppressWarnings("unused")
     private JPanel myPanel;
+    @SuppressWarnings("unused")
     private JLabel myTextAreaLabel;
     protected JTextArea myTextArea;
     private String currentValue;

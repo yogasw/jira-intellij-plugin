@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -26,9 +25,11 @@ public class DateFieldEditor extends AbstractFieldEditor {
 
     private static final DateFormatter DATE_FORMATTER = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd"));
 
+    @SuppressWarnings("unused")
+    private JPanel myPanel;
+    protected JFormattedTextField myFormattedTextField;
     protected JLabel myInfoLabel;
     private Date currentValue;
-    protected JFormattedTextField myFormattedTextField;
 
     public DateFieldEditor(String fieldName, String issueKey, boolean required, Object currentValue) {
         super(fieldName, issueKey, required);
@@ -46,9 +47,7 @@ public class DateFieldEditor extends AbstractFieldEditor {
         myInfoLabel.setToolTipText(getToolTipMessage());
         myInfoLabel.setIcon(AllIcons.Actions.Help);
 
-        return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myFormattedTextField)
-                .getPanel();
+        return myPanel;
     }
 
 
