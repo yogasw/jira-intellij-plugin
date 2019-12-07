@@ -56,4 +56,8 @@ public class TextFieldEditor extends AbstractFieldEditor {
 
         return null;
     }
+
+    public JBTextField getMyTextField() {
+        return myTextField;
+    }
 }

@@ -72,4 +72,8 @@ public class JiraGsonUtil {
         return new JsonPrimitive(value);
     }
 
+    public static JsonElement createPrimitive(Integer value){
+        return new JsonPrimitive(value);
+    }
+
 }

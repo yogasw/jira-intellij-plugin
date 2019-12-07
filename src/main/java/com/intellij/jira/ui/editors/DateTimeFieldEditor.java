@@ -4,7 +4,6 @@ import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.text.DateFormatter;
-import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -12,10 +11,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
-import static com.intellij.openapi.util.text.StringUtil.isEmpty;
-import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
-import static com.intellij.openapi.util.text.StringUtil.trim;
+import static com.intellij.openapi.util.text.StringUtil.*;
 
 
 public class DateTimeFieldEditor extends DateFieldEditor {
@@ -40,7 +38,7 @@ public class DateTimeFieldEditor extends DateFieldEditor {
             return "";
         }
 
-        LocalDate ld = Date.valueOf(words[0]).toLocalDate();
+        LocalDate ld = LocalDate.parse(words[0]);
         LocalTime lt = Time.valueOf(words[1]).toLocalTime();
 
         return DateTimeFormatter.ofPattern(ISO_FORMAT).format(LocalDateTime.of(ld, lt));

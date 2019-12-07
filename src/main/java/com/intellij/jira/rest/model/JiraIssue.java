@@ -1,6 +1,7 @@
 package com.intellij.jira.rest.model;
 
 import com.intellij.jira.rest.JiraIssueCommentsWrapper;
+import com.intellij.jira.rest.JiraIssueWorklogsWrapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels,fixVersions";
+    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels,worklog,timetracking,fixVersions";
 
     private String id;
     private String self;
@@ -80,6 +81,14 @@ public class JiraIssue {
 
     public JiraIssueCommentsWrapper getComments(){
         return fields.comment;
+    }
+
+    public List<JiraIssueWorklog> getWorklogs(){
+        return Objects.nonNull(fields.worklog) ? fields.worklog.getWorklogs() : new ArrayList<>();
+    }
+
+    public JiraIssueTimeTracking getTimetracking(){
+        return fields.timetracking;
     }
 
     public List<JiraIssueLink> getIssueLinks(){
@@ -197,6 +206,8 @@ public class JiraIssue {
         private JiraIssueUser creator;
         private JiraIssueUser reporter;
         private JiraIssueCommentsWrapper comment;
+        private JiraIssueWorklogsWrapper worklog;
+        private JiraIssueTimeTracking timetracking;
         private List<JiraIssueLink> issuelinks = new ArrayList<>();
         private JiraProject project;
         private List<JiraProjectVersion> versions = new ArrayList<>();
@@ -205,7 +216,6 @@ public class JiraIssue {
         private List<JiraProjectVersion> fixVersions = new ArrayList<>();
 
         public Fields() { }
-
 
     }
 

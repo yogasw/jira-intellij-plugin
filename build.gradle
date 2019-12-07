@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.jetbrains.intellij" version "0.4.14"
+    id 'org.jetbrains.intellij' version '0.4.14'
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 group 'com.intellij'
-version '1.4'
+version '2.1.1'
 
 sourceCompatibility = 1.8
 
@@ -22,13 +22,14 @@ dependencies {
 }
 
 intellij {
-    version '2018.3'
+    version = '2019.3'
     plugins 'tasks'
 }
+
 patchPluginXml {
     changeNotes """
-      Version 1.4<br>
+      Version 2.1.1<br>
       <ul>
-        <li>Support 2018.3+</li>
+        <li>Support 2019.3+</li>
       </ul>"""
 }
