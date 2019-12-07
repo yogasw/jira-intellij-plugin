@@ -1,7 +1,14 @@
 package com.intellij.jira.ui.editors;
 
 import com.google.gson.JsonArray;
-import com.intellij.jira.rest.model.*;
+import com.intellij.jira.rest.model.JiraCustomFieldOption;
+import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueFieldProperties;
+import com.intellij.jira.rest.model.JiraIssuePriority;
+import com.intellij.jira.rest.model.JiraIssueResolution;
+import com.intellij.jira.rest.model.JiraProject;
+import com.intellij.jira.rest.model.JiraProjectComponent;
+import com.intellij.jira.rest.model.JiraProjectVersion;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -22,46 +29,46 @@ public class FieldEditorFactory {
     private static final Set<String> DATE_FIELDS = ContainerUtil.immutableSet("duedate");
     private static final Set<String> USER_PICKER_FIELDS = ContainerUtil.immutableSet("assignee", "reporter");
 
-    private static final Set<String> CF_TEXT_FIELDS = ContainerUtil.immutableSet( "float", "textfield");
+    private static final Set<String> CF_TEXT_FIELDS = ContainerUtil.immutableSet("float", "textfield");
 
-    public static FieldEditor create(JiraIssueFieldProperties properties, JiraIssue issue){
+    public static FieldEditor create(JiraIssueFieldProperties properties, JiraIssue issue) {
 
         Object currentValue = issue.getValueForField(properties);
 
-        if(properties.getSchema().isCustomField()){
+        if (properties.getSchema().isCustomField()) {
             return createCustomFieldEditor(properties, issue);
         }
 
         String fieldType = properties.getSchema().getSystem();
-        if(TEXT_FIELDS.contains(fieldType)){
+        if (TEXT_FIELDS.contains(fieldType)) {
             return new TextFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), currentValue);
-        }else if(TEXT_AREA_FIELDS.contains(fieldType)){
+        } else if (TEXT_AREA_FIELDS.contains(fieldType)) {
             return new TextAreaFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), currentValue);
-        }else if(DATE_FIELDS.contains(fieldType)){
+        } else if (DATE_FIELDS.contains(fieldType)) {
             return new DateFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), currentValue);
-        }else if(USER_PICKER_FIELDS.contains(fieldType)) {
+        } else if (USER_PICKER_FIELDS.contains(fieldType)) {
             return new UserSelectFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
-        }else if("timetracking".equals(fieldType)){
+        } else if ("timetracking".equals(fieldType)) {
             return new TimeTrackingFieldEditor(issue.getKey(), properties.isRequired());
-        }else if("issuelinks".equals(fieldType)){
+        } else if ("issuelinks".equals(fieldType)) {
             return new LinkedIssueFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), issue.getProject().getKey());
-        }else if("issuetype".equals(fieldType)){
+        } else if ("issuetype".equals(fieldType)) {
             return new LabelFieldEditor(properties.getName(), issue.getIssuetype().getName(), issue.getKey());
         }
 
         return createCustomComboBoxFieldEditor(properties, issue.getKey(), currentValue);
     }
 
-    public static CommentFieldEditor createCommentFieldEditor(String issueKey){
+    public static CommentFieldEditor createCommentFieldEditor(String issueKey) {
         return new CommentFieldEditor(issueKey);
     }
 
 
-    private static FieldEditor createCustomComboBoxFieldEditor(JiraIssueFieldProperties properties, String issueKey, Object currentValue){
+    private static FieldEditor createCustomComboBoxFieldEditor(JiraIssueFieldProperties properties, String issueKey, Object currentValue) {
         List<?> items = new ArrayList<>();
         JsonArray values = properties.getAllowedValues();
-        if(isNull(values) || isEmpty(values)){
-            if(StringUtil.isEmpty(properties.getAutoCompleteUrl())){
+        if (isNull(values) || isEmpty(values)) {
+            if (StringUtil.isEmpty(properties.getAutoCompleteUrl())) {
                 return new LabelFieldEditor(properties.getName(), issueKey);
             }
 
@@ -69,59 +76,61 @@ public class FieldEditorFactory {
 
         boolean isArray = properties.getSchema().getType().equals("array");
         String type = isArray ? properties.getSchema().getItems() : properties.getSchema().getType();
-        if("priority".equals(type)){
+        if ("priority".equals(type)) {
             items = Arrays.asList(GSON.fromJson(values, JiraIssuePriority[].class));
-        }else if("version".equals(type)){
+        } else if ("version".equals(type)) {
             items = Arrays.asList(GSON.fromJson(values, JiraProjectVersion[].class));
-        }else if("resolution".equals(type)){
+        } else if ("resolution".equals(type)) {
             items = Arrays.asList(GSON.fromJson(values, JiraIssueResolution[].class));
-        }else if("component".equals(type)){
+        } else if ("component".equals(type)) {
             items = Arrays.asList(GSON.fromJson(values, JiraProjectComponent[].class));
         }
 
-
-        return new ComboBoxFieldEditor(properties.getName(), items, issueKey, properties.isRequired(), isArray, currentValue);
+        if (isArray) {
+            return new MultiSelectFieldEditor<>(properties.getName(), items, issueKey, properties.isRequired(), currentValue);
+        } else {
+            return new ComboBoxFieldEditor<>(properties.getName(), items, issueKey, properties.isRequired(), isArray, currentValue);
+        }
     }
 
     private static FieldEditor createCustomFieldEditor(JiraIssueFieldProperties properties, JiraIssue issue) {
 
         boolean isArray = properties.getSchema().getType().equals("array");
-        String type =  isArray ? properties.getSchema().getItems() : properties.getSchema().getType();
+        String type = isArray ? properties.getSchema().getItems() : properties.getSchema().getType();
         String customFieldType = properties.getSchema().getCustom();
 
-        if(!isArray){
-            if("string".equals(type)){
-                if("textarea".equals(customFieldType)){
+        if (!isArray) {
+            if ("string".equals(type)) {
+                if ("textarea".equals(customFieldType)) {
                     return new TextAreaFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), null);
                 }
                 return new TextFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), null);
-            }else if("number".equals(type)){
+            } else if ("number".equals(type)) {
                 return new NumberFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
-            }else if("date".equals(type)){
+            } else if ("date".equals(type)) {
                 return new DateFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), null);
-            }else if("datetime".equals(type)){
-                return new DateTimeFieldEditor(properties.getName(), issue.getKey(), properties.isRequired());
+            } else if ("datetime".equals(type)) {
+                return new DateTimeFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), null);
             }
         }
 
         // The field has not values so we have to retrieve them
         JsonArray values = properties.getAllowedValues();
-        if(isNull(values) || isEmpty(values)){
-            if("user".equals(type)){
+        if (isNull(values) || isEmpty(values)) {
+            if ("user".equals(type)) {
                 return new UserSelectFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), isArray);
-            }else if("group".equals(type)){
+            } else if ("group".equals(type)) {
                 return new GroupSelectFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), isArray);
-            }
-            else{
+            } else {
                 return new LabelFieldEditor(properties.getName(), issue.getKey());
             }
         }
 
         // The field has values
-        if("project".equals(type)){
+        if ("project".equals(type)) {
             List<JiraProject> projects = Arrays.asList(GSON.fromJson(values, JiraProject[].class));
             return new ProjectSelectFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), isArray, projects);
-        }else if("version".equals(type)){
+        } else if ("version".equals(type)) {
             List<JiraProjectVersion> versions = Arrays.asList(GSON.fromJson(values, JiraProjectVersion[].class));
             return new VersionSelectFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), isArray, versions);
         }
@@ -130,8 +139,6 @@ public class FieldEditorFactory {
         return new OptionSelectFieldEditor(properties.getName(), issue.getKey(), properties.isRequired(), isArray, options);
 
     }
-
-
 
 
 }

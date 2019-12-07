@@ -133,6 +133,9 @@ public class JiraIssue {
 
     public Object getValueForField(JiraIssueFieldProperties property) {
         String field = property.getSchema().getSystem();
+        if (field == null) {
+            return null;
+        }
 
         if (field.equals("summary")) {
             return getSummary();
@@ -187,6 +190,12 @@ public class JiraIssue {
         }
         if (field.equals("fixVersions")) {
             return getFixVersions();
+        }
+        if (field.equals("worklog")) {
+            return getWorklogs();
+        }
+        if (field.equals("timetracking")) {
+            return getTimetracking();
         }
         return null;
     }

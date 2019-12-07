@@ -150,9 +150,14 @@ public class JiraRestClient {
         return jiraRepository.executeMethod(method);
     }
 
-    public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey) throws Exception {
+    public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey, JiraPermissionType permission) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("mypermissions"));
-        method.setQueryString(new NameValuePair[]{new NameValuePair("issueKey", issueKey)});
+        method.setQueryString(new NameValuePair[]{
+                new NameValuePair("issueKey", issueKey),
+                // "permissions" to check is required to be added right from the start
+                // https://blog.developer.atlassian.com/change-notice-get-my-permissions-requires-permissions-query-parameter/
+                new NameValuePair("permissions", permission.toString())
+        });
         String response = jiraRepository.executeMethod(method);
         return parsePermissions(response);
     }

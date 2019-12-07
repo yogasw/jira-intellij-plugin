@@ -152,7 +152,7 @@ public class JiraRestApi {
     public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType permission){
         LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
         try {
-            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey);
+            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey, permission);
         } catch (Exception e) {
             log.error("Current user has not permission to do this action");
         }

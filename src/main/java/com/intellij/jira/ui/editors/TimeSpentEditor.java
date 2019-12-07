@@ -19,7 +19,7 @@ public class TimeSpentEditor extends TextFieldEditor {
     }
 
     public TimeSpentEditor(String fieldName, String fieldValue, String issueKey, boolean required) {
-        super(fieldName, fieldValue, issueKey, required);
+        super(fieldName, fieldValue, required, issueKey);
     }
 
     @Override

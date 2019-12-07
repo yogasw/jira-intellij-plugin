@@ -33,6 +33,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor {
                 T item = findItem(items, value);
                 if (item != null) {
                     this.myComboBoxItems.setSelectedItem(item);
+                    break;
                 }
             }
         } else if (currentValue != null) {
