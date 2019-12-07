@@ -2,142 +2,108 @@ package com.intellij.jira.ui.editors;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
-import com.intellij.jira.util.JiraGsonUtil;
-import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.util.ui.FormBuilder;
-import com.intellij.util.ui.UI;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-public class MultiSelectFieldEditor<T> extends AbstractFieldEditor {
-    private final static int DEFAULT_WIDTH = 450;
-    private final static int DEFAULT_HEIGHT = 24;
+import static com.intellij.jira.util.JiraGsonUtil.createArrayNameObjects;
+import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
+import static com.intellij.openapi.util.text.StringUtil.isEmpty;
+import static com.intellij.openapi.util.text.StringUtil.trim;
+import static com.intellij.util.containers.ContainerUtil.getFirstItem;
+import static java.util.Objects.nonNull;
 
-    private final static String VALUE_PROPERTY = "_value";
-
-    private JButton triggerPopup;
-    private List<JCheckBoxMenuItem> selectableItems;
+public class MultiSelectFieldEditor<T> extends SelectFieldEditor {
+    private List<String> selectedItems = new ArrayList<>();
 
     public MultiSelectFieldEditor(String fieldName, List<T> items, String issueKey, boolean required, Object currentValue) {
-        super(fieldName, issueKey, required);
-        JPopupMenu popupMenu = new JPopupMenu("");
-
-        this.triggerPopup = new JButton("");
-        this.triggerPopup.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-        this.triggerPopup.addActionListener(e -> popupMenu.show(triggerPopup, 0, 0));
-
-        this.selectableItems = new ArrayList<>();
-
-        JMenuItem header = new JMenuItem(this.myLabel.getMyLabelText());
-        header.setEnabled(false);
-        popupMenu.add(header);
-        popupMenu.add(new JSeparator());
-        for (T item : items) {
-            JCheckBoxMenuItem selectableItem = new JCheckBoxMenuItem(item != null ? item.toString() : "");
-            selectableItem.setState(isSelected(currentValue, item));
-            selectableItem.putClientProperty(VALUE_PROPERTY, item);
-            selectableItem.addActionListener(e -> recalcTriggerText());
-
-            this.selectableItems.add(selectableItem);
-            popupMenu.add(selectableItem);
+        super(fieldName, issueKey, required, true);
+        List currentItems = Collections.emptyList();
+        if (currentValue instanceof List) {
+            currentItems = (List) currentValue;
+        } else if (currentValue != null) {
+            currentItems = Collections.singletonList(currentValue);
         }
-        recalcTriggerText();
+        myButtonAction = new ItemPickerDialogAction(fieldName, items, currentItems);
 
-        this.triggerPopup.setComponentPopupMenu(popupMenu);
+        myTextField.setText(currentItems.isEmpty() ? "" : String.join(", ", toStringList(currentItems)));
     }
 
-    private void recalcTriggerText() {
-        StringBuilder sb = new StringBuilder();
+    @NotNull
+    private List<String> toStringList(List items) {
+        if (items == null) {
+            return Collections.emptyList();
+        }
 
-        Collection<T> selectedValues = getSelectedValues();
-        for (T selectedValue : selectedValues) {
-            if (selectedValue == null) {
+        List<String> itemsToString = new ArrayList<>();
+        for (Object item : items) {
+            if (item == null) {
                 continue;
             }
-
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(selectedValue.toString());
+            itemsToString.add(item.toString());
         }
-
-        this.triggerPopup.setText(sb.length() > 0 ? sb.toString() : "-");
+        return itemsToString;
     }
-
-    private boolean isSelected(Object currentValue, T item) {
-        if (currentValue instanceof List) {
-            if (findItem((List) currentValue, item) != null) {
-                return true;
-            }
-        } else if (currentValue != null) {
-            return currentValue.equals(item);
-        }
-
-        return false;
-    }
-
-    private T findItem(List<T> items, Object value) {
-        for (T item : items) {
-            if (item != null && item.equals(value)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public JComponent createPanel() {
-        return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.triggerPopup)
-                .getPanel();
-    }
-
 
     @Override
     public JsonElement getJsonValue() {
-        Collection<T> selectedValues = getSelectedValues();
-        List<String> selectedValuesToString = new ArrayList<>();
-        for (T selectedValue : selectedValues) {
-            if (selectedValue == null) {
-                continue;
-            }
-
-            selectedValuesToString.add(selectedValue.toString());
-        }
-
-        if (selectedValuesToString.isEmpty()) {
+        if (isEmpty(trim(myTextField.getText()))) {
             return JsonNull.INSTANCE;
         }
 
+        if (isMultiSelect) {
+            return createArrayNameObjects(selectedItems);
+        }
 
-        return JiraGsonUtil.createArrayNameObjects(selectedValuesToString);
+        return createNameObject(getFirstItem(selectedItems));
     }
 
-    private Collection<T> getSelectedValues() {
-        Set<T> ret = new LinkedHashSet<>();
-        for (JCheckBoxMenuItem selectableItem : selectableItems) {
-            if (selectableItem.getState()) {
-                ret.add((T) selectableItem.getClientProperty(VALUE_PROPERTY));
+    private class ItemPickerDialogAction extends PickerDialogAction {
+        private List<T> items;
+        private List<T> selectedItems;
+        private String fieldName;
+
+        public ItemPickerDialogAction(String fieldName, List<T> items, List<T> selectedItems) {
+            super();
+
+            this.fieldName = fieldName;
+            this.items = items;
+            this.selectedItems = selectedItems;
+        }
+
+        @Override
+        public void actionPerformed(AnActionEvent e) {
+            super.actionPerformed(e);
+            if (nonNull(myJiraRestApi)) {
+                List<String> items = toStringList(this.items);
+                items.sort(String.CASE_INSENSITIVE_ORDER);
+
+                List<String> selectedItems = toStringList(this.selectedItems);
+
+                ItemPickerDialog dialog = new ItemPickerDialog(myProject, fieldName, items, selectedItems);
+                dialog.show();
             }
-        }
 
-        return ret;
+        }
     }
 
-    @Nullable
-    @Override
-    public ValidationInfo validate() {
-        Collection<T> selectedValues = getSelectedValues();
-        if (isRequired() && selectedValues.isEmpty()) {
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+    class ItemPickerDialog extends PickerDialog<String> {
+
+        public ItemPickerDialog(@Nullable Project project, String fieldName, List<String> items, List<String> selectedItems) {
+            super(project, fieldName, items, selectedItems);
         }
 
-        return null;
+        @Override
+        protected void doOKAction() {
+            selectedItems = myList.getSelectedValuesList();
+            myTextField.setText(selectedItems.isEmpty() ? "" : String.join(", ", selectedItems));
+
+            super.doOKAction();
+        }
     }
 }

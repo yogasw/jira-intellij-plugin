@@ -57,7 +57,7 @@ public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFie
     class OptionPickerDialog extends PickerDialog<JiraCustomFieldOption>{
 
         OptionPickerDialog(@Nullable Project project) {
-            super(project, "Options", myItems);
+            super(project, "Options", myItems, null);
         }
 
         @Override
