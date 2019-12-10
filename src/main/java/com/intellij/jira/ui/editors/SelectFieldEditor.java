@@ -13,6 +13,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.containers.IntArrayList;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.awt.BorderLayout.CENTER;
@@ -91,12 +93,24 @@ public abstract class SelectFieldEditor extends AbstractFieldEditor {
 
         protected JBList<E> myList;
 
-        public PickerDialog(@Nullable Project project, @NotNull String title, List<E> items ) {
+        public PickerDialog(@Nullable Project project, @NotNull String title, List<E> items, List<E> selectedItems) {
             super(project, false);
             setTitle(title);
             this.myList = new JBList(items);
             this.myList.setPreferredSize(getPreferredSizeList());
             this.myList.setSelectionMode(isMultiSelect ? MULTIPLE_INTERVAL_SELECTION: SINGLE_SELECTION);
+            if (selectedItems != null) {
+                IntArrayList selectedIndices = new IntArrayList();
+                for (E selectedItem : selectedItems) {
+                    int pos = items.indexOf(selectedItem);
+                    if (pos > -1) {
+                        selectedIndices.add(pos);
+                    }
+                }
+                if (selectedIndices.size() > 0) {
+                    this.myList.setSelectedIndices(selectedIndices.toArray());
+                }
+            }
 
             init();
         }

@@ -38,18 +38,20 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
         JiraIssueWorklog worklogToEdit = jiraRestApi.getWorklog(issueKey, worklogFactory.create().getId());
         // Check permissions
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_ALL_WORKLOGS);
-        if(!userHasPermission){
+        if (!userHasPermission) {
             userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_OWN_WORKLOGS);
-            if(!userHasPermission){
+            if (!userHasPermission) {
                 throw new InvalidPermissionException("Edited Work Log failed", "You don't have permission to edit work logs");
             }
 
-            if(nonNull(worklogToEdit) && !worklogToEdit.getAuthor().getName().equals(jiraRestApi.getUsername())){
+            if (nonNull(worklogToEdit)
+                    && !jiraRestApi.getUsername().equals(worklogToEdit.getAuthor().getName())
+                    && !jiraRestApi.getUsername().equals(worklogToEdit.getAuthor().getEmailAddress())) {
                 throw new InvalidPermissionException("Edited Work Log failed", "This work log not yours. You cannot edit it.");
             }
         }
 
-        if(Objects.nonNull(worklogToEdit)){
+        if (Objects.nonNull(worklogToEdit)) {
             List<String> projectRoles = jiraRestApi.getProjectRoles(projectKey);
 
             EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, projectRoles, worklogToEdit, timetrackingFactory.create(), false);

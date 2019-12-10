@@ -63,7 +63,7 @@ public class GroupSelectFieldEditor extends SelectFieldEditor {
     class GroupPickerDialog extends PickerDialog<String> {
 
         public GroupPickerDialog(@Nullable Project project, List<String> items) {
-            super(project, "Groups", items);
+            super(project, "Groups", items, null);
         }
 
 

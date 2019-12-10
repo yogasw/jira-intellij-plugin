@@ -21,12 +21,8 @@ public class DateTimeFieldEditor extends DateFieldEditor {
     private static final DateFormatter DATE_TIME_FORMATTER = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.ss+0000";
 
-    public DateTimeFieldEditor(String fieldName, String issueKey, boolean required) {
-        this(fieldName, null, issueKey, required);
-    }
-
-    public DateTimeFieldEditor(String fieldName, Date fieldValue, String issueKey, boolean required) {
-        super(fieldName, fieldValue, issueKey, required);
+    public DateTimeFieldEditor(String fieldName, String issueKey, boolean required, Object currentValue) {
+        super(fieldName, issueKey, required, currentValue);
     }
 
     @Override

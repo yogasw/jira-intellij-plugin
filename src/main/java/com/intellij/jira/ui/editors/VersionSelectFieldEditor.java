@@ -59,7 +59,7 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
     class VersionPickerDialog extends PickerDialog<JiraProjectVersion>{
 
         VersionPickerDialog(@Nullable Project project) {
-            super(project, "Versions", myItems);
+            super(project, "Versions", myItems, null);
         }
 
         @Override

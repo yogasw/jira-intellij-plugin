@@ -58,7 +58,7 @@ public class ProjectSelectFieldEditor extends DataSelectFieldEditor<JiraProject>
     class ProjectPickerDialog extends PickerDialog<JiraProject>{
 
         ProjectPickerDialog(@Nullable Project project) {
-            super(project, "Projects", myItems);
+            super(project, "Projects", myItems, null);
         }
 
         @Override

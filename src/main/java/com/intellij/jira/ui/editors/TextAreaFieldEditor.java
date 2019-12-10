@@ -14,24 +14,25 @@ import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class TextAreaFieldEditor extends AbstractFieldEditor {
 
+    @SuppressWarnings("unused")
     private JPanel myPanel;
+    @SuppressWarnings("unused")
     private JLabel myTextAreaLabel;
     protected JTextArea myTextArea;
-    private String myTextAreaValue;
+    private String currentValue;
 
-    public TextAreaFieldEditor(String fieldName, String issueKey, boolean required) {
-        this(fieldName, "", issueKey, required);
-    }
 
-    public TextAreaFieldEditor(String fieldName, String fieldValue, String issueKey, boolean required) {
+    public TextAreaFieldEditor(String fieldName, String issueKey, boolean required, Object currentValue) {
         super(fieldName, issueKey, required);
-        this.myTextAreaValue = fieldValue;
+        if (currentValue instanceof String) {
+            this.currentValue = currentValue.toString();
+        }
     }
 
     @Override
     public JComponent createPanel() {
         this.myTextArea.setBorder(BorderFactory.createLineBorder(JBColor.border()));
-        this.myTextArea.setText(this.myTextAreaValue);
+        this.myTextArea.setText(currentValue);
         this.myTextAreaLabel.setText(myLabel.getText());
 
         return myPanel;

@@ -15,7 +15,7 @@ public class NumberFieldEditor extends TextFieldEditor {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+([,.]\\d{1,2})?");
 
     public NumberFieldEditor(String fieldName, String issueKey, boolean required) {
-        super(fieldName, issueKey, required);
+        super(fieldName, issueKey, required, null);
     }
 
 

@@ -11,13 +11,7 @@ import java.util.Objects;
 public class VisibilityFieldEditor extends ComboBoxFieldEditor<String> {
 
     public VisibilityFieldEditor(List<String> items, JiraVisibility selectedValue, String issueKey) {
-        super("Viewable by", items, issueKey, false, false);
-        if(Objects.nonNull(selectedValue) && Objects.nonNull(items)){
-            int index = items.indexOf(selectedValue.getValue());
-            if(index > -1){
-                this.myComboBox.setSelectedIndex(index);
-            }
-        }
+        super("Viewable by", items, issueKey, false, false, selectedValue);
     }
 
     @Override

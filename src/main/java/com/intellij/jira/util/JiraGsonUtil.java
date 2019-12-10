@@ -24,12 +24,13 @@ public class JiraGsonUtil {
 
     public static JsonArray createArrayNameObjects(List<String> values){
         JsonArray array = new JsonArray();
-        JsonObject name = new JsonObject();
+
         for(String value : values){
+            JsonObject name = new JsonObject();
             name.add("name", createPrimitive(value));
+            array.add(name);
         }
 
-        array.add(name);
         return array;
     }
 
