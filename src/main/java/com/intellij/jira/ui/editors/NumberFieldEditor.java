@@ -14,10 +14,9 @@ public class NumberFieldEditor extends TextFieldEditor {
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+([,.]\\d{1,2})?");
 
-    public NumberFieldEditor(String fieldName, String issueKey, boolean required) {
-        super(fieldName, issueKey, required, null);
+    public NumberFieldEditor(String issueKey, String fieldName, String fieldValue, boolean required) {
+        super(issueKey, fieldName, fieldValue, required);
     }
-
 
     @Override
     public JsonElement getJsonValue() {
@@ -27,7 +26,6 @@ public class NumberFieldEditor extends TextFieldEditor {
 
         return createPrimitive(Double.valueOf(myTextField.getText()));
     }
-
 
     @Nullable
     @Override
@@ -42,7 +40,7 @@ public class NumberFieldEditor extends TextFieldEditor {
             }
         }
 
-
         return null;
     }
+
 }

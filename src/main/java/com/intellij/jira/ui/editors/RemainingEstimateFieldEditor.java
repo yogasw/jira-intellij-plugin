@@ -11,21 +11,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
-public class RemainingEstimateFieldEditor extends AbstractFieldEditor {
+public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
 
     private JRadioButton autoButton;
-    private JRadioButton leaveButton;
-    private JRadioButton newButton;
-    private JRadioButton manualButton;
+    protected JRadioButton leaveButton;
+    protected JRadioButton newButton;
+    protected JRadioButton manualButton;
 
-    private TimeSpentEditor myNewTextFieldEditor;
-    private TimeSpentEditor myManualTextFieldEditor;
+    protected TimeSpentEditor myNewTextFieldEditor;
+    protected TimeSpentEditor myManualTextFieldEditor;
 
     private JiraIssueTimeTracking timeTracking;
     private boolean showManualField;
 
-    public RemainingEstimateFieldEditor(String fieldName, JiraIssueTimeTracking timeTracking, boolean showManualField, String issueKey, boolean required) {
-        super(fieldName, issueKey, required);
+    public RemainingEstimateFieldEditor(String issueKey, String fieldName, boolean required, JiraIssueTimeTracking timeTracking, boolean showManualField) {
+        super(issueKey, fieldName, null, required);
         this.showManualField = showManualField;
         this.timeTracking = timeTracking;
     }
@@ -46,8 +46,8 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor {
             myRadioGroup.add(manualButton);
         }
 
-        this.myNewTextFieldEditor = new TimeSpentEditor("Set to", "", this.issueKey, false);
-        this.myManualTextFieldEditor = new TimeSpentEditor("Reduce by", "", this.issueKey, false);
+        this.myNewTextFieldEditor = new TimeSpentEditor( this.issueKey, "Set to", "", false);
+        this.myManualTextFieldEditor = new TimeSpentEditor( this.issueKey, "Reduce by", "", false);
 
         JPanel radioPanel = new JPanel();
         radioPanel.setLayout(new GridLayout(4, 1));
@@ -99,4 +99,8 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor {
         return Objects.isNull(this.timeTracking) ? "Leave estimate unset" : "Use existing estimate of " + this.timeTracking.getRemainingEstimate();
     }
 
+    @Override
+    public String getFieldValue() {
+        return null;
+    }
 }

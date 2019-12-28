@@ -4,6 +4,7 @@ import com.intellij.jira.actions.AddWorklogDialogAction;
 import com.intellij.jira.actions.DeleteWorklogDialogAction;
 import com.intellij.jira.actions.EditWorklogDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
+import com.intellij.jira.rest.JiraIssueWorklogsWrapper;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.Objects;
 
 import static java.awt.BorderLayout.CENTER;
@@ -48,12 +48,12 @@ class JiraIssueWorklogsPanel extends AbstractJiraPanel {
         return group;
     }
 
-    private void initContent(List<JiraIssueWorklog> worklogs){
+    private void initContent(JiraIssueWorklogsWrapper worklogs){
         JBPanel panel = new JBPanel(new BorderLayout());
 
         issueWorklogList = new JBList<>();
         issueWorklogList.setEmptyText("No work logs");
-        issueWorklogList.setModel(new JiraIssueWorklogListModel(worklogs));
+        issueWorklogList.setModel(new JiraIssueWorklogListModel(worklogs.getWorklogs()));
         issueWorklogList.setCellRenderer(new JiraIssueWorklogListCellRender());
         issueWorklogList.setSelectionMode(SINGLE_SELECTION);
         issueWorklogList.addListSelectionListener(e -> {

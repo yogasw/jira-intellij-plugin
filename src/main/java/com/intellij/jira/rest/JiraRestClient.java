@@ -40,14 +40,13 @@ public class JiraRestClient {
 
     public JiraIssue getIssue(String issueIdOrKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueIdOrKey));
-        method.setQueryString(method.getQueryString() + "?fields=" + JiraIssue.REQUIRED_FIELDS);
         String response = jiraRepository.executeMethod(method);
         return parseIssue(response);
     }
 
     public List<JiraIssue> findIssues(String searchQuery) throws Exception {
         GetMethod method = getBasicSearchMethod(searchQuery, MAX_ISSUES_RESULTS);
-        method.setQueryString(method.getQueryString() + "&fields=" + JiraIssue.REQUIRED_FIELDS);
+        method.setQueryString(method.getQueryString() + "&fields=*all");
         String response = jiraRepository.executeMethod(method);
         return parseIssues(response);
     }
@@ -154,6 +153,7 @@ public class JiraRestClient {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("mypermissions"));
         method.setQueryString(new NameValuePair[]{
                 new NameValuePair("issueKey", issueKey),
+
                 // "permissions" to check is required to be added right from the start
                 // https://blog.developer.atlassian.com/change-notice-get-my-permissions-requires-permissions-query-parameter/
                 new NameValuePair("permissions", permission.toString())
@@ -187,6 +187,15 @@ public class JiraRestClient {
             updateObject.add("comment", commentField.getJsonValue());
         }
 
+        // Work Log
+        FieldEditorInfo worklogField = fields.remove("worklog");
+        if(nonNull(worklogField)) {
+            JsonElement worklogFieldValue = worklogField.getJsonValue();
+            if (!(worklogFieldValue instanceof JsonNull)) {
+                updateObject.add("worklog", worklogFieldValue);
+            }
+        }
+
         // Linked Issues
         FieldEditorInfo issueLinkField = fields.remove("issuelinks");
         if(nonNull(issueLinkField) && !(issueLinkField.getJsonValue() instanceof JsonNull)){
@@ -200,8 +209,9 @@ public class JiraRestClient {
         //Fields
         JsonObject fieldsObject = new JsonObject();
         fields.forEach((key, value) -> {
-            if(!(value.getJsonValue() instanceof JsonNull)){
-                fieldsObject.add(key, value.getJsonValue());
+            JsonElement jsonValue = value.getJsonValue();
+            if(!(jsonValue instanceof JsonNull)){
+                fieldsObject.add(key, jsonValue);
             }
         });
 

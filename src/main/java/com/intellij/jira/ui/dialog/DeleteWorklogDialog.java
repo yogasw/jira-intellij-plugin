@@ -42,7 +42,7 @@ public class DeleteWorklogDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        this.remainingEstimateFieldEditor = new RemainingEstimateFieldEditor("Remaining Estimate", this.timeTracking, true, this.issueKey, false);
+        this.remainingEstimateFieldEditor = new RemainingEstimateFieldEditor(this.issueKey, "Remaining Estimate", false, this.timeTracking, true);
 
         return FormBuilder.createFormBuilder()
                 .addComponent(new JBLabel("You are going to delete this work log. This cannot be undone."))

@@ -53,11 +53,11 @@ public class EditWorklogDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        this.timeSpentEditor = new TimeSpentEditor(this.worklog.getTimeSpent(), this.issueKey, true);
-        this.startedEditor = new DateTimeFieldEditor("Date Started", this.issueKey, true, this.worklog.getStarted());
-        this.remainingEstimateEditor = new RemainingEstimateFieldEditor("Remaining Estimate", this.timeTracking, this.showManualField, this.issueKey, false);
-        this.worklogCommentEditor = new TextAreaFieldEditor("Work Description", this.issueKey, false, this.worklog.getComment());
-        this.visibilityEditor = new VisibilityFieldEditor(this.projectRoles, this.worklog.getVisibility(), this.issueKey);
+        this.timeSpentEditor = new TimeSpentEditor(this.issueKey, this.worklog.getTimeSpent(), true);
+        this.startedEditor = new DateTimeFieldEditor(this.issueKey,"Date Started", this.worklog.getStarted(), true);
+        this.remainingEstimateEditor = new RemainingEstimateFieldEditor(this.issueKey, "Remaining Estimate", false, this.timeTracking, this.showManualField);
+        this.worklogCommentEditor = new TextAreaFieldEditor(this.issueKey, "Work Description", this.worklog.getComment(), false);
+        this.visibilityEditor = new VisibilityFieldEditor(this.issueKey, this.worklog.getVisibility(), this.projectRoles);
 
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("timeSpentSeconds", timeSpentEditor));
         worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("started", startedEditor));

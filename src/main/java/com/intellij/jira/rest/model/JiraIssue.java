@@ -1,21 +1,21 @@
 package com.intellij.jira.rest.model;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.intellij.jira.rest.JiraIssueCommentsWrapper;
 import com.intellij.jira.rest.JiraIssueWorklogsWrapper;
+import com.intellij.jira.util.JiraGsonUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class JiraIssue {
 
-    public static final String REQUIRED_FIELDS = "summary,description,created,updated,duedate,resolutiondate,assignee,reporter,issuetype,status,priority,comment,issuelinks,project,versions,components,labels,worklog,timetracking,fixVersions";
-
     private String id;
     private String self;
     private String key;
-    private JiraIssue.Fields fields;
+    private JsonObject fields;
 
     public JiraIssue() { }
 
@@ -32,87 +32,107 @@ public class JiraIssue {
     }
 
     public String getSummary() {
-        return fields.summary;
+        return JiraGsonUtil.getAsString(fields.get("summary"));
     }
 
     public String getDescription() {
-        return fields.description;
+        return JiraGsonUtil.getAsString(fields.get("description"));
     }
 
     public Date getCreated() {
-        return fields.created;
+        return JiraGsonUtil.getAsDate(fields.get("created"));
     }
 
     public Date getUpdated() {
-        return fields.updated;
+        return JiraGsonUtil.getAsDate(fields.get("updated"));
     }
 
     public Date getResolutiondate() {
-        return fields.resolutiondate;
+        return JiraGsonUtil.getAsDate(fields.get("resolutiondate"));
     }
 
     public Date getDuedate() {
-        return fields.duedate;
+        return JiraGsonUtil.getAsDate(fields.get("duedate"));
     }
 
     public JiraIssueType getIssuetype() {
-        return fields.issuetype;
+        return JiraGsonUtil.getAs(fields.get("issuetype"), JiraIssueType.class);
     }
 
     public JiraIssueStatus getStatus() {
-        return fields.status;
+        return JiraGsonUtil.getAs(fields.get("status"), JiraIssueStatus.class);
+    }
+
+    public JiraIssueResolution getResolution() {
+        return JiraGsonUtil.getAs(fields.get("resolution"), JiraIssueResolution.class);
     }
 
     public JiraIssuePriority getPriority() {
-        return fields.priority;
+        return JiraGsonUtil.getAs(fields.get("priority"), JiraIssuePriority.class);
     }
 
     public JiraIssueUser getAssignee() {
-        return fields.assignee;
+        return JiraGsonUtil.getAs(fields.get("assignee"), JiraIssueUser.class);
     }
 
     public JiraIssueUser getCreator() {
-        return fields.creator;
+        return JiraGsonUtil.getAs(fields.get("creator"), JiraIssueUser.class);
     }
 
     public JiraIssueUser getReporter() {
-        return fields.reporter;
+        return JiraGsonUtil.getAs(fields.get("reporter"), JiraIssueUser.class);
     }
 
     public JiraIssueCommentsWrapper getComments(){
-        return fields.comment;
+        return JiraGsonUtil.getAs(fields.get("comment"), JiraIssueCommentsWrapper.class);
     }
 
-    public List<JiraIssueWorklog> getWorklogs(){
-        return Objects.nonNull(fields.worklog) ? fields.worklog.getWorklogs() : new ArrayList<>();
+    public JiraIssueWorklogsWrapper getWorklogs(){
+        return JiraGsonUtil.getAs(fields.get("worklog"), JiraIssueWorklogsWrapper.class);
     }
 
     public JiraIssueTimeTracking getTimetracking(){
-        return fields.timetracking;
+        return JiraGsonUtil.getAs(fields.get("timetracking"), JiraIssueTimeTracking.class);
     }
 
     public List<JiraIssueLink> getIssueLinks(){
-        return fields.issuelinks;
+        return JiraGsonUtil.getAsList(fields.get("issuelinks"), JiraIssueLink[].class);
     }
 
     public JiraProject getProject(){
-        return fields.project;
+        return JiraGsonUtil.getAs(fields.get("project"), JiraProject.class);
     }
 
     public List<JiraProjectVersion> getVersions(){
-        return fields.versions;
+        return JiraGsonUtil.getAsList(fields.get("versions"), JiraProjectVersion[].class);
     }
 
     public List<JiraProjectVersion> getFixVersions(){
-        return fields.fixVersions;
+        return JiraGsonUtil.getAsList(fields.get("fixVersions"), JiraProjectVersion[].class);
     }
 
     public List<JiraIssueComponent> getComponents(){
-        return fields.components;
+        return JiraGsonUtil.getAsList(fields.get("components"), JiraIssueComponent[].class);
     }
 
     public List<String> getLabels(){
-        return fields.labels;
+        return JiraGsonUtil.getAsList(fields.get("labels"), String[].class);
+    }
+
+    public String getAsString(String fieldName) {
+        return JiraGsonUtil.getAsString(fields.get(fieldName));
+    }
+
+    public Date getAsDate(String fieldName) {
+        return JiraGsonUtil.getAsDate(fields.get(fieldName));
+    }
+
+    public JiraIssueUser getAsJiraIssueUser(String fieldName) {
+        return JiraGsonUtil.getAs(fields.get(fieldName), JiraIssueUser.class);
+    }
+
+    public JsonElement getCustomfieldValue(String customId) {
+        return fields.get("customfield_" + customId);
     }
 
     public String getUrl(){
@@ -129,103 +149,6 @@ public class JiraIssue {
 
     public boolean hasLabels(){
         return !getLabels().isEmpty();
-    }
-
-    public Object getValueForField(JiraIssueFieldProperties property) {
-        String field = property.getSchema().getSystem();
-        if (field == null) {
-            return null;
-        }
-
-        if (field.equals("summary")) {
-            return getSummary();
-        }
-        if (field.equals("description")) {
-            return getDescription();
-        }
-        if (field.equals("created")) {
-            return getCreated();
-        }
-        if (field.equals("updated")) {
-            return getUpdated();
-        }
-        if (field.equals("duedate")) {
-            return getDuedate();
-        }
-        if (field.equals("resolutiondate")) {
-            return getResolutiondate();
-        }
-        if (field.equals("assignee")) {
-            return getAssignee();
-        }
-        if (field.equals("reporter")) {
-            return getReporter();
-        }
-        if (field.equals("issuetype")) {
-            return getIssuetype();
-        }
-        if (field.equals("status")) {
-            return getStatus();
-        }
-        if (field.equals("priority")) {
-            return getPriority();
-        }
-        if (field.equals("comment")) {
-            return getComponents();
-        }
-        if (field.equals("issuelinks")) {
-            return getIssueLinks();
-        }
-        if (field.equals("project")) {
-            return getProject();
-        }
-        if (field.equals("versions")) {
-            return getVersions();
-        }
-        if (field.equals("components")) {
-            return getComponents();
-        }
-        if (field.equals("labels")) {
-            return getLabels();
-        }
-        if (field.equals("fixVersions")) {
-            return getFixVersions();
-        }
-        if (field.equals("worklog")) {
-            return getWorklogs();
-        }
-        if (field.equals("timetracking")) {
-            return getTimetracking();
-        }
-        return null;
-    }
-
-    public static class Fields{
-
-        private String summary;
-        private String description;
-        private Date created;
-        private Date updated;
-        private Date resolutiondate;
-        private Date duedate;
-        private JiraIssueType issuetype;
-        private JiraIssueStatus status;
-        private JiraIssuePriority priority;
-        private JiraIssueUser assignee;
-        private JiraIssueUser creator;
-        private JiraIssueUser reporter;
-        private JiraIssueCommentsWrapper comment;
-        private JiraIssueWorklogsWrapper worklog;
-        private JiraIssueTimeTracking timetracking;
-        private List<JiraIssueLink> issuelinks = new ArrayList<>();
-        private JiraProject project;
-        private List<JiraProjectVersion> versions = new ArrayList<>();
-        private List<JiraIssueComponent> components = new ArrayList<>();
-        private List<String> labels = new ArrayList<>();
-        private List<JiraProjectVersion> fixVersions = new ArrayList<>();
-
-        public Fields() { }
-
     }
 
     @Override

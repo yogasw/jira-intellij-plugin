@@ -16,18 +16,18 @@ import static com.intellij.openapi.util.text.StringUtil.isEmpty;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-public class ComboBoxFieldEditor<T> extends AbstractFieldEditor {
+public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
 
     protected ComboBox<T> myComboBox;
     private CollectionComboBoxModel<T> myComboBoxItems;
-    private boolean isMultiSelect;
 
-    public ComboBoxFieldEditor(String fieldName, List<T> items, String issueKey, boolean required, boolean isMultiSelect, Object currentValue) {
-        super(fieldName, issueKey, required);
+    public ComboBoxFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, List<T> items) {
+        super(issueKey, fieldName, fieldValue, required);
         this.myComboBoxItems = new CollectionComboBoxModel<>(items);
         this.myComboBox = new ComboBox(myComboBoxItems, 300);
-        this.isMultiSelect = isMultiSelect;
 
+        // TODO: 22/12/2019 mejorar
+        T currentValue = getFieldValue();
         if (currentValue instanceof List) {
             for (Object value : (List) currentValue) {
                 T item = findItem(items, value);
@@ -67,7 +67,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor {
             return JsonNull.INSTANCE;
         }
 
-        return createNameObject(getSelectedValue(), isMultiSelect);
+        return createNameObject(getSelectedValue());
     }
 
     protected String getSelectedValue(){
@@ -84,4 +84,10 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor {
 
         return null;
     }
+
+    @Override
+    public T getFieldValue() {
+        return (T) fieldValue;
+    }
+
 }

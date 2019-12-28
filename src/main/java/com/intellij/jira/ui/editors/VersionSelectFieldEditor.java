@@ -7,23 +7,46 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static com.intellij.jira.util.JiraGsonUtil.createArrayObject;
 import static com.intellij.jira.util.JiraGsonUtil.createObject;
 import static com.intellij.openapi.util.text.StringUtil.isEmpty;
 import static com.intellij.openapi.util.text.StringUtil.trim;
+import static com.intellij.tasks.jira.JiraRepository.GSON;
 import static com.intellij.util.containers.ContainerUtil.getFirstItem;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
-
 public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectVersion> {
 
-    public VersionSelectFieldEditor(String fieldName, String issueKey, boolean required, boolean isMultiSelect, List<JiraProjectVersion> items) {
-        super(fieldName, issueKey, required, isMultiSelect, items);
+    public VersionSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect, List<JiraProjectVersion> items) {
+        super(issueKey, fieldName, fieldValue, required, isMultiSelect, items);
         myButtonAction = new VersionPickerDialogAction();
+    }
+
+    @Override
+    protected void initSelectedItems() {
+        JsonElement element = GSON.toJsonTree(fieldValue);
+        if (element.isJsonArray()) {
+            selectedItems = Arrays.asList(GSON.fromJson(element, JiraProjectVersion[].class));
+        } else if (element.isJsonObject()) {
+            selectedItems = Collections.singletonList(GSON.fromJson(element, JiraProjectVersion.class));
+        }
+    }
+
+    @Override
+    public JComponent createPanel() {
+        if (Objects.nonNull(selectedItems)) {
+            myTextField.setText(selectedItems.stream().map(JiraProjectVersion::getName).collect(joining(", ")));
+        }
+
+        return super.createPanel();
     }
 
     @Override
@@ -40,6 +63,11 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
         return createObject("key", getFirstItem(values));
     }
 
+    @Override
+    public JiraProjectVersion getFieldValue() {
+        return null;
+    }
+
 
     class VersionPickerDialogAction extends PickerDialogAction{
 
@@ -54,12 +82,10 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
         }
     }
 
-
-
     class VersionPickerDialog extends PickerDialog<JiraProjectVersion>{
 
         VersionPickerDialog(@Nullable Project project) {
-            super(project, "Versions", myItems, null);
+            super(project, "Versions", myItems, selectedItems);
         }
 
         @Override
@@ -67,10 +93,8 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
             selectedItems = myList.getSelectedValuesList();
             myTextField.setText(selectedItems.isEmpty() ? "" :  selectedItems.stream().map(JiraProjectVersion::getName).collect(joining(", ")));
 
-
             super.doOKAction();
         }
     }
-
 
 }

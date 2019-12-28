@@ -18,16 +18,16 @@ import static com.intellij.openapi.util.text.StringUtil.trim;
 import static com.intellij.util.containers.ContainerUtil.getFirstItem;
 import static java.util.Objects.nonNull;
 
-public class MultiSelectFieldEditor<T> extends SelectFieldEditor {
+public class MultiSelectFieldEditor<T> extends SelectFieldEditor<T> {
     private List<String> selectedItems = new ArrayList<>();
 
-    public MultiSelectFieldEditor(String fieldName, List<T> items, String issueKey, boolean required, Object currentValue) {
-        super(fieldName, issueKey, required, true);
+    public MultiSelectFieldEditor(String issueKey, String fieldName, List<T> items, Object fieldValue, boolean required) {
+        super(issueKey, fieldName, fieldValue, required, true);
         List currentItems = Collections.emptyList();
-        if (currentValue instanceof List) {
-            currentItems = (List) currentValue;
-        } else if (currentValue != null) {
-            currentItems = Collections.singletonList(currentValue);
+        if (fieldValue instanceof List) {
+            currentItems = (List) fieldValue;
+        } else if (fieldValue != null) {
+            currentItems = Collections.singletonList(fieldValue);
         }
         myButtonAction = new ItemPickerDialogAction(fieldName, items, currentItems);
 
@@ -61,6 +61,11 @@ public class MultiSelectFieldEditor<T> extends SelectFieldEditor {
         }
 
         return createNameObject(getFirstItem(selectedItems));
+    }
+
+    @Override
+    public T getFieldValue() {
+        return null;
     }
 
     private class ItemPickerDialogAction extends PickerDialogAction {

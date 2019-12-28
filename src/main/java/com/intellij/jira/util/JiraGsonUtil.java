@@ -5,14 +5,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static com.intellij.openapi.util.text.StringUtil.trim;
+import static com.intellij.tasks.jira.JiraRepository.GSON;
 import static java.util.Objects.nonNull;
 
 public class JiraGsonUtil {
-
 
     public static JsonObject createNameObject(String value){
         return createObject("name", value);
@@ -75,6 +77,22 @@ public class JiraGsonUtil {
 
     public static JsonElement createPrimitive(Integer value){
         return new JsonPrimitive(value);
+    }
+
+    public static String getAsString(JsonElement element) {
+        return getAs(element, String.class);
+    }
+
+    public static Date getAsDate(JsonElement element) {
+        return getAs(element, Date.class);
+    }
+
+    public static <T> List<T> getAsList(JsonElement element, Class<T[]> clazz) {
+        return Arrays.asList(getAs(element, clazz));
+    }
+
+    public static <T> T getAs(JsonElement element, Class<T> clazz) {
+        return GSON.fromJson(element, clazz);
     }
 
 }

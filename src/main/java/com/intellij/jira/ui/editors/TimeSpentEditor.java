@@ -3,23 +3,36 @@ package com.intellij.jira.ui.editors;
 import com.google.gson.JsonElement;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.intellij.openapi.util.text.StringUtil.*;
 
 public class TimeSpentEditor extends TextFieldEditor {
 
     private static final Pattern TIME_SPENT_SIMPLE_PATTERN = Pattern.compile("(\\d+)([wdhm])");
     private static final Pattern TIME_SPENT_MULTI_PATTERN = Pattern.compile("(\\d+[wdhm])(\\s{1}\\d+[wdhm])*");
 
-    public TimeSpentEditor(String fieldValue, String issueKey, boolean required) {
-        this("Time Spent", fieldValue, issueKey, required);
+    public TimeSpentEditor(String issueKey) {
+        this(issueKey, "Time Spent", null, false);
     }
 
-    public TimeSpentEditor(String fieldName, String fieldValue, String issueKey, boolean required) {
-        super(fieldName, issueKey, required, fieldValue);
+    public TimeSpentEditor(String issueKey, Object fieldValue, boolean required) {
+        this(issueKey, "Time Spent", fieldValue, required);
+    }
+
+    public TimeSpentEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
+        super(issueKey, fieldName, fieldValue, required);
+    }
+
+    @Override
+    public Dimension getFieldSize() {
+        return UI.size(150, 24);
     }
 
     @Override
@@ -48,12 +61,14 @@ public class TimeSpentEditor extends TextFieldEditor {
     public ValidationInfo validate() {
         ValidationInfo info = super.validate();
         if(Objects.isNull(info)){
-            String timeSpent = myTextField.getText();
-            if(!TIME_SPENT_MULTI_PATTERN.matcher(timeSpent).matches()){
-                return new ValidationInfo("Invalid time duration entered", myTextField);
+            if(isNotEmpty(trim(myTextField.getText()))) {
+                String timeSpent = myTextField.getText();
+                if(!TIME_SPENT_MULTI_PATTERN.matcher(timeSpent).matches()){
+                    return new ValidationInfo("Invalid time duration entered", myTextField);
+                }
             }
         }
 
-        return info;
+        return null;
     }
 }

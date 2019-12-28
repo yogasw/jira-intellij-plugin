@@ -32,10 +32,8 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
     private JTextField mySecondField;
     private JLabel mySecondInfoLabel;
 
-
-
     public TimeTrackingFieldEditor(String issueKey, boolean required) {
-        super(ORIGINAL_ESTIMATE_FIELD, issueKey, required);
+        super(issueKey, ORIGINAL_ESTIMATE_FIELD, required);
         this.mySecondLabel = new MyLabel(REMAINING_ESTIMATE_FIELD, required);
     }
 
@@ -92,7 +90,6 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
             return new ValidationInfo("Wrong format in " + mySecondLabel.getMyLabelText() + " field.");
         }
 
-
         return null;
     }
 
@@ -102,5 +99,10 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
 
     private String getRemainingEstimate(){
         return nonNull(mySecondField) ? mySecondField.getText() : "";
+    }
+
+    @Override
+    public Object getFieldValue() {
+        return null;
     }
 }
