@@ -135,6 +135,11 @@ public class JiraIssue {
         return fields.get("customfield_" + customId);
     }
 
+
+    public List<JiraIssue> getSubtasks() {
+        return JiraGsonUtil.getAsList(fields.get("subtasks"), JiraIssue[].class);
+    }
+
     public String getUrl(){
         return self.replaceFirst("(/rest([\\w/]+))", "/browse/" + getKey());
     }

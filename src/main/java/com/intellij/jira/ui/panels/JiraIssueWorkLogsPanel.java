@@ -24,14 +24,14 @@ import static java.awt.BorderLayout.CENTER;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-class JiraIssueWorklogsPanel extends AbstractJiraPanel {
+class JiraIssueWorkLogsPanel extends AbstractJiraPanel {
 
     private JiraIssueWorklog worklog;
     private JiraIssueTimeTracking timeTracking;
 
     private JBList<JiraIssueWorklog> issueWorklogList;
 
-    JiraIssueWorklogsPanel(@NotNull JiraIssue issue) {
+    JiraIssueWorkLogsPanel(@NotNull JiraIssue issue) {
         super(issue);
         this.timeTracking = issue.getTimetracking();
 

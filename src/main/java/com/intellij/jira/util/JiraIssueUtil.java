@@ -76,7 +76,7 @@ public class JiraIssueUtil {
     }
 
     public static String getPrettyDateTime(Date date){
-        return DateFormatUtil.formatPrettyDateTime(date);
+        return nonNull(date) ? DateFormatUtil.formatPrettyDateTime(date) : "";
     }
 
 }
