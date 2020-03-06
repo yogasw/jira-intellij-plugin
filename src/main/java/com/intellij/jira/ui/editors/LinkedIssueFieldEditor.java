@@ -10,6 +10,7 @@ import com.intellij.jira.actions.AddIssueLinkDialogAction;
 import com.intellij.jira.rest.model.JiraIssueLinkType;
 import com.intellij.jira.rest.model.JiraIssueLinkTypeInfo;
 import com.intellij.jira.ui.dialog.AddIssueLinkDialog;
+import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -24,35 +25,38 @@ import java.util.List;
 
 import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
 import static com.intellij.jira.util.JiraGsonUtil.createObject;
+import static com.intellij.jira.util.JiraIssueField.KEY;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-public class LinkedIssueFieldEditor extends AbstractFieldEditor {
+public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
 
     protected JPanel myPanel;
     protected JTextField myTextField;
     protected JButton myButton;
 
-
     private JiraIssueLinkTypeInfo mySelectedLinkType;
     private String mySelectedIssue;
     private String projectKey;
 
-    public LinkedIssueFieldEditor(String fieldName, String issueKey, boolean required, String projectKey) {
-        super(fieldName, issueKey, required);
+    public LinkedIssueFieldEditor(String issueKey, String fieldName, boolean required, String projectKey) {
+        super(issueKey, fieldName, null, required);
         this.projectKey = projectKey;
     }
 
     @Override
-    public JComponent createPanel() {
+    public String getFieldValue() {
+        return null;
+    }
 
+    @Override
+    public JComponent createPanel() {
         this.myButton.setIcon(AllIcons.Ide.UpDown);
         this.myButton.addActionListener(e -> {
             InputEvent inputEvent = e.getSource() instanceof InputEvent ? (InputEvent)e.getSource() : null;
             MyAddIssueLinkDialogAction myAction = new MyAddIssueLinkDialogAction();
             myAction.actionPerformed(AnActionEvent.createFromAnAction(myAction, inputEvent, ActionPlaces.UNKNOWN, DataManager.getInstance().getDataContext(myTextField)));
         });
-
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(myLabel, myPanel)
@@ -69,7 +73,7 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor {
         JsonObject rootObject = new JsonObject();
         JsonObject addObject = new JsonObject();
         addObject.add("type", createNameObject(mySelectedLinkType.getName()));
-        addObject.add(mySelectedLinkType.isInward() ? "inwardIssue" : "outwardIssue", createObject("key", mySelectedIssue));
+        addObject.add(mySelectedLinkType.isInward() ? "inwardIssue" : "outwardIssue", createObject(KEY, mySelectedIssue));
 
 
         rootObject.add("add", addObject);
@@ -100,16 +104,11 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor {
         }
     }
 
-
-
-
-
     private class MyAddIssueLinkDialog extends AddIssueLinkDialog {
 
         public MyAddIssueLinkDialog(@Nullable Project project, List<JiraIssueLinkType> linkTypes, List<String> issuesKey, String issueKey) {
             super(project, linkTypes, issuesKey, issueKey);
         }
-
 
         @Override
         protected void doOKAction() {
@@ -124,8 +123,5 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor {
             close(0);
         }
     }
-
-
-
 
 }

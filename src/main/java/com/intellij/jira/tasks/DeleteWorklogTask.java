@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.intellij.jira.exceptions.InvalidResultException;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.server.JiraRestApi;
-import com.intellij.jira.util.Result;
+import com.intellij.jira.util.result.Result;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

@@ -4,6 +4,7 @@ import com.intellij.jira.actions.AddWorklogDialogAction;
 import com.intellij.jira.actions.DeleteWorklogDialogAction;
 import com.intellij.jira.actions.EditWorklogDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
+import com.intellij.jira.rest.JiraIssueWorklogsWrapper;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
@@ -17,21 +18,20 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.Objects;
 
 import static java.awt.BorderLayout.CENTER;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-class JiraIssueWorklogsPanel extends AbstractJiraPanel {
+class JiraIssueWorkLogsPanel extends AbstractJiraPanel {
 
     private JiraIssueWorklog worklog;
     private JiraIssueTimeTracking timeTracking;
 
     private JBList<JiraIssueWorklog> issueWorklogList;
 
-    JiraIssueWorklogsPanel(@NotNull JiraIssue issue) {
+    JiraIssueWorkLogsPanel(@NotNull JiraIssue issue) {
         super(issue);
         this.timeTracking = issue.getTimetracking();
 
@@ -48,12 +48,12 @@ class JiraIssueWorklogsPanel extends AbstractJiraPanel {
         return group;
     }
 
-    private void initContent(List<JiraIssueWorklog> worklogs){
+    private void initContent(JiraIssueWorklogsWrapper worklogs){
         JBPanel panel = new JBPanel(new BorderLayout());
 
         issueWorklogList = new JBList<>();
         issueWorklogList.setEmptyText("No work logs");
-        issueWorklogList.setModel(new JiraIssueWorklogListModel(worklogs));
+        issueWorklogList.setModel(new JiraIssueWorklogListModel(worklogs.getWorklogs()));
         issueWorklogList.setCellRenderer(new JiraIssueWorklogListCellRender());
         issueWorklogList.setSelectionMode(SINGLE_SELECTION);
         issueWorklogList.addListSelectionListener(e -> {

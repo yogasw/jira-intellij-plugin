@@ -6,8 +6,8 @@ import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.EditWorklogDialog;
-import com.intellij.jira.util.JiraIssuTimeTrackingFactory;
-import com.intellij.jira.util.JiraIssueWorklogFactory;
+import com.intellij.jira.util.factory.JiraIssuTimeTrackingFactory;
+import com.intellij.jira.util.factory.JiraIssueWorklogFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -38,18 +38,20 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
         JiraIssueWorklog worklogToEdit = jiraRestApi.getWorklog(issueKey, worklogFactory.create().getId());
         // Check permissions
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_ALL_WORKLOGS);
-        if(!userHasPermission){
+        if (!userHasPermission) {
             userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_OWN_WORKLOGS);
-            if(!userHasPermission){
+            if (!userHasPermission) {
                 throw new InvalidPermissionException("Edited Work Log failed", "You don't have permission to edit work logs");
             }
 
-            if(nonNull(worklogToEdit) && !worklogToEdit.getAuthor().getName().equals(jiraRestApi.getUsername())){
+            if (nonNull(worklogToEdit)
+                    && !jiraRestApi.getUsername().equals(worklogToEdit.getAuthor().getName())
+                    && !jiraRestApi.getUsername().equals(worklogToEdit.getAuthor().getEmailAddress())) {
                 throw new InvalidPermissionException("Edited Work Log failed", "This work log not yours. You cannot edit it.");
             }
         }
 
-        if(Objects.nonNull(worklogToEdit)){
+        if (Objects.nonNull(worklogToEdit)) {
             List<String> projectRoles = jiraRestApi.getProjectRoles(projectKey);
 
             EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, projectRoles, worklogToEdit, timetrackingFactory.create(), false);

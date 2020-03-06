@@ -4,7 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.DeleteIssueLinkDialog;
-import com.intellij.jira.util.JiraIssueLinkFactory;
+import com.intellij.jira.util.factory.JiraIssueLinkFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

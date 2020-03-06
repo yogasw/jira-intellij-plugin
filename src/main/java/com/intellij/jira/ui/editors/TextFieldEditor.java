@@ -10,35 +10,40 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import java.awt.*;
+import java.util.Objects;
+
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
 import static com.intellij.openapi.util.text.StringUtil.isEmpty;
 import static com.intellij.openapi.util.text.StringUtil.trim;
 
-public class TextFieldEditor extends AbstractFieldEditor {
+public class TextFieldEditor extends AbstractFieldEditor<String> {
 
     protected JBTextField myTextField;
-    private String myTextFieldValue;
 
-    public TextFieldEditor(String fieldName, String issueKey, boolean required) {
-        this(fieldName, "", issueKey, required);
+    public TextFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
+        super(issueKey, fieldName, fieldValue, required);
     }
 
-    public TextFieldEditor(String fieldName, String fieldValue, String issueKey, boolean required) {
-        super(fieldName, issueKey, required);
-        this.myTextFieldValue = fieldValue;
+    @Override
+    public String getFieldValue() {
+        return Objects.nonNull(fieldValue) ? (String) fieldValue : "";
     }
 
     @Override
     public JComponent createPanel() {
         this.myTextField = new JBTextField();
-        this.myTextField.setText(myTextFieldValue);
-        this.myTextField.setPreferredSize(UI.size(250, 24));
+        this.myTextField.setPreferredSize(getFieldSize());
+        this.myTextField.setText(getFieldValue());
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(this.myLabel, this.myTextField)
                 .getPanel();
     }
 
+    public Dimension getFieldSize() {
+        return UI.size(250, 24);
+    }
 
     @Override
     public JsonElement getJsonValue() {

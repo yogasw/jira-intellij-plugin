@@ -1,8 +1,8 @@
 package com.intellij.jira.ui.editors;
 
 import com.intellij.ide.DataManager;
-import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.server.JiraRestApi;
+import com.intellij.jira.server.JiraServerManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -13,6 +13,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.containers.IntArrayList;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.util.List;
+import java.util.Objects;
 
 import static java.awt.BorderLayout.CENTER;
 import static java.util.Objects.nonNull;
@@ -30,7 +32,7 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-public abstract class SelectFieldEditor extends AbstractFieldEditor {
+public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
 
     protected JPanel myPanel;
     protected JTextField myTextField;
@@ -38,9 +40,8 @@ public abstract class SelectFieldEditor extends AbstractFieldEditor {
     protected PickerDialogAction myButtonAction;
     protected boolean isMultiSelect;
 
-
-    public SelectFieldEditor(String fieldName, String issueKey, boolean required, boolean isMultiSelect) {
-        super(fieldName, issueKey, required);
+    public SelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
+        super(issueKey, fieldName, fieldValue, required);
         this.isMultiSelect = isMultiSelect;
     }
 
@@ -91,12 +92,25 @@ public abstract class SelectFieldEditor extends AbstractFieldEditor {
 
         protected JBList<E> myList;
 
-        public PickerDialog(@Nullable Project project, @NotNull String title, List<E> items ) {
+        public PickerDialog(@Nullable Project project, @NotNull String title, List<E> items, List<E> selectedItems) {
             super(project, false);
             setTitle(title);
             this.myList = new JBList(items);
             this.myList.setPreferredSize(getPreferredSizeList());
             this.myList.setSelectionMode(isMultiSelect ? MULTIPLE_INTERVAL_SELECTION: SINGLE_SELECTION);
+            if (Objects.nonNull(selectedItems)) {
+                IntArrayList selectedIndices = new IntArrayList();
+                for (E selectedItem : selectedItems) {
+                    int pos = items.indexOf(selectedItem);
+                    if (pos > -1) {
+                        selectedIndices.add(pos);
+                    }
+                }
+
+                if (selectedIndices.size() > 0) {
+                    this.myList.setSelectedIndices(selectedIndices.toArray());
+                }
+            }
 
             init();
         }
@@ -112,18 +126,9 @@ public abstract class SelectFieldEditor extends AbstractFieldEditor {
             panel.setPreferredSize(UI.size(100, 250));
             panel.add(ScrollPaneFactory.createScrollPane(myList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);
 
-
             return panel;
         }
 
-
     }
-
-
-
-
-
-
-
 
 }

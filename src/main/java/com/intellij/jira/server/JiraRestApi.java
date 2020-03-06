@@ -3,9 +3,9 @@ package com.intellij.jira.server;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.JiraRestClient;
 import com.intellij.jira.rest.model.*;
-import com.intellij.jira.util.BodyResult;
-import com.intellij.jira.util.EmptyResult;
-import com.intellij.jira.util.Result;
+import com.intellij.jira.util.result.BodyResult;
+import com.intellij.jira.util.result.EmptyResult;
+import com.intellij.jira.util.result.Result;
 import com.intellij.tasks.jira.JiraRepository;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -152,7 +152,7 @@ public class JiraRestApi {
     public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType permission){
         LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
         try {
-            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey);
+            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey, permission);
         } catch (Exception e) {
             log.error("Current user has not permission to do this action");
         }

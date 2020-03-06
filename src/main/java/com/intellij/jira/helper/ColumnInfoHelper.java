@@ -16,13 +16,21 @@ import static java.util.Objects.nonNull;
 
 public class ColumnInfoHelper {
 
+    private static final String KEY_COLUMN = "Key";
+    private static final String SUMMARY_COLUMN = "Summary";
+    private static final String ASSIGNEE_COLUMN = "Assignee";
+    private static final String TYPE_COLUMN = "Type";
+    private static final String PRIORITY_COLUMN = "Priority";
+    private static final String STATUS_COLUMN = "Status";
+    private static final String CREATED_COLUMN = "Created";
+
     private static ColumnInfoHelper helper;
 
     private ColumnInfoHelper(){ }
 
     @NotNull
     public static ColumnInfoHelper getHelper(){
-        if(helper == null){
+        if (helper == null){
             helper = new ColumnInfoHelper();
         }
 
@@ -31,49 +39,14 @@ public class ColumnInfoHelper {
 
     @NotNull
     public ColumnInfo[] generateColumnsInfo() {
-        return new ColumnInfo[]{new KeyColumnInfo("Key"),
-                new JiraIssueColumnInfo("Summary") {
-            public String valueOf(JiraIssue issue) {
-                return getSummary(issue);
-            }
-
-            @Nullable
-            @Override
-            public String getMaxStringValue() {
-                return "";
-            }
-
-            @Override
-            public int getAdditionalWidth() {
-                return 400;
-            }
-        },
-           new JiraIssueColumnInfo("Assignee") {
-            public String valueOf(JiraIssue issue) {
-                return getAssignee(issue);
-            }
-
-            @Nullable
-            @Override
-            public String getMaxStringValue() {
-                return "";
-            }
-
-            @Override
-            public int getAdditionalWidth() {
-                return 70;
-            }
-
-        }, new IssueTypeColumnInfo("Type")
-         , new PriorityColumnInfo("Priority")
-         , new StatusColumnInfo("Status")
-         , new CreatedColumnInfo("Created")
-        };
+        return new ColumnInfo[]{ new KeyColumnInfo(),
+                                new SummaryColumnInfo(),
+                                new AssigneeColumnInfo(),
+                                new IssueTypeColumnInfo(),
+                                new PriorityColumnInfo(),
+                                new StatusColumnInfo(),
+                                new CreatedColumnInfo()};
     }
-
-
-
-
 
 
     private abstract static class AbstractColumnInfo extends ColumnInfo<JiraIssue, String>{
@@ -100,10 +73,106 @@ public class ColumnInfoHelper {
 
     }
 
+    private abstract static class JiraIssueColumnInfo extends ColumnInfo<JiraIssue, String> {
+        private static final JiraIssueTableCellRenderer JIRA_ISSUE_RENDERER = new JiraIssueTableCellRenderer();
+
+        JiraIssueColumnInfo(@NotNull String name) {
+            super(name);
+        }
+
+        @Nullable
+        @Override
+        public TableCellRenderer getRenderer(JiraIssue issue) {
+            return JIRA_ISSUE_RENDERER;
+        }
+
+    }
+
+    private static class KeyColumnInfo extends JiraIssueColumnInfo{
+
+        KeyColumnInfo() {
+            super(KEY_COLUMN);
+        }
+
+        @Nullable
+        @Override
+        public String valueOf(JiraIssue issue) {
+            return issue.getKey();
+        }
+
+        @Nullable
+        @Override
+        public String getMaxStringValue() {
+            return "";
+        }
+
+        @Override
+        public int getAdditionalWidth() {
+            return 90;
+        }
+
+        @Override
+        public TableCellRenderer getCustomizedRenderer(JiraIssue o, TableCellRenderer renderer) {
+            if(renderer instanceof JiraIssueTableCellRenderer){
+                ((JiraIssueTableCellRenderer) renderer).setHorizontalAlignment(SwingUtilities.LEFT);
+            }
+            return renderer;
+        }
+    }
+
+    private static class SummaryColumnInfo extends JiraIssueColumnInfo {
+
+        SummaryColumnInfo() {
+            super(SUMMARY_COLUMN);
+        }
+
+        @Nullable
+        @Override
+        public String valueOf(JiraIssue issue) {
+            return issue.getSummary();
+        }
+
+        @Nullable
+        @Override
+        public String getMaxStringValue() {
+            return "";
+        }
+
+        @Override
+        public int getAdditionalWidth() {
+            return 400;
+        }
+    }
+
+    private static class AssigneeColumnInfo extends JiraIssueColumnInfo {
+
+        AssigneeColumnInfo() {
+            super(ASSIGNEE_COLUMN);
+        }
+
+        @Nullable
+        @Override
+        public String valueOf(JiraIssue issue) {
+            return getAssignee(issue);
+        }
+
+        @Nullable
+        @Override
+        public String getMaxStringValue() {
+            return "";
+        }
+
+        @Override
+        public int getAdditionalWidth() {
+            return 70;
+        }
+
+    }
+
     private static class IssueTypeColumnInfo extends JiraIssueColumnInfo{
 
-        IssueTypeColumnInfo(String name) {
-            super(name);
+        IssueTypeColumnInfo() {
+            super(TYPE_COLUMN);
         }
 
         @Nullable
@@ -112,13 +181,12 @@ public class ColumnInfoHelper {
             return getIssueType(issue);
         }
 
-
     }
 
     private static class PriorityColumnInfo extends AbstractColumnInfo{
 
-        PriorityColumnInfo(String name) {
-            super(name);
+        PriorityColumnInfo() {
+            super(PRIORITY_COLUMN);
         }
 
         @Nullable
@@ -142,8 +210,8 @@ public class ColumnInfoHelper {
 
     private static class StatusColumnInfo extends JiraIssueColumnInfo{
 
-        StatusColumnInfo(String name) {
-            super(name);
+        StatusColumnInfo() {
+            super(STATUS_COLUMN);
         }
 
         @Nullable
@@ -160,59 +228,10 @@ public class ColumnInfoHelper {
 
     }
 
-    private abstract static class JiraIssueColumnInfo extends ColumnInfo<JiraIssue, String> {
-        private static final JiraIssueTableCellRenderer JIRA_ISSUE_RENDERER = new JiraIssueTableCellRenderer();
+    private static class CreatedColumnInfo extends JiraIssueColumnInfo{
 
-        JiraIssueColumnInfo(@NotNull String name) {
-            super(name);
-        }
-
-
-        @Nullable
-        @Override
-        public TableCellRenderer getRenderer(JiraIssue issue) {
-            return JIRA_ISSUE_RENDERER;
-        }
-
-
-    }
-
-    private class KeyColumnInfo extends JiraIssueColumnInfo{
-
-        KeyColumnInfo(@NotNull String name) {
-            super(name);
-        }
-
-        @Nullable
-        @Override
-        public String valueOf(JiraIssue issue) {
-            return getKey(issue);
-        }
-
-        @Nullable
-        @Override
-        public String getMaxStringValue() {
-            return "";
-        }
-
-        @Override
-        public int getAdditionalWidth() {
-            return 90;
-        }
-
-        @Override
-        public TableCellRenderer getCustomizedRenderer(JiraIssue o, TableCellRenderer renderer) {
-            if(renderer instanceof JiraIssueTableCellRenderer){
-                ((JiraIssueTableCellRenderer) renderer).setHorizontalAlignment(SwingUtilities.LEFT);
-            }
-            return renderer;
-        }
-    }
-
-    private class CreatedColumnInfo extends JiraIssueColumnInfo{
-
-        CreatedColumnInfo(@NotNull String name) {
-            super(name);
+        CreatedColumnInfo() {
+            super(CREATED_COLUMN);
         }
 
         @Nullable
@@ -230,6 +249,5 @@ public class ColumnInfoHelper {
         }
 
     }
-
 
 }

@@ -77,6 +77,9 @@ public class JiraIssueFieldProperties {
             return isNotEmpty(getCustomId()) && isNotEmpty(getCustom());
         }
 
+        public boolean isArray() {
+            return "array".equals(type);
+        }
 
         public String getFieldName(){
             if(isCustomField()){

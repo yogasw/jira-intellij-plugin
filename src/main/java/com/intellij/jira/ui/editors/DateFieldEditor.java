@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,54 +19,61 @@ import java.util.Date;
 import java.util.Objects;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
-import static com.intellij.openapi.util.text.StringUtil.*;
+import static com.intellij.openapi.util.text.StringUtil.isEmpty;
+import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
+import static com.intellij.openapi.util.text.StringUtil.trim;
 import static java.util.Objects.nonNull;
 
-public class DateFieldEditor extends AbstractFieldEditor {
+public class DateFieldEditor extends AbstractFieldEditor<String> {
 
     private static final DateFormatter DATE_FORMATTER = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd"));
 
     private JPanel myPanel;
-    protected JLabel myInfoLabel;
     protected JFormattedTextField myFormattedTextField;
-    private String myFormattedTextFieldValue;
+    protected JLabel myInfoLabel;
 
-    public DateFieldEditor(String fieldName, String issueKey, boolean required) {
-        this(fieldName, null, issueKey, required);
+    public DateFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
+        super(issueKey, fieldName, fieldValue, required);
     }
 
-    public DateFieldEditor(String fieldName, Date fieldValue, String issueKey, boolean required) {
-        super(fieldName, issueKey, required);
-        this.myFormattedTextFieldValue = Objects.nonNull(fieldValue) ? getDateFormatter().getFormat().format(fieldValue) : "";
+    @Override
+    public String getFieldValue() {
+        try {
+            return getDateFormatter().valueToString(Objects.nonNull(fieldValue) ? fieldValue : new Date());
+        } catch (ParseException e) {
+            return "";
+        }
     }
 
     @Override
     public JComponent createPanel() {
         myFormattedTextField.setFormatterFactory(new DefaultFormatterFactory(getDateFormatter()));
-        myFormattedTextField.setText(myFormattedTextFieldValue);
+        myFormattedTextField.setText(getFieldValue());
+
         myInfoLabel.setToolTipText(getToolTipMessage());
         myInfoLabel.setIcon(AllIcons.Actions.Help);
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myPanel)
-                .getPanel();
+                    .addLabeledComponent(myLabel, myPanel)
+                    .getPanel();
     }
 
-    public DateFormatter getDateFormatter(){
+
+    public DateFormatter getDateFormatter() {
         return DATE_FORMATTER;
     }
 
-    public String getToolTipMessage(){
+    public String getToolTipMessage() {
         return "E.g. yyyy-MM-dd";
     }
 
-    protected String getValue(){
+    protected String getValue() {
         return nonNull(myFormattedTextField) ? trim(myFormattedTextField.getText()) : "";
     }
 
     @Override
     public JsonElement getJsonValue() {
-        if(isEmpty(myFormattedTextField.getText())){
+        if (isEmpty(myFormattedTextField.getText())) {
             return JsonNull.INSTANCE;
         }
 
@@ -75,13 +83,13 @@ public class DateFieldEditor extends AbstractFieldEditor {
     @Nullable
     @Override
     public ValidationInfo validate() {
-        if(isRequired() && isEmpty(trim(myFormattedTextField.getText()))){
+        if (isRequired() && isEmpty(trim(myFormattedTextField.getText()))) {
             return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
-        }else{
-            if(isNotEmpty(trim(myFormattedTextField.getText()))){
-                try{
+        } else {
+            if (isNotEmpty(trim(myFormattedTextField.getText()))) {
+                try {
                     LocalDate.parse(myFormattedTextField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                }catch (DateTimeParseException e){
+                } catch (DateTimeParseException e) {
                     return new ValidationInfo("Wrong format in " + myLabel.getMyLabelText() + " field.");
                 }
             }

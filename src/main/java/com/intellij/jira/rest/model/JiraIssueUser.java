@@ -7,7 +7,7 @@ public class JiraIssueUser {
     private String self;
     private String name;
     private String key;
-    private String emailAdress;
+    private String emailAddress;
     private String displayName;
     private JiraIssueUser.Avatar avatarUrls;
 
@@ -25,8 +25,8 @@ public class JiraIssueUser {
         return key;
     }
 
-    public String getEmailAdress() {
-        return emailAdress;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
     public String getDisplayName() {

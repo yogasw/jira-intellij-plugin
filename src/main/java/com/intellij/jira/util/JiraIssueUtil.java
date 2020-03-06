@@ -18,20 +18,8 @@ public class JiraIssueUtil {
 
     private static final Pattern BODY_NAME_PATTERN = Pattern.compile("(\\[~(\\w+)])");
 
-    public static String getKey(@NotNull JiraIssue jiraIssue) {
-        return jiraIssue.getKey();
-    }
-
-    public static String getSummary(@NotNull JiraIssue jiraIssue) {
-        return jiraIssue.getSummary();
-    }
-
     public static String getAssignee(@NotNull JiraIssue jiraIssue) {
         return nonNull(jiraIssue.getAssignee()) ? jiraIssue.getAssignee().getName() : "";
-    }
-
-    public static String getAvatarIcon(@Nullable JiraIssueUser user) {
-        return nonNull(user) ? user.getAvatarIcon(): "";
     }
 
     public static String getIssueType(@NotNull JiraIssue jiraIssue) {
@@ -76,7 +64,7 @@ public class JiraIssueUtil {
     }
 
     public static String getPrettyDateTime(Date date){
-        return DateFormatUtil.formatPrettyDateTime(date);
+        return nonNull(date) ? DateFormatUtil.formatPrettyDateTime(date) : "";
     }
 
 }

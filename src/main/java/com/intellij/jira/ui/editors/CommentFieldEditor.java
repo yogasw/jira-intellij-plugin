@@ -12,9 +12,8 @@ import static com.intellij.openapi.util.text.StringUtil.trim;
 public class CommentFieldEditor extends TextAreaFieldEditor {
 
     public CommentFieldEditor(String issueKey) {
-        super("Comment", issueKey, false);
+        super(issueKey, "Comment", null, false);
     }
-
 
     @Override
     public JsonElement getJsonValue() {

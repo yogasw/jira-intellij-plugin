@@ -4,34 +4,31 @@ import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.text.DateFormatter;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 
 import static com.intellij.openapi.util.text.StringUtil.*;
 
-
 public class DateTimeFieldEditor extends DateFieldEditor {
 
-    private static final DateFormatter DATE_TIME_FORMATTER = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+    private static final DateFormatter DATE_TIME_FORMATTER = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd HH:mm"));
     private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.ss+0000";
 
-    public DateTimeFieldEditor(String fieldName, String issueKey, boolean required) {
-        this(fieldName, null, issueKey, required);
+    public DateTimeFieldEditor(String issueKey, String fieldName, boolean required) {
+        super(issueKey, fieldName, null, required);
     }
 
-    public DateTimeFieldEditor(String fieldName, Date fieldValue, String issueKey, boolean required) {
-        super(fieldName, fieldValue, issueKey, required);
+    public DateTimeFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
+        super(issueKey, fieldName, fieldValue, required);
     }
 
     @Override
     public String getToolTipMessage() {
-        return "E.g. yyyy-MM-dd HH:mm:ss";
+        return "E.g. yyyy-MM-dd HH:mm";
     }
 
     @Override
@@ -43,7 +40,7 @@ public class DateTimeFieldEditor extends DateFieldEditor {
         }
 
         LocalDate ld = LocalDate.parse(words[0]);
-        LocalTime lt = Time.valueOf(words[1]).toLocalTime();
+        LocalTime lt = LocalTime.parse(words[1]);
 
         return DateTimeFormatter.ofPattern(ISO_FORMAT).format(LocalDateTime.of(ld, lt));
     }
@@ -61,7 +58,7 @@ public class DateTimeFieldEditor extends DateFieldEditor {
         }else{
             if(isNotEmpty(trim(myFormattedTextField.getText()))){
                 try{
-                    LocalDateTime.parse(myFormattedTextField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    LocalDateTime.parse(myFormattedTextField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
                 }catch (DateTimeParseException e){
                     return new ValidationInfo("Wrong format in " + myLabel.getMyLabelText() + " field.");
                 }
@@ -71,4 +68,5 @@ public class DateTimeFieldEditor extends DateFieldEditor {
 
         return null;
     }
+
 }

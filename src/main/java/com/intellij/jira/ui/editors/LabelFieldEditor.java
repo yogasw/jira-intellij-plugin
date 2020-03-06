@@ -9,30 +9,28 @@ import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Objects;
 
-public class LabelFieldEditor extends AbstractFieldEditor {
+public class LabelFieldEditor extends AbstractFieldEditor<String> {
 
     private JBLabel myLabelText;
-    private String labelText;
 
-    public LabelFieldEditor(String fieldName, String issueKey) {
-        this(fieldName, "None", issueKey);
+    public LabelFieldEditor(String issueKey, String fieldName) {
+        this(issueKey, fieldName, null);
     }
 
-    public LabelFieldEditor(String fieldName, String labelText, String issueKey) {
-        super(fieldName, issueKey);
-        this.labelText = labelText;
+    public LabelFieldEditor(String issueKey, String fieldName, Object fieldValue) {
+        super(issueKey, fieldName, fieldValue);
     }
 
     @Override
     public JComponent createPanel() {
-        this.myLabelText = JiraLabelUtil.createBoldLabel(labelText);
+        this.myLabelText = JiraLabelUtil.createBoldLabel(getFieldValue());
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(this.myLabel, this.myLabelText)
                 .getPanel();
     }
-
 
     @Override
     public JsonElement getJsonValue() {
@@ -44,4 +42,10 @@ public class LabelFieldEditor extends AbstractFieldEditor {
     public ValidationInfo validate() {
         return null;
     }
+
+    @Override
+    public String getFieldValue() {
+        return Objects.nonNull(fieldValue) ? (String) fieldValue : "None";
+    }
+
 }

@@ -5,6 +5,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.*;
+import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
@@ -19,6 +20,7 @@ import java.util.Map;
 import static com.intellij.jira.rest.JiraIssueParser.*;
 import static com.intellij.jira.ui.dialog.AddCommentDialog.ALL_USERS;
 import static com.intellij.jira.util.JiraGsonUtil.*;
+import static com.intellij.jira.util.JiraIssueField.KEY;
 import static java.util.Objects.nonNull;
 
 public class JiraRestClient {
@@ -40,14 +42,13 @@ public class JiraRestClient {
 
     public JiraIssue getIssue(String issueIdOrKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueIdOrKey));
-        method.setQueryString(method.getQueryString() + "?fields=" + JiraIssue.REQUIRED_FIELDS);
         String response = jiraRepository.executeMethod(method);
         return parseIssue(response);
     }
 
     public List<JiraIssue> findIssues(String searchQuery) throws Exception {
         GetMethod method = getBasicSearchMethod(searchQuery, MAX_ISSUES_RESULTS);
-        method.setQueryString(method.getQueryString() + "&fields=" + JiraIssue.REQUIRED_FIELDS);
+        method.setQueryString(method.getQueryString() + "&fields=*all");
         String response = jiraRepository.executeMethod(method);
         return parseIssues(response);
     }
@@ -150,9 +151,15 @@ public class JiraRestClient {
         return jiraRepository.executeMethod(method);
     }
 
-    public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey) throws Exception {
+    public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey, JiraPermissionType permission) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("mypermissions"));
-        method.setQueryString(new NameValuePair[]{new NameValuePair("issueKey", issueKey)});
+        method.setQueryString(new NameValuePair[]{
+                new NameValuePair("issueKey", issueKey),
+
+                // "permissions" to check is required to be added right from the start
+                // https://blog.developer.atlassian.com/change-notice-get-my-permissions-requires-permissions-query-parameter/
+                new NameValuePair("permissions", permission.toString())
+        });
         String response = jiraRepository.executeMethod(method);
         return parsePermissions(response);
     }
@@ -182,6 +189,15 @@ public class JiraRestClient {
             updateObject.add("comment", commentField.getJsonValue());
         }
 
+        // Work Log
+        FieldEditorInfo worklogField = fields.remove("worklog");
+        if(nonNull(worklogField)) {
+            JsonElement worklogFieldValue = worklogField.getJsonValue();
+            if (!(worklogFieldValue instanceof JsonNull)) {
+                updateObject.add("worklog", worklogFieldValue);
+            }
+        }
+
         // Linked Issues
         FieldEditorInfo issueLinkField = fields.remove("issuelinks");
         if(nonNull(issueLinkField) && !(issueLinkField.getJsonValue() instanceof JsonNull)){
@@ -195,8 +211,9 @@ public class JiraRestClient {
         //Fields
         JsonObject fieldsObject = new JsonObject();
         fields.forEach((key, value) -> {
-            if(!(value.getJsonValue() instanceof JsonNull)){
-                fieldsObject.add(key, value.getJsonValue());
+            JsonElement jsonValue = value.getJsonValue();
+            if(!(jsonValue instanceof JsonNull)){
+                fieldsObject.add(key, jsonValue);
             }
         });
 
@@ -251,8 +268,8 @@ public class JiraRestClient {
     private String prepareIssueLinkBody(String linkType, String inIssueKey, String outIssueKey) {
         JsonObject linkObject = new JsonObject();
         linkObject.add("type", createNameObject(linkType));
-        linkObject.add("inwardIssue", createObject("key", inIssueKey));
-        linkObject.add("outwardIssue", createObject("key", outIssueKey));
+        linkObject.add("inwardIssue", createObject(KEY, inIssueKey));
+        linkObject.add("outwardIssue", createObject(KEY, outIssueKey));
 
         return linkObject.toString();
     }

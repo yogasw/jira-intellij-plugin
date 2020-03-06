@@ -1,4 +1,4 @@
-package com.intellij.jira.util;
+package com.intellij.jira.util.result;
 
 import static java.util.Objects.nonNull;
 

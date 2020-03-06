@@ -18,12 +18,12 @@ import static com.intellij.util.containers.ContainerUtil.getFirstItem;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
-public class GroupSelectFieldEditor extends SelectFieldEditor {
+public class GroupSelectFieldEditor extends SelectFieldEditor<String> {
 
     private List<String> selectedGroups = new ArrayList<>();
 
-    public GroupSelectFieldEditor(String fieldName, String issueKey, boolean required, boolean isMultiSelect) {
-        super(fieldName, issueKey, required, isMultiSelect);
+    public GroupSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
+        super(issueKey, fieldName, fieldValue, required, isMultiSelect);
         myButtonAction = new GroupPickerDialogAction();
     }
 
@@ -40,6 +40,10 @@ public class GroupSelectFieldEditor extends SelectFieldEditor {
         return createNameObject(getFirstItem(selectedGroups));
     }
 
+    @Override
+    public String getFieldValue() {
+        return null;
+    }
 
     private class GroupPickerDialogAction extends PickerDialogAction {
 
@@ -63,10 +67,8 @@ public class GroupSelectFieldEditor extends SelectFieldEditor {
     class GroupPickerDialog extends PickerDialog<String> {
 
         public GroupPickerDialog(@Nullable Project project, List<String> items) {
-            super(project, "Groups", items);
+            super(project, "Groups", items, null);
         }
-
-
 
         @Override
         protected void doOKAction() {
