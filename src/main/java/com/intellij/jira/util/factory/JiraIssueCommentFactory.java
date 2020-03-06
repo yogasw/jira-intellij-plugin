@@ -1,4 +1,4 @@
-package com.intellij.jira.util;
+package com.intellij.jira.util.factory;
 
 import com.intellij.jira.rest.model.JiraIssueComment;
 import com.intellij.openapi.util.Factory;

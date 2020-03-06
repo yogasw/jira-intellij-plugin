@@ -5,7 +5,7 @@ import com.intellij.jira.rest.model.JiraIssueUser;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.popup.JiraIssueAssignableUsersPopup;
-import com.intellij.jira.util.JiraIssueFactory;
+import com.intellij.jira.util.factory.JiraIssueFactory;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
