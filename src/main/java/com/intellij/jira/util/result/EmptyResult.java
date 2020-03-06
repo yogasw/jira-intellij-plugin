@@ -1,9 +1,9 @@
-package com.intellij.jira.util;
+package com.intellij.jira.util.result;
 
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.Nullable;
 
-public class EmptyResult implements Result{
+public class EmptyResult implements Result {
 
     private String response;
 
