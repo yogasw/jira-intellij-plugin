@@ -10,6 +10,7 @@ import com.intellij.jira.actions.AddIssueLinkDialogAction;
 import com.intellij.jira.rest.model.JiraIssueLinkType;
 import com.intellij.jira.rest.model.JiraIssueLinkTypeInfo;
 import com.intellij.jira.ui.dialog.AddIssueLinkDialog;
+import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
 import static com.intellij.jira.util.JiraGsonUtil.createObject;
+import static com.intellij.jira.util.JiraIssueField.KEY;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -71,7 +73,7 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
         JsonObject rootObject = new JsonObject();
         JsonObject addObject = new JsonObject();
         addObject.add("type", createNameObject(mySelectedLinkType.getName()));
-        addObject.add(mySelectedLinkType.isInward() ? "inwardIssue" : "outwardIssue", createObject("key", mySelectedIssue));
+        addObject.add(mySelectedLinkType.isInward() ? "inwardIssue" : "outwardIssue", createObject(KEY, mySelectedIssue));
 
 
         rootObject.add("add", addObject);

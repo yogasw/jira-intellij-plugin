@@ -97,7 +97,7 @@ public class ColumnInfoHelper {
         @Nullable
         @Override
         public String valueOf(JiraIssue issue) {
-            return getKey(issue);
+            return issue.getKey();
         }
 
         @Nullable
@@ -129,7 +129,7 @@ public class ColumnInfoHelper {
         @Nullable
         @Override
         public String valueOf(JiraIssue issue) {
-            return getSummary(issue);
+            return issue.getSummary();
         }
 
         @Nullable

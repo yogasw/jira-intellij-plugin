@@ -10,6 +10,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import javax.swing.*;
 
 import static com.intellij.jira.ui.editors.FieldEditorFactory.createCommentFieldEditor;
+import static com.intellij.jira.util.JiraIssueField.COMMENT;
 
 public final class TransitionFieldHelper {
 
@@ -22,7 +23,7 @@ public final class TransitionFieldHelper {
     }
 
     public static FieldEditorInfo createCommentFieldEditorInfo(String issueKey){
-        return new FieldEditorInfo("comment", createCommentFieldEditor(issueKey));
+        return new FieldEditorInfo(COMMENT, createCommentFieldEditor(issueKey));
     }
 
     public static class FieldEditorInfo {

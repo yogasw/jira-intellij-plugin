@@ -18,15 +18,16 @@ import java.util.List;
 import java.util.Set;
 
 import static com.intellij.jira.util.JiraGsonUtil.isEmpty;
+import static com.intellij.jira.util.JiraIssueField.*;
 import static com.intellij.tasks.jira.JiraRepository.GSON;
 import static java.util.Objects.isNull;
 
 public class FieldEditorFactory {
 
-    private static final Set<String> TEXT_AREA_FIELDS = ContainerUtil.immutableSet("description", "environment");
-    private static final Set<String> TEXT_FIELDS = ContainerUtil.immutableSet("summary");
-    private static final Set<String> DATE_FIELDS = ContainerUtil.immutableSet("duedate");
-    private static final Set<String> USER_PICKER_FIELDS = ContainerUtil.immutableSet("assignee", "reporter");
+    private static final Set<String> TEXT_AREA_FIELDS = ContainerUtil.immutableSet(DESCRIPTION, ENVIRONMENT);
+    private static final Set<String> TEXT_FIELDS = ContainerUtil.immutableSet(SUMMARY);
+    private static final Set<String> DATE_FIELDS = ContainerUtil.immutableSet(DUEDATE);
+    private static final Set<String> USER_PICKER_FIELDS = ContainerUtil.immutableSet(ASSIGNEE, REPORTER);
 
     public static FieldEditor create(JiraIssueFieldProperties properties, JiraIssue issue) {
 
@@ -43,13 +44,13 @@ public class FieldEditorFactory {
             return new DateFieldEditor(issue.getKey(), properties.getName(), issue.getAsDate(fieldName), properties.isRequired());
         } else if (USER_PICKER_FIELDS.contains(fieldName)) {
             return new UserSelectFieldEditor(issue.getKey(), properties.getName(), issue.getAsJiraIssueUser(fieldName), properties.isRequired());
-        } else if ("timetracking".equals(fieldName)) {
+        } else if (TIME_TRACKING.equals(fieldName)) {
             return new TimeTrackingFieldEditor(issue.getKey(), properties.isRequired());
-        } else if ("issuelinks".equals(fieldName)) {
+        } else if (ISSUE_LINKS.equals(fieldName)) {
             return new LinkedIssueFieldEditor(issue.getKey(), properties.getName(), properties.isRequired(), issue.getProject().getKey());
-        } else if ("issuetype".equals(fieldName)) {
+        } else if (ISSUE_TYPE.equals(fieldName)) {
             return new LabelFieldEditor(issue.getKey(), properties.getName(), issue.getIssuetype().getName());
-        } else if("worklog".equals(fieldName)) {
+        } else if(WORKLOG.equals(fieldName)) {
             return new LogWorkFieldEditor(issue.getKey(), properties.getName(), issue.getTimetracking(), properties.isRequired());
         }
 
@@ -73,20 +74,20 @@ public class FieldEditorFactory {
         boolean isArray = properties.getSchema().isArray();
         String type = isArray ? properties.getSchema().getItems() : properties.getSchema().getType();
         String fieldName = properties.getSchema().getSystem();
-        if ("priority".equals(type)) {
+        if (PRIORITY.equals(type)) {
             items = Arrays.asList(GSON.fromJson(allowedValues, JiraIssuePriority[].class));
             selectedItem = issue.getPriority();
-        } else if ("version".equals(type)) {
+        } else if (VERSION.equals(type)) {
             items = Arrays.asList(GSON.fromJson(allowedValues, JiraProjectVersion[].class));
-            if ("fixVersions".equals(fieldName)) {
+            if (FIX_VERSIONS.equals(fieldName)) {
                 selectedItem = issue.getFixVersions();
-            } else if ("versions".equals(fieldName)) {
+            } else if (VERSIONS.equals(fieldName)) {
                 selectedItem = issue.getVersions();
             }
-        } else if ("resolution".equals(type)) {
+        } else if (RESOLUTION.equals(type)) {
             items = Arrays.asList(GSON.fromJson(allowedValues, JiraIssueResolution[].class));
             selectedItem = issue.getResolution();
-        } else if ("component".equals(type)) {
+        } else if (COMPONENT.equals(type)) {
             items = Arrays.asList(GSON.fromJson(allowedValues, JiraProjectComponent[].class));
             selectedItem = issue.getComponents();
         }
@@ -133,10 +134,10 @@ public class FieldEditorFactory {
         }
 
         // The field has values
-        if ("project".equals(type)) {
+        if (PROJECT.equals(type)) {
             List<JiraProject> projects = Arrays.asList(GSON.fromJson(values, JiraProject[].class));
             return new ProjectSelectFieldEditor(issue.getKey(), properties.getName(), issue.getCustomfieldValue(properties.getSchema().getCustomId()), properties.isRequired(), isArray, projects);
-        } else if ("version".equals(type)) {
+        } else if (VERSION.equals(type)) {
             List<JiraProjectVersion> versions = Arrays.asList(GSON.fromJson(values, JiraProjectVersion[].class));
             return new VersionSelectFieldEditor(issue.getKey(), properties.getName(), issue.getCustomfieldValue(properties.getSchema().getCustomId()), properties.isRequired(), isArray, versions);
         }

@@ -5,6 +5,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.*;
+import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
@@ -19,6 +20,7 @@ import java.util.Map;
 import static com.intellij.jira.rest.JiraIssueParser.*;
 import static com.intellij.jira.ui.dialog.AddCommentDialog.ALL_USERS;
 import static com.intellij.jira.util.JiraGsonUtil.*;
+import static com.intellij.jira.util.JiraIssueField.KEY;
 import static java.util.Objects.nonNull;
 
 public class JiraRestClient {
@@ -266,8 +268,8 @@ public class JiraRestClient {
     private String prepareIssueLinkBody(String linkType, String inIssueKey, String outIssueKey) {
         JsonObject linkObject = new JsonObject();
         linkObject.add("type", createNameObject(linkType));
-        linkObject.add("inwardIssue", createObject("key", inIssueKey));
-        linkObject.add("outwardIssue", createObject("key", outIssueKey));
+        linkObject.add("inwardIssue", createObject(KEY, inIssueKey));
+        linkObject.add("outwardIssue", createObject(KEY, outIssueKey));
 
         return linkObject.toString();
     }

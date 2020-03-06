@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static com.intellij.jira.util.JiraIssueField.*;
+
 public class JiraIssue {
 
     private String id;
@@ -32,91 +34,91 @@ public class JiraIssue {
     }
 
     public String getSummary() {
-        return JiraGsonUtil.getAsString(fields.get("summary"));
+        return JiraGsonUtil.getAsString(fields.get(SUMMARY));
     }
 
     public String getDescription() {
-        return JiraGsonUtil.getAsString(fields.get("description"));
+        return JiraGsonUtil.getAsString(fields.get(DESCRIPTION));
     }
 
     public Date getCreated() {
-        return JiraGsonUtil.getAsDate(fields.get("created"));
+        return JiraGsonUtil.getAsDate(fields.get(CREATED));
     }
 
     public Date getUpdated() {
-        return JiraGsonUtil.getAsDate(fields.get("updated"));
+        return JiraGsonUtil.getAsDate(fields.get(UPDATED));
     }
 
     public Date getResolutiondate() {
-        return JiraGsonUtil.getAsDate(fields.get("resolutiondate"));
+        return JiraGsonUtil.getAsDate(fields.get(RESOLUTION_DATE));
     }
 
     public Date getDuedate() {
-        return JiraGsonUtil.getAsDate(fields.get("duedate"));
+        return JiraGsonUtil.getAsDate(fields.get(DUEDATE));
     }
 
     public JiraIssueType getIssuetype() {
-        return JiraGsonUtil.getAs(fields.get("issuetype"), JiraIssueType.class);
+        return JiraGsonUtil.getAs(fields.get(ISSUE_TYPE), JiraIssueType.class);
     }
 
     public JiraIssueStatus getStatus() {
-        return JiraGsonUtil.getAs(fields.get("status"), JiraIssueStatus.class);
+        return JiraGsonUtil.getAs(fields.get(STATUS), JiraIssueStatus.class);
     }
 
     public JiraIssueResolution getResolution() {
-        return JiraGsonUtil.getAs(fields.get("resolution"), JiraIssueResolution.class);
+        return JiraGsonUtil.getAs(fields.get(RESOLUTION), JiraIssueResolution.class);
     }
 
     public JiraIssuePriority getPriority() {
-        return JiraGsonUtil.getAs(fields.get("priority"), JiraIssuePriority.class);
+        return JiraGsonUtil.getAs(fields.get(PRIORITY), JiraIssuePriority.class);
     }
 
     public JiraIssueUser getAssignee() {
-        return JiraGsonUtil.getAs(fields.get("assignee"), JiraIssueUser.class);
+        return JiraGsonUtil.getAs(fields.get(ASSIGNEE), JiraIssueUser.class);
     }
 
     public JiraIssueUser getCreator() {
-        return JiraGsonUtil.getAs(fields.get("creator"), JiraIssueUser.class);
+        return JiraGsonUtil.getAs(fields.get(CREATOR), JiraIssueUser.class);
     }
 
     public JiraIssueUser getReporter() {
-        return JiraGsonUtil.getAs(fields.get("reporter"), JiraIssueUser.class);
+        return JiraGsonUtil.getAs(fields.get(REPORTER), JiraIssueUser.class);
     }
 
     public JiraIssueCommentsWrapper getComments(){
-        return JiraGsonUtil.getAs(fields.get("comment"), JiraIssueCommentsWrapper.class);
+        return JiraGsonUtil.getAs(fields.get(COMMENT), JiraIssueCommentsWrapper.class);
     }
 
     public JiraIssueWorklogsWrapper getWorklogs(){
-        return JiraGsonUtil.getAs(fields.get("worklog"), JiraIssueWorklogsWrapper.class);
+        return JiraGsonUtil.getAs(fields.get(WORKLOG), JiraIssueWorklogsWrapper.class);
     }
 
     public JiraIssueTimeTracking getTimetracking(){
-        return JiraGsonUtil.getAs(fields.get("timetracking"), JiraIssueTimeTracking.class);
+        return JiraGsonUtil.getAs(fields.get(TIME_TRACKING), JiraIssueTimeTracking.class);
     }
 
     public List<JiraIssueLink> getIssueLinks(){
-        return JiraGsonUtil.getAsList(fields.get("issuelinks"), JiraIssueLink[].class);
+        return JiraGsonUtil.getAsList(fields.get(ISSUE_LINKS), JiraIssueLink[].class);
     }
 
     public JiraProject getProject(){
-        return JiraGsonUtil.getAs(fields.get("project"), JiraProject.class);
+        return JiraGsonUtil.getAs(fields.get(PROJECT), JiraProject.class);
     }
 
     public List<JiraProjectVersion> getVersions(){
-        return JiraGsonUtil.getAsList(fields.get("versions"), JiraProjectVersion[].class);
+        return JiraGsonUtil.getAsList(fields.get(VERSIONS), JiraProjectVersion[].class);
     }
 
     public List<JiraProjectVersion> getFixVersions(){
-        return JiraGsonUtil.getAsList(fields.get("fixVersions"), JiraProjectVersion[].class);
+        return JiraGsonUtil.getAsList(fields.get(FIX_VERSIONS), JiraProjectVersion[].class);
     }
 
     public List<JiraIssueComponent> getComponents(){
-        return JiraGsonUtil.getAsList(fields.get("components"), JiraIssueComponent[].class);
+        return JiraGsonUtil.getAsList(fields.get(COMPONENTS), JiraIssueComponent[].class);
     }
 
     public List<String> getLabels(){
-        return JiraGsonUtil.getAsList(fields.get("labels"), String[].class);
+        return JiraGsonUtil.getAsList(fields.get(LABELS), String[].class);
     }
 
     public String getAsString(String fieldName) {
@@ -137,7 +139,7 @@ public class JiraIssue {
 
 
     public List<JiraIssue> getSubtasks() {
-        return JiraGsonUtil.getAsList(fields.get("subtasks"), JiraIssue[].class);
+        return JiraGsonUtil.getAsList(fields.get(SUBTASKS), JiraIssue[].class);
     }
 
     public String getUrl(){
