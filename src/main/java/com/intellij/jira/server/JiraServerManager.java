@@ -1,14 +1,12 @@
 package com.intellij.jira.server;
 
-import com.intellij.configurationStore.XmlSerializer;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.components.*;
 import com.intellij.tasks.jira.JiraRepository;
 import com.intellij.tasks.jira.JiraRepositoryType;
-import com.intellij.util.xmlb.XmlSerializationException;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Tag;
-import org.jdom.Element;
+import com.intellij.util.xmlb.annotations.XCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 @State(name = "JiraServerManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
 public class JiraServerManager implements ProjectComponent, PersistentStateComponent<JiraServerManager.Config> {
@@ -29,7 +26,7 @@ public class JiraServerManager implements ProjectComponent, PersistentStateCompo
     @Override
     public Config getState() {
         myConfig.selected = myJiraServers.getSelectedItemIndex();
-        myConfig.servers = XmlSerializer.serialize(getAllJiraServersAsArray());
+        myConfig.servers = myJiraServers.getItems();
         return myConfig;
     }
 
@@ -38,29 +35,13 @@ public class JiraServerManager implements ProjectComponent, PersistentStateCompo
         XmlSerializerUtil.copyBean(config, myConfig);
 
         myJiraServers.clear();
-        Element element = config.servers;
-        List<JiraServer> servers = loadServers(element);
-        myJiraServers.addAll(servers);
+        List<JiraServer> servers =  config.servers;
+        if (servers != null) {
+            myJiraServers.addAll(servers);
+        }
 
         myJiraServers.selectItem(config.selected);
     }
-
-    private List<JiraServer> loadServers(Element element) {
-        List<JiraServer> servers = new ArrayList<>();
-        if(nonNull(element)){
-            for(Element o : element.getChildren()){
-                try{
-                    JiraServer server = XmlSerializer.deserialize(o, JiraServer.class);
-                    servers.add(server);
-                }catch (XmlSerializationException e) {
-                    //LOG.error(e.getMessage(), e);
-                }
-            }
-        }
-
-        return servers;
-    }
-
 
     public void addConfigurationServerChangedListener(Runnable runnable){
         myListeners.add(runnable);
@@ -72,10 +53,6 @@ public class JiraServerManager implements ProjectComponent, PersistentStateCompo
 
     public int getSelectedJiraServerIndex(){
         return myJiraServers.getSelectedItemIndex();
-    }
-
-    private JiraServer[] getAllJiraServersAsArray(){
-        return getJiraServers().toArray(new JiraServer[0]);
     }
 
     public boolean hasJiraServerConfigured(){
@@ -109,8 +86,8 @@ public class JiraServerManager implements ProjectComponent, PersistentStateCompo
 
         JiraRepository repository = new JiraRepositoryType().createRepository();
         repository.setUrl(jiraServer.getUrl());
-        repository.setUsername(jiraServer.getUsername());
-        repository.setPassword(jiraServer.getPassword());
+        repository.setUsername(jiraServer.hasUserAndPassAuth() ? jiraServer.getUsername() : jiraServer.getUseremail());
+        repository.setPassword(jiraServer.hasUserAndPassAuth() ? jiraServer.getPassword() : jiraServer.getApiToken());
 
         return new JiraRestApi(repository);
     }
@@ -121,12 +98,12 @@ public class JiraServerManager implements ProjectComponent, PersistentStateCompo
 
 
     public static class Config{
-
         @Tag("selected")
         public int selected;
 
-        @Tag("servers")
-        public Element servers;
+
+        @XCollection(propertyElementName = "servers")
+        public List<JiraServer> servers;
 
     }
 
