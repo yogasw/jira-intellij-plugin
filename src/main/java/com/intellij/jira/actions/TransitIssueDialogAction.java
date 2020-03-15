@@ -31,7 +31,7 @@ public class TransitIssueDialogAction extends JiraIssueDialogAction {
         JiraIssue issue = issueFactory.create();
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issue.getKey(), JiraPermissionType.TRANSITION_ISSUES);
         if(!userHasPermission){
-            throw new InvalidPermissionException("Transition failed", "You don't have permission to transit issues");
+            throw new InvalidPermissionException("Transition Failed", "You don't have permission to transit issues");
         }
 
         List<JiraIssueTransition> transitions = jiraRestApi.getTransitions(issue.getId());

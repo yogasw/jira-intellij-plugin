@@ -75,12 +75,12 @@ public class JiraRestApi {
     }
 
 
-    public Result assignUserToIssue(String username, String issueKey){
+    public Result assignUserToIssue(String accountId,  String username, String issueKey){
         try {
-            String response = jiraRestClient.assignUserToIssue(username, issueKey);
+            String response = jiraRestClient.assignUserToIssue(accountId, username, issueKey);
             return EmptyResult.create(response);
         } catch (Exception e) {
-            log.error(String.format("Error assigning user '%s' to issue '%s'", username, issueKey));
+            log.error(String.format("Error assigning user with accoundId = '%s' to issue '%s'", accountId, issueKey));
             return EmptyResult.error();
         }
     }

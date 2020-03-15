@@ -41,13 +41,13 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
         if (!userHasPermission) {
             userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_OWN_WORKLOGS);
             if (!userHasPermission) {
-                throw new InvalidPermissionException("Edited Work Log failed", "You don't have permission to edit work logs");
+                throw new InvalidPermissionException("Edit Work Log Failed", "You don't have permission to edit work logs");
             }
 
             if (nonNull(worklogToEdit)
                     && !jiraRestApi.getUsername().equals(worklogToEdit.getAuthor().getName())
                     && !jiraRestApi.getUsername().equals(worklogToEdit.getAuthor().getEmailAddress())) {
-                throw new InvalidPermissionException("Edited Work Log failed", "This work log not yours. You cannot edit it.");
+                throw new InvalidPermissionException("Edit Work Log Failed", "This work log not yours. You cannot edit it.");
             }
         }
 

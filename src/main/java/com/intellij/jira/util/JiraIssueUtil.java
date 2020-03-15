@@ -2,10 +2,8 @@ package com.intellij.jira.util;
 
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComment;
-import com.intellij.jira.rest.model.JiraIssueUser;
 import com.intellij.util.text.DateFormatUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -19,7 +17,14 @@ public class JiraIssueUtil {
     private static final Pattern BODY_NAME_PATTERN = Pattern.compile("(\\[~(\\w+)])");
 
     public static String getAssignee(@NotNull JiraIssue jiraIssue) {
-        return nonNull(jiraIssue.getAssignee()) ? jiraIssue.getAssignee().getName() : "";
+        if (isNull(jiraIssue.getAssignee())) {
+            return "";
+        }
+
+        String useremail = jiraIssue.getAssignee().getEmailAddress();
+        int index = useremail.lastIndexOf('@');
+
+        return index >= 0 ? useremail.substring(0, index) : "";
     }
 
     public static String getIssueType(@NotNull JiraIssue jiraIssue) {

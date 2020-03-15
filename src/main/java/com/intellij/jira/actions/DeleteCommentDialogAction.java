@@ -34,11 +34,11 @@ public class DeleteCommentDialogAction extends JiraIssueDialogAction {
         if(!userHasPermission){
             userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.DELETE_OWN_COMMENTS);
             if(!userHasPermission){
-                throw new InvalidPermissionException("Deleted comment failed", "You don't have permission to delete comments");
+                throw new InvalidPermissionException("Delete Comment Failed", "You don't have permission to delete comments");
             }
 
             if(nonNull(commentToDelete) && !commentToDelete.getAuthor().getName().equals(jiraRestApi.getUsername())){
-                throw new InvalidPermissionException("Deleted comment failed", "This comment not yours. You cannot delete it");
+                throw new InvalidPermissionException("Delete Comment Failed", "This comment not yours. You cannot delete it");
             }
         }
 

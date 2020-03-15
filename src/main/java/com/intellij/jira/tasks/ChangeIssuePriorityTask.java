@@ -28,7 +28,7 @@ public class ChangeIssuePriorityTask extends AbstractBackgroundableTask {
         // Check user permissions
         boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueIdOrKey, EDIT_ISSUES);
         if(!hasPermission){
-            throw new InvalidPermissionException("Edit issue failed", "You don't have permission to change priority");
+            throw new InvalidPermissionException("Edit Issue Failed", "You don't have permission to change priority");
         }
 
         Result result = jiraRestApi.changeIssuePriority(priorityName, issueIdOrKey);
