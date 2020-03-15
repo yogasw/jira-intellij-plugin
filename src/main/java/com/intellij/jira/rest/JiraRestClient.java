@@ -337,5 +337,31 @@ public class JiraRestClient {
         return method.getStatusCode();
     }
 
+    public Integer watchIssue(String issueKey) throws Exception {
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "watchers"));
+
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
+    }
+
+    public Integer unwatchIssue(String issueKey, String accountId, String username) throws Exception {
+        DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "watchers"));
+        if (accountId != null) {
+            method.setQueryString(new NameValuePair[]{new NameValuePair("accountId", accountId)});
+        } else {
+            // For compatibility
+            method.setQueryString(new NameValuePair[]{new NameValuePair("username", username)});
+        }
+
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
+    }
+
+    public JiraIssueUser getCurrentUser() throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("myself"));
+        String response = jiraRepository.executeMethod(method);
+
+        return parseUser(response);
+    }
 }
 

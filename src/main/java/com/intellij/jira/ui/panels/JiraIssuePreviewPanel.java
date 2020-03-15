@@ -7,11 +7,13 @@ import com.intellij.jira.actions.TransitIssueDialogAction;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
+import com.intellij.jira.tasks.ToggleWatchIssueTask;
 import com.intellij.jira.util.JiraIconUtil;
 import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
@@ -21,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,10 +39,12 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 class JiraIssuePreviewPanel extends AbstractJiraPanel {
 
+    private final Project myProject;
     private JiraIssue issue;
 
-    JiraIssuePreviewPanel(@NotNull JiraIssue issue) {
+    JiraIssuePreviewPanel(@NotNull Project project, @NotNull JiraIssue issue) {
         super(true, issue);
+        this.myProject = project;
         this.issue = issue;
         setBackground(JBColor.white);
 
@@ -134,6 +140,29 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         priorityAndAssigneePanel.add(assigneePanel);
 
         issueDetails.add(priorityAndAssigneePanel);
+
+        // Watches
+        JBPanel watchesPanel = JiraPanelUtil.createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 0)).withBorder(MARGIN_BOTTOM);
+        JBLabel watchesLabel = JiraLabelUtil.createLabel("Watchers: ").withFont(BOLD);
+        JBLabel watchesValueLabel = JiraLabelUtil.createLabel(issue.getWatches().getWatchCount() + " ");
+        boolean isWatching = issue.getWatches().isWatching();
+        JBLabel watchLabel = JiraLabelUtil.createLabel((isWatching ? "Stop " : "Start ") + "watching this issue");
+        watchLabel.setBackground(DARCULA_TEXT_COLOR);
+        watchLabel.setBorder(JBUI.Borders.empty(2, 2, 2, 3));
+        watchLabel.setOpaque(true);
+        watchLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        watchLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                SwingUtilities.invokeLater(() -> new ToggleWatchIssueTask(myProject, issue.getKey(), isWatching).queue());
+            }
+        });
+
+        watchesPanel.add(watchesLabel);
+        watchesPanel.add(watchesValueLabel);
+        watchesPanel.add(watchLabel);
+
+        issueDetails.add(watchesPanel);
 
         // Versions
         JBPanel versionsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);

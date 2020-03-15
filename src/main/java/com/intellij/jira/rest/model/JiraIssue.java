@@ -133,6 +133,10 @@ public class JiraIssue {
         return JiraGsonUtil.getAs(fields.get(fieldName), JiraIssueUser.class);
     }
 
+    public JiraIssueWatches getWatches() {
+        return JiraGsonUtil.getAs(fields.get(WATCHES), JiraIssueWatches.class);
+    }
+
     public JsonElement getCustomfieldValue(String customId) {
         return fields.get("customfield_" + customId);
     }

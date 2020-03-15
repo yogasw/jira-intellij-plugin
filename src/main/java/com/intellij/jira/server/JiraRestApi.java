@@ -265,4 +265,33 @@ public class JiraRestApi {
             return BodyResult.error();
         }
     }
+
+    public Result watchIssue(String issueKey) {
+        try {
+            Integer statusCode = jiraRestClient.watchIssue(issueKey);
+            return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error watching issue");
+            return BodyResult.error();
+        }
+    }
+
+    public Result unwatchIssue(String issueKey, String accountId, String username) {
+        try {
+            Integer statusCode = jiraRestClient.unwatchIssue(issueKey, accountId, username);
+            return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error watching issue");
+            return BodyResult.error();
+        }
+    }
+
+    public Result getCurrentUser() {
+        try {
+            return BodyResult.ok(jiraRestClient.getCurrentUser());
+        } catch (Exception e) {
+            log.error("Error getting current user");
+            return BodyResult.error();
+        }
+    }
 }
