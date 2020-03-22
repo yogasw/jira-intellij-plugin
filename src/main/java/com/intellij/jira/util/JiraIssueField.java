@@ -30,5 +30,6 @@ public final class JiraIssueField {
     public static final String LABELS = "labels";
     public static final String SUBTASKS = "subtasks";
     public static final String WATCHES = "watches";
+    public static final String ATTACHMENT = "attachment";
 
 }

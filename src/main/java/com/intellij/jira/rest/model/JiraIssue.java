@@ -137,6 +137,10 @@ public class JiraIssue {
         return JiraGsonUtil.getAs(fields.get(WATCHES), JiraIssueWatches.class);
     }
 
+    public List<JiraIssueAttachment> getAttachments() {
+        return JiraGsonUtil.getAsList(fields.get(ATTACHMENT), JiraIssueAttachment[].class);
+    }
+
     public JsonElement getCustomfieldValue(String customId) {
         return fields.get("customfield_" + customId);
     }
