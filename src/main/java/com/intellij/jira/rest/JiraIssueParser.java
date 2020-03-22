@@ -82,7 +82,11 @@ public class JiraIssueParser {
     }
 
     public static JiraIssueWorklog parseIssueWorklog(String response){
-        return  JiraRepository.GSON.fromJson(response, JiraIssueWorklog.class);
+        return JiraRepository.GSON.fromJson(response, JiraIssueWorklog.class);
+    }
+
+    public static List<JiraIssueAttachment> parseIssueAttachments(String response){
+        return Arrays.asList(JiraRepository.GSON.fromJson(response, JiraIssueAttachment[].class));
     }
 
 }

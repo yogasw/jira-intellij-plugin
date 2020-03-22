@@ -10,7 +10,11 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -362,6 +366,17 @@ public class JiraRestClient {
         String response = jiraRepository.executeMethod(method);
 
         return parseUser(response);
+    }
+
+    public List<JiraIssueAttachment> addIssueAttachment(String issueKey, File attachment) throws Exception {
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "attachments"));
+        method.addRequestHeader("X-Atlassian-Token", "no-check");
+        Part[] parts = {new FilePart("file", attachment)};
+
+        method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
+        String response = jiraRepository.executeMethod(method);
+
+        return parseIssueAttachments(response);
     }
 }
 

@@ -7,31 +7,27 @@ import com.intellij.jira.util.result.Result;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class AddIssueLinkTask extends AbstractBackgroundableTask {
+import java.io.File;
+
+public class AddIssueAttachmentTask extends AbstractBackgroundableTask {
 
     private String issueKey;
-    private String linkType;
-    private String inIssueKey;
-    private String outIssueKey;
+    private File attachment;
 
-
-    public AddIssueLinkTask(@Nullable Project project, String issueKey, String linkType, String inIssueKey, String outIssueKey) {
-        super(project, "Adding issue link");
+    public AddIssueAttachmentTask(@NotNull Project project, @NotNull String issueKey, @NotNull File attachment) {
+        super(project, "Adding issue attachment...");
         this.issueKey = issueKey;
-        this.linkType = linkType;
-        this.inIssueKey = inIssueKey;
-        this.outIssueKey = outIssueKey;
+        this.attachment = attachment;
     }
 
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
 
-        Result result = jiraRestApi.addIssueLink(linkType, inIssueKey, outIssueKey);
+        Result result = jiraRestApi.addIssueAttachment(issueKey, attachment);
         if(!result.isValid()) {
-            throw new InvalidResultException("Error", "Issue comment has not been added");
+            throw new InvalidResultException("Error", "Issue attachment has not been added");
         }
 
         // Retrieve updated issue
@@ -46,7 +42,7 @@ public class AddIssueLinkTask extends AbstractBackgroundableTask {
 
     @Override
     public void onSuccess() {
-        showNotification("Jira", "Issue Link created successfully");
+        showNotification("Jira", "Issue attachment added successfully");
     }
 
 }

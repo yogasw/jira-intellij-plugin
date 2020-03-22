@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 
 public class JiraRestApi {
@@ -291,6 +292,15 @@ public class JiraRestApi {
             return BodyResult.ok(jiraRestClient.getCurrentUser());
         } catch (Exception e) {
             log.error("Error getting current user");
+            return BodyResult.error();
+        }
+    }
+
+    public Result addIssueAttachment(String issueKey, File attachment) {
+        try {
+            return BodyResult.ok(jiraRestClient.addIssueAttachment(issueKey, attachment));
+        } catch (Exception e) {
+            log.error("Error attaching on issue " + issueKey);
             return BodyResult.error();
         }
     }
