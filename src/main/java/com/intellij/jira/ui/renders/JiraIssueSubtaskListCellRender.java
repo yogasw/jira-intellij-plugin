@@ -7,10 +7,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 
-import javax.swing.JList;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 
 import static com.intellij.jira.util.JiraLabelUtil.*;
 import static com.intellij.openapi.util.text.StringUtil.toUpperCase;
@@ -48,16 +46,16 @@ public class JiraIssueSubtaskListCellRender extends DefaultJiraListCellRender {
         setBackground(DARCULA_TEXT_COLOR);
 
         keyLabel.setText(issue.getKey());
-        keyLabel.setForeground(getFgRowColor());
+        keyLabel.setForeground(JiraLabelUtil.BLACK);
 
         summaryLabel.setText(issue.getSummary());
-        //summaryLabel.setForeground(getFgRowColor());
+        summaryLabel.setForeground(JiraLabelUtil.BLACK);
 
         JiraIssueStatus status = issue.getStatus();
 
         statusLabel.setText(toUpperCase(status.getName()));
         statusLabel.setBackground(status.getCategoryColor());
-        statusLabel.setForeground(status.isInProgressCategory() ?  IN_PROGRESS_TEXT_COLOR : Color.WHITE);
+        statusLabel.setForeground(status.isInProgressCategory() ?  IN_PROGRESS_TEXT_COLOR : JiraLabelUtil.WHITE);
 
         return this;
     }

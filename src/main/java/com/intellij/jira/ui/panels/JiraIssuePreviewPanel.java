@@ -19,6 +19,7 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -147,10 +148,10 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         JBLabel watchesValueLabel = JiraLabelUtil.createLabel(issue.getWatches().getWatchCount() + " ");
         boolean isWatching = issue.getWatches().isWatching();
         JBLabel watchLabel = JiraLabelUtil.createLabel((isWatching ? "Stop " : "Start ") + "watching this issue");
-        watchLabel.setBackground(DARCULA_TEXT_COLOR);
+        watchLabel.setBackground(UIUtil.isUnderDarcula() ? DEFAULT_SELECTED_ISSUE_COLOR : DARCULA_TEXT_COLOR);
         watchLabel.setBorder(JBUI.Borders.empty(2, 2, 2, 3));
         watchLabel.setOpaque(true);
-        watchLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        watchLabel.setCursor(HAND_CURSOR);
         watchLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
