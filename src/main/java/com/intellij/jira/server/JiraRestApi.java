@@ -304,4 +304,14 @@ public class JiraRestApi {
             return BodyResult.error();
         }
     }
+
+    public Result deleteIssueAttachment(String attachmentId) {
+        try {
+            Integer statusCode = jiraRestClient.deleteIssueAttachment(attachmentId);
+            return statusCode == 204 ? BodyResult.ok(statusCode) : BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error deleting attachment");
+            return BodyResult.error();
+        }
+    }
 }

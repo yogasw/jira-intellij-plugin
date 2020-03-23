@@ -378,5 +378,12 @@ public class JiraRestClient {
 
         return parseIssueAttachments(response);
     }
+
+    public Integer deleteIssueAttachment(String attachmentId) throws Exception {
+        DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl("attachment", attachmentId));
+
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
+    }
 }
 
