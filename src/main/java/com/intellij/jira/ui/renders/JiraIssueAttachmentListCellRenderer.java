@@ -2,6 +2,7 @@ package com.intellij.jira.ui.renders;
 
 import com.intellij.jira.rest.model.JiraIssueAttachment;
 import com.intellij.jira.util.JiraLabelUtil;
+import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.ui.components.JBLabel;
@@ -18,6 +19,7 @@ import static com.intellij.jira.util.JiraLabelUtil.*;
 public class JiraIssueAttachmentListCellRenderer extends DefaultJiraListCellRender {
 
     private JBLabel iconAndNameLabel;
+    private JBLabel authorLabel;
     private JBLabel createdLabel;
 
     public JiraIssueAttachmentListCellRenderer() {
@@ -26,12 +28,21 @@ public class JiraIssueAttachmentListCellRenderer extends DefaultJiraListCellRend
     }
 
     private void init() {
-        JBPanel issueLinkpanel = new JBPanel(new BorderLayout()).withBorder(JBUI.Borders.empty(4, 5)).andTransparent();
+        JPanel issueLinkpanel = new JBPanel(new BorderLayout()).withBorder(JBUI.Borders.empty(4, 5)).andTransparent();
         iconAndNameLabel =  JiraLabelUtil.createEmptyLabel().withFont(BOLD);
-        createdLabel = JiraLabelUtil.createEmptyLabel();
+
+        FlowLayout flowLayout = new FlowLayout(FlowLayout.RIGHT);
+        flowLayout.setVgap(0);
+
+        JPanel authorAndCreatePanel = new JBPanel(flowLayout).andTransparent();
+        createdLabel = JiraLabelUtil.createEmptyLabel().withFont(ITALIC);
+        authorLabel = JiraLabelUtil.createEmptyLabel().withFont(BOLD);
+
+        authorAndCreatePanel.add(authorLabel);
+        authorAndCreatePanel.add(createdLabel);
 
         issueLinkpanel.add(iconAndNameLabel, BorderLayout.LINE_START);
-        issueLinkpanel.add(createdLabel, BorderLayout.LINE_END);
+        issueLinkpanel.add(authorAndCreatePanel, BorderLayout.LINE_END);
         add(issueLinkpanel);
     }
 
@@ -56,6 +67,9 @@ public class JiraIssueAttachmentListCellRenderer extends DefaultJiraListCellRend
         iconAndNameLabel.setIcon(fileType.getIcon());
         iconAndNameLabel.setText(issueAttachment.getFilename());
         iconAndNameLabel.setForeground(JiraLabelUtil.getFgRowColor());
+
+        authorLabel.setText(issueAttachment.getAuthorName());
+        authorLabel.setForeground(JiraLabelUtil.getFgRowColor());
 
         createdLabel.setText(getPrettyDateTime(issueAttachment.getCreated()));
         createdLabel.setForeground(JiraLabelUtil.getFgRowColor());

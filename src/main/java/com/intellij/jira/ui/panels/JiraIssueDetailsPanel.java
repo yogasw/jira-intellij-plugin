@@ -35,7 +35,7 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
             tabbedPane.addTab(String.format("Attachments (%d)", issue.getAttachments().size()), new JiraIssueAttachmentsPanel(issue));
             tabbedPane.addTab(String.format("Links (%d)", issue.getIssueLinks().size()), new JiraIssueLinksPanel(issue));
             tabbedPane.addTab(String.format("Sub-Tasks (%d)", issue.getSubtasks().size()), new JiraIssueSubtasksPanel(issue));
-            tabbedPane.addTab(String.format("Comments (%d)", issue.getComments().getTotal()), new JiraIssueCommentsPanel(issue));
+            tabbedPane.addTab(String.format("Comments (%d)", issue.getRenderedComments().getTotal()), new JiraIssueCommentsPanel(issue));
             tabbedPane.addTab(String.format("Work Log (%d)", issue.getWorklogs().getTotal()), new JiraIssueWorkLogsPanel(issue));
 
             tabbedPane.addChangeListener(e -> data.put(TAB_KEY, tabbedPane.getSelectedIndex()));

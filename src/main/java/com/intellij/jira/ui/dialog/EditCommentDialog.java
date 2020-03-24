@@ -62,6 +62,7 @@ public class EditCommentDialog extends DialogWrapper {
         commentArea.setLineWrap(true);
         commentArea.setWrapStyleWord(true);
         commentArea.setText(JiraIssueUtil.getPrettyBody(comment.getBody()));
+
         panel.add(ScrollPaneFactory.createScrollPane(commentArea, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 
         projectRoles.add(0, ALL_USERS);

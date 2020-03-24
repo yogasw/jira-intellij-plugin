@@ -27,6 +27,10 @@ public class JiraIssueAttachment {
         return created;
     }
 
+    public String getAuthorName() {
+        return author.getDisplayName();
+    }
+
     public String getMimeType() {
         return mimeType;
     }

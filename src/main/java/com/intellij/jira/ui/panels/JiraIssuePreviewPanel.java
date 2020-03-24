@@ -8,12 +8,14 @@ import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
 import com.intellij.jira.tasks.ToggleWatchIssueTask;
+import com.intellij.jira.ui.JiraTextPane;
 import com.intellij.jira.util.JiraIconUtil;
 import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
@@ -35,8 +37,7 @@ import static java.awt.BorderLayout.*;
 import static java.util.Objects.nonNull;
 import static javax.swing.BoxLayout.X_AXIS;
 import static javax.swing.BoxLayout.Y_AXIS;
-import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
-import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.ScrollPaneConstants.*;
 
 class JiraIssuePreviewPanel extends AbstractJiraPanel {
 
@@ -63,16 +64,16 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
     }
 
     private void initContent() {
-        JBPanel previewPanel = new JBPanel(new BorderLayout())
+        JPanel previewPanel = new JBPanel(new BorderLayout())
                 .withBackground(JBColor.WHITE)
                 .withBorder(JBUI.Borders.empty(1, 5, 1, 0));
 
-        JBPanel issueDetails = new JBPanel().withBackground(JBColor.WHITE);
+        JPanel issueDetails = new JBPanel().withBackground(JBColor.WHITE);
         issueDetails.setLayout(new BoxLayout(issueDetails, Y_AXIS));
 
         // Key and updated
-        JBPanel keyAndUpdatedPanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
-        JBPanel issueAndProjectKeyPanel = new JBPanel().withBackground(JBColor.WHITE);
+        JPanel keyAndUpdatedPanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
+        JPanel issueAndProjectKeyPanel = new JBPanel().withBackground(JBColor.WHITE);
         issueAndProjectKeyPanel.setLayout(new BoxLayout(issueAndProjectKeyPanel, X_AXIS));
         JBLabel projectKeyLabel = JiraLabelUtil.createLinkLabel(issue.getProject().getName(), issue.getProject().getUrl());
         JBLabel separatorLabel = JiraLabelUtil.createLabel(" / ");
@@ -92,22 +93,29 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         issueDetails.add(keyAndUpdatedPanel);
 
         // Summary
-        JBPanel issueSummaryPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
-        JBLabel summaryLabel = JiraLabelUtil.createLabel(issue.getSummary());
-        issueSummaryPanel.add(summaryLabel, LINE_START);
+        if (StringUtil.isNotEmpty(issue.getSummary())) {
+            JPanel issueSummaryPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
+            JTextArea summaryArea = new JTextArea(issue.getSummary());
+            summaryArea.setLineWrap(true);
+            summaryArea.setWrapStyleWord(true);
+            summaryArea.setEditable(false);
+            summaryArea. setBackground(UIUtil.isUnderDarcula() ? DACULA_DEFAULT_COLOR : WHITE);
 
-        issueDetails.add(issueSummaryPanel);
+            issueSummaryPanel.add(summaryArea, CENTER);
+
+            issueDetails.add(issueSummaryPanel);
+        }
 
         // Type and Status
-        JBPanel typeAndStatusPanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
-        JBPanel typePanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+        JPanel typeAndStatusPanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
+        JPanel typePanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
         JBLabel typeLabel = JiraLabelUtil.createLabel("Type: ").withFont(BOLD);
         JBLabel typeValueLabel = JiraLabelUtil.createLabel(issue.getIssuetype().getName());
 
         typePanel.add(typeLabel, LINE_START);
         typePanel.add(typeValueLabel, CENTER);
 
-        JBPanel statusPanel = new JBPanel().withBackground(JBColor.white);
+        JPanel statusPanel = new JBPanel().withBackground(JBColor.white);
         statusPanel.setLayout(new BoxLayout( statusPanel, X_AXIS));
 
         JBLabel statusLabel = JiraLabelUtil.createLabel("Status: ").withFont(BOLD);
@@ -122,15 +130,15 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         issueDetails.add(typeAndStatusPanel);
 
         // Priority and Assignee
-        JBPanel priorityAndAssigneePanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
-        JBPanel priorityPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+        JPanel priorityAndAssigneePanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
+        JPanel priorityPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
         JBLabel priorityLabel = JiraLabelUtil.createLabel("Priority: ").withFont(BOLD);
         JBLabel priorityValueLabel = nonNull(issue.getPriority()) ? createIconLabel(JiraIconUtil.getSmallIcon(issue.getPriority().getIconUrl()), issue.getPriority().getName()) : createEmptyLabel();
 
         priorityPanel.add(priorityLabel, LINE_START);
         priorityPanel.add(priorityValueLabel, CENTER);
 
-        JBPanel assigneePanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+        JPanel assigneePanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
         JBLabel assigneeLabel = JiraLabelUtil.createLabel("Assigne: ").withFont(BOLD);
         JBLabel assigneeValueLabel = JiraLabelUtil.createLabel(issue.getAssignee() != null ? issue.getAssignee().getDisplayName() : "");
 
@@ -143,7 +151,7 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         issueDetails.add(priorityAndAssigneePanel);
 
         // Watches
-        JBPanel watchesPanel = JiraPanelUtil.createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 0)).withBorder(MARGIN_BOTTOM);
+        JPanel watchesPanel = JiraPanelUtil.createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 0)).withBorder(MARGIN_BOTTOM);
         JBLabel watchesLabel = JiraLabelUtil.createLabel("Watchers: ").withFont(BOLD);
         JBLabel watchesValueLabel = JiraLabelUtil.createLabel(issue.getWatches().getWatchCount() + " ");
         boolean isWatching = issue.getWatches().isWatching();
@@ -166,7 +174,7 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         issueDetails.add(watchesPanel);
 
         // Versions
-        JBPanel versionsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
+        JPanel versionsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
         JBLabel versionsLabel = JiraLabelUtil.createLabel("Versions: ").withFont(BOLD);
         JBLabel versionsValueLabel = JiraLabelUtil.createLabel(getVersionsNames(issue.getVersions()));
 
@@ -177,7 +185,7 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
 
         // Components
         if(issue.hasComponents()){
-            JBPanel componentsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
+            JPanel componentsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
             JBLabel componentsLabel = JiraLabelUtil.createLabel("Components: ").withFont(BOLD);
             JBLabel componentsValueLabel = JiraLabelUtil.createLabel(getComponentNames(issue.getComponents()));
 
@@ -189,7 +197,7 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
 
         // Labels
         if(issue.hasLabels()){
-            JBPanel labelsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
+            JPanel labelsPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
 
             labelsPanel.add(JiraLabelUtil.createLabel("Labels: ").withFont(BOLD), LINE_START);
             labelsPanel.add(JiraLabelUtil.createLabel(String.join(", ", issue.getLabels())), CENTER);
@@ -198,18 +206,19 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         }
 
         // Description
-        JBPanel issueDescriptionPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
-        JBLabel descriptionLabel = JiraLabelUtil.createLabel("Description: ").withFont(BOLD).withBorder(MARGIN_BOTTOM);
-        JTextArea descriptionArea = new JTextArea(nonNull(issue.getDescription()) ? issue.getDescription() : "");
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setEditable(false);
+        if (StringUtil.isNotEmpty(issue.getRenderedDescription())) {
+            JPanel issueDescriptionPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+            JBLabel descriptionLabel = JiraLabelUtil.createLabel("Description: ").withFont(BOLD);
+            JiraTextPane descriptionTextPane = new JiraTextPane();
+            descriptionTextPane.setHTMLText(issue.getRenderedDescription());
 
-        issueDescriptionPanel.add(descriptionLabel, PAGE_START);
-        issueDescriptionPanel.add(descriptionArea, CENTER);
+            issueDescriptionPanel.add(descriptionLabel, PAGE_START);
+            issueDescriptionPanel.add(descriptionTextPane, CENTER);
 
-        issueDetails.add(issueDescriptionPanel);
+            issueDetails.add(issueDescriptionPanel);
+        }
 
-        previewPanel.add(ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);
+        previewPanel.add(ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), CENTER);
 
         setContent(previewPanel);
     }

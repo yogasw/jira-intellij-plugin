@@ -46,13 +46,14 @@ public class JiraRestClient {
 
     public JiraIssue getIssue(String issueIdOrKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueIdOrKey));
+        method.setQueryString(new NameValuePair[]{new NameValuePair("expand", "renderedFields")});
         String response = jiraRepository.executeMethod(method);
         return parseIssue(response);
     }
 
     public List<JiraIssue> findIssues(String searchQuery) throws Exception {
         GetMethod method = getBasicSearchMethod(searchQuery, MAX_ISSUES_RESULTS);
-        method.setQueryString(method.getQueryString() + "&fields=*all");
+        method.setQueryString(method.getQueryString() + "&fields=*all&expand=renderedFields");
         String response = jiraRepository.executeMethod(method);
         return parseIssues(response);
     }

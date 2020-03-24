@@ -8,8 +8,8 @@ public class JiraIssueComment {
     private String id;
     private JiraIssueUser author;
     private String body;
-    private Date created;
-    private Date updated;
+    private String created;
+    private String updated;
     private JiraVisibility visibility;
 
     public JiraIssueComment() { }
@@ -22,7 +22,7 @@ public class JiraIssueComment {
         return body;
     }
 
-    public Date getCreated() {
+    public String getCreated() {
         return created;
     }
 

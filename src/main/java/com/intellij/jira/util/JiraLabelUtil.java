@@ -26,6 +26,8 @@ public class JiraLabelUtil {
 
     public static final Color LINK_COLOR = JBColor.BLUE;
 
+    public static final Color DACULA_DEFAULT_COLOR = new Color(60, 63, 65);
+
     public static final Color DEFAULT_ISSUE_COLOR = new Color(211, 232, 240  );
     public static final Color DEFAULT_SELECTED_ISSUE_COLOR = new Color(26, 125, 196  );
     public static final Color DARCULA_ISSUE_COLOR = new Color(114, 62, 133);
