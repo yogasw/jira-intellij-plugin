@@ -3,6 +3,7 @@ package com.intellij.jira.ui.panels;
 import com.intellij.jira.actions.AddIssueAttachmentDialogAction;
 import com.intellij.jira.actions.DeleteIssueAttachmentDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
+import com.intellij.jira.actions.OpenAttachmentInBrowserAction;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueAttachment;
 import com.intellij.jira.ui.JiraIssueAttachmentListModel;
@@ -38,6 +39,7 @@ public class JiraIssueAttachmentsPanel extends AbstractJiraPanel {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
         group.add(new AddIssueAttachmentDialogAction(issueKey));
         group.add(new DeleteIssueAttachmentDialogAction(issueKey, () -> issueAttachment));
+        group.add(new OpenAttachmentInBrowserAction(() -> issueAttachment));
 
         return group;
     }
