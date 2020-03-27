@@ -3,6 +3,7 @@ package com.intellij.jira.ui.editors;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.jira.rest.model.JiraCustomFieldOption;
+import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,7 @@ public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFie
     protected void initSelectedItems() {
         JsonElement element = GSON.toJsonTree(fieldValue);
         if (element.isJsonArray()) {
-            selectedItems = Arrays.asList(GSON.fromJson(element, JiraCustomFieldOption[].class));
+            selectedItems = JiraGsonUtil.getAsList(element, JiraCustomFieldOption[].class);
         } else if (element.isJsonObject()) {
             selectedItems = Collections.singletonList(GSON.fromJson(element, JiraCustomFieldOption.class));
         }

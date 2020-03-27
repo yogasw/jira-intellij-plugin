@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 group 'com.intellij'
-version '2.3.0'
+version '2.3.1'
 
 sourceCompatibility = 1.8
 
@@ -28,11 +28,8 @@ intellij {
 
 patchPluginXml {
     changeNotes """
-      Version 2.3.0<br>
+      Version 2.3.1<br>
       <ul>
-        <li>Configure server with API Token</li>
-        <li>Watch/Unwatch issues</li>
-        <li>New 'Attachments' tab</li>
         <li>Bug fixes</li>
       </ul>"""
 }

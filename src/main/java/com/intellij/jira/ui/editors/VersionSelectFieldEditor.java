@@ -3,6 +3,7 @@ package com.intellij.jira.ui.editors;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.jira.rest.model.JiraProjectVersion;
+import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -36,7 +37,7 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
     protected void initSelectedItems() {
         JsonElement element = GSON.toJsonTree(fieldValue);
         if (element.isJsonArray()) {
-            selectedItems = Arrays.asList(GSON.fromJson(element, JiraProjectVersion[].class));
+            selectedItems = JiraGsonUtil.getAsList(element, JiraProjectVersion[].class);
         } else if (element.isJsonObject()) {
             selectedItems = Collections.singletonList(GSON.fromJson(element, JiraProjectVersion.class));
         }

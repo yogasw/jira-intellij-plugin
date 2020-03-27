@@ -9,6 +9,7 @@ import com.intellij.jira.rest.model.JiraIssueResolution;
 import com.intellij.jira.rest.model.JiraProject;
 import com.intellij.jira.rest.model.JiraProjectComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
+import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -75,20 +76,20 @@ public class FieldEditorFactory {
         String type = isArray ? properties.getSchema().getItems() : properties.getSchema().getType();
         String fieldName = properties.getSchema().getSystem();
         if (PRIORITY.equals(type)) {
-            items = Arrays.asList(GSON.fromJson(allowedValues, JiraIssuePriority[].class));
+            items = JiraGsonUtil.getAsList(allowedValues, JiraIssuePriority[].class);
             selectedItem = issue.getPriority();
         } else if (VERSION.equals(type)) {
-            items = Arrays.asList(GSON.fromJson(allowedValues, JiraProjectVersion[].class));
+            items = JiraGsonUtil.getAsList(allowedValues, JiraProjectVersion[].class);
             if (FIX_VERSIONS.equals(fieldName)) {
                 selectedItem = issue.getFixVersions();
             } else if (VERSIONS.equals(fieldName)) {
                 selectedItem = issue.getVersions();
             }
         } else if (RESOLUTION.equals(type)) {
-            items = Arrays.asList(GSON.fromJson(allowedValues, JiraIssueResolution[].class));
+            items = JiraGsonUtil.getAsList(allowedValues, JiraIssueResolution[].class);
             selectedItem = issue.getResolution();
         } else if (COMPONENT.equals(type)) {
-            items = Arrays.asList(GSON.fromJson(allowedValues, JiraProjectComponent[].class));
+            items = JiraGsonUtil.getAsList(allowedValues, JiraProjectComponent[].class);
             selectedItem = issue.getComponents();
         }
 
@@ -135,16 +136,15 @@ public class FieldEditorFactory {
 
         // The field has values
         if (PROJECT.equals(type)) {
-            List<JiraProject> projects = Arrays.asList(GSON.fromJson(values, JiraProject[].class));
+            List<JiraProject> projects = JiraGsonUtil.getAsList(values, JiraProject[].class);
             return new ProjectSelectFieldEditor(issue.getKey(), properties.getName(), issue.getCustomfieldValue(properties.getSchema().getCustomId()), properties.isRequired(), isArray, projects);
         } else if (VERSION.equals(type)) {
-            List<JiraProjectVersion> versions = Arrays.asList(GSON.fromJson(values, JiraProjectVersion[].class));
+            List<JiraProjectVersion> versions = JiraGsonUtil.getAsList(values, JiraProjectVersion[].class);
             return new VersionSelectFieldEditor(issue.getKey(), properties.getName(), issue.getCustomfieldValue(properties.getSchema().getCustomId()), properties.isRequired(), isArray, versions);
         }
 
-        List<JiraCustomFieldOption> options = Arrays.asList(GSON.fromJson(values, JiraCustomFieldOption[].class));
+        List<JiraCustomFieldOption> options = JiraGsonUtil.getAsList(values, JiraCustomFieldOption[].class);
         return new OptionSelectFieldEditor(issue.getKey(), properties.getName(), null, properties.isRequired(), isArray, options);
-
     }
 
 }

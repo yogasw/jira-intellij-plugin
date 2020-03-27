@@ -3,6 +3,7 @@ package com.intellij.jira.ui.editors;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.jira.rest.model.JiraProject;
+import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -36,7 +37,7 @@ public class ProjectSelectFieldEditor extends DataSelectFieldEditor<JiraProject>
     protected void initSelectedItems() {
         JsonElement element = GSON.toJsonTree(fieldValue);
         if (element.isJsonArray()) {
-            selectedItems = Arrays.asList(GSON.fromJson(element, JiraProject[].class));
+            selectedItems = JiraGsonUtil.getAsList(element, JiraProject[].class);
         } else if (element.isJsonObject()) {
             selectedItems = Collections.singletonList(GSON.fromJson(element, JiraProject.class));
         }
