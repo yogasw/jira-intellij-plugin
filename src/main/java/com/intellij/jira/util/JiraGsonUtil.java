@@ -5,13 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.intellij.openapi.util.text.StringUtil.trim;
 import static com.intellij.tasks.jira.JiraRepository.GSON;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class JiraGsonUtil {
@@ -88,11 +86,29 @@ public class JiraGsonUtil {
     }
 
     public static <T> List<T> getAsList(JsonElement element, Class<T[]> clazz) {
-        return Arrays.asList(getAs(element, clazz));
+        T[] values = getAs(element, clazz);
+        if (isNull(values)) {
+            return new ArrayList<>();
+        }
+
+        return Arrays.asList(values);
     }
 
     public static <T> T getAs(JsonElement element, Class<T> clazz) {
         return GSON.fromJson(element, clazz);
+    }
+
+    public static <T> T getAs(String response, Class<T> clazz) {
+        return GSON.fromJson(response, clazz);
+    }
+
+    public static <T> List<T> getAsList(String response, Class<T[]> clazz) {
+        T[] values = getAs(response, clazz);
+        if (isNull(values)) {
+            return new ArrayList<>();
+        }
+
+        return Arrays.asList(values);
     }
 
 }

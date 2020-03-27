@@ -31,7 +31,7 @@ public class AddWorklogDialogAction extends JiraIssueDialogAction {
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.WORK_ON_ISSUES);
         if(!userHasPermission){
-            throw new InvalidPermissionException("Add log work failed", "You don't have permission to log work");
+            throw new InvalidPermissionException("Add Log Work Failed", "You don't have permission to log work");
         }
 
         List<String> projectRoles = jiraRestApi.getProjectRoles(projectKey);

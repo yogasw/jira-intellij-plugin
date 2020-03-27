@@ -49,8 +49,4 @@ public class AddIssueLinkTask extends AbstractBackgroundableTask {
         showNotification("Jira", "Issue Link created successfully");
     }
 
-
-
-
-
 }

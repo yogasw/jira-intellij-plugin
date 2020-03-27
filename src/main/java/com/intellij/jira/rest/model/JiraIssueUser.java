@@ -7,6 +7,7 @@ public class JiraIssueUser {
     private String self;
     private String name;
     private String key;
+    private String accountId;
     private String emailAddress;
     private String displayName;
     private JiraIssueUser.Avatar avatarUrls;
@@ -23,6 +24,10 @@ public class JiraIssueUser {
 
     public String getKey() {
         return key;
+    }
+
+    public String getAccountId() {
+        return accountId;
     }
 
     public String getEmailAddress() {

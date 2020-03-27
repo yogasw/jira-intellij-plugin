@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import static java.awt.BorderLayout.CENTER;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 class JiraIssueCommentsPanel extends AbstractJiraPanel {
@@ -30,7 +31,7 @@ class JiraIssueCommentsPanel extends AbstractJiraPanel {
 
     JiraIssueCommentsPanel(@NotNull JiraIssue issue) {
         super(issue);
-        initContent(issue.getComments());
+        initContent(issue.getRenderedComments());
     }
 
     @Override
@@ -55,7 +56,7 @@ class JiraIssueCommentsPanel extends AbstractJiraPanel {
              SwingUtilities.invokeLater(this::updateToolbarActions);
         });
 
-        panel.add(ScrollPaneFactory.createScrollPane(issueCommentList, VERTICAL_SCROLLBAR_AS_NEEDED), CENTER);
+        panel.add(ScrollPaneFactory.createScrollPane(issueCommentList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), CENTER);
 
         setContent(panel);
     }

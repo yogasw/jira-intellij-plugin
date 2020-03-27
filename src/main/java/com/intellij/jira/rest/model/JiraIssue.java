@@ -18,6 +18,7 @@ public class JiraIssue {
     private String self;
     private String key;
     private JsonObject fields;
+    private JsonObject renderedFields;
 
     public JiraIssue() { }
 
@@ -37,8 +38,8 @@ public class JiraIssue {
         return JiraGsonUtil.getAsString(fields.get(SUMMARY));
     }
 
-    public String getDescription() {
-        return JiraGsonUtil.getAsString(fields.get(DESCRIPTION));
+    public String getRenderedDescription() {
+        return JiraGsonUtil.getAsString(renderedFields.get(DESCRIPTION));
     }
 
     public Date getCreated() {
@@ -85,8 +86,8 @@ public class JiraIssue {
         return JiraGsonUtil.getAs(fields.get(REPORTER), JiraIssueUser.class);
     }
 
-    public JiraIssueCommentsWrapper getComments(){
-        return JiraGsonUtil.getAs(fields.get(COMMENT), JiraIssueCommentsWrapper.class);
+    public JiraIssueCommentsWrapper getRenderedComments(){
+        return JiraGsonUtil.getAs(renderedFields.get(COMMENT), JiraIssueCommentsWrapper.class);
     }
 
     public JiraIssueWorklogsWrapper getWorklogs(){
@@ -131,6 +132,14 @@ public class JiraIssue {
 
     public JiraIssueUser getAsJiraIssueUser(String fieldName) {
         return JiraGsonUtil.getAs(fields.get(fieldName), JiraIssueUser.class);
+    }
+
+    public JiraIssueWatches getWatches() {
+        return JiraGsonUtil.getAs(fields.get(WATCHES), JiraIssueWatches.class);
+    }
+
+    public List<JiraIssueAttachment> getAttachments() {
+        return JiraGsonUtil.getAsList(fields.get(ATTACHMENT), JiraIssueAttachment[].class);
     }
 
     public JsonElement getCustomfieldValue(String customId) {

@@ -8,25 +8,26 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-public class AssignUserTask extends AbstractBackgroundableTask {
+import java.io.File;
 
-    private String accountId;
-    private String username;
+public class AddIssueAttachmentTask extends AbstractBackgroundableTask {
+
     private String issueKey;
+    private File attachment;
 
-    public AssignUserTask(@NotNull Project project, String accountId,  String username, String issueKey) {
-        super(project, "Assigning User to Issue...");
-        this.accountId = accountId;
-        this.username = username;
+    public AddIssueAttachmentTask(@NotNull Project project, @NotNull String issueKey, @NotNull File attachment) {
+        super(project, "Adding issue attachment...");
         this.issueKey = issueKey;
+        this.attachment = attachment;
     }
 
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
-        Result result = jiraRestApi.assignUserToIssue(accountId, username, issueKey);
+
+        Result result = jiraRestApi.addIssueAttachment(issueKey, attachment);
         if(!result.isValid()) {
-            throw new InvalidResultException("Assignment error", "Issue has not been updated");
+            throw new InvalidResultException("Error", "Issue attachment has not been added");
         }
 
         // Retrieve updated issue
@@ -36,12 +37,12 @@ public class AssignUserTask extends AbstractBackgroundableTask {
             // Update panels
             getJiraIssueUpdater().update(issue);
         }
-    }
 
+    }
 
     @Override
     public void onSuccess() {
-        showNotification("Assignment successful", "Issue assignee has been updated");
+        showNotification("Jira", "Issue attachment added successfully");
     }
 
 }

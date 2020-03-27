@@ -8,25 +8,24 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-public class AssignUserTask extends AbstractBackgroundableTask {
+public class DeleteIssueAttachmentTask extends AbstractBackgroundableTask {
 
-    private String accountId;
-    private String username;
     private String issueKey;
+    private String attachmentId;
 
-    public AssignUserTask(@NotNull Project project, String accountId,  String username, String issueKey) {
-        super(project, "Assigning User to Issue...");
-        this.accountId = accountId;
-        this.username = username;
+    public DeleteIssueAttachmentTask(@NotNull Project project, @NotNull String issueKey, @NotNull String attachmentId) {
+        super(project, "Deleting attachment...");
         this.issueKey = issueKey;
+        this.attachmentId = attachmentId;
     }
 
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
-        Result result = jiraRestApi.assignUserToIssue(accountId, username, issueKey);
+
+        Result result = jiraRestApi.deleteIssueAttachment(attachmentId);
         if(!result.isValid()) {
-            throw new InvalidResultException("Assignment error", "Issue has not been updated");
+            throw new InvalidResultException("Error", "Issue comment has not been deleted");
         }
 
         // Retrieve updated issue
@@ -38,10 +37,9 @@ public class AssignUserTask extends AbstractBackgroundableTask {
         }
     }
 
-
     @Override
     public void onSuccess() {
-        showNotification("Assignment successful", "Issue assignee has been updated");
+        showNotification("Jira", "Attachment deleted successfully");
     }
 
 }

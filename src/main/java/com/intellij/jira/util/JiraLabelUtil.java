@@ -3,6 +3,7 @@ package com.intellij.jira.util;
 import com.intellij.jira.rest.model.JiraIssueStatus;
 import com.intellij.jira.ui.labels.JiraLinkLabel;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
@@ -15,14 +16,24 @@ import static javax.swing.SwingConstants.LEFT;
 
 public class JiraLabelUtil {
 
+    public static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+
     public static final JBFont BOLD = JBUI.Fonts.label().asBold();
     public static final JBFont ITALIC = JBUI.Fonts.label().asItalic();
+
+    public static final Color BLACK = Color.BLACK;
+    public static final Color WHITE = Color.WHITE;
+
+    public static final Color LINK_COLOR = JBColor.BLUE;
+
+    public static final Color DACULA_DEFAULT_COLOR = new Color(60, 63, 65);
 
     public static final Color DEFAULT_ISSUE_COLOR = new Color(211, 232, 240  );
     public static final Color DEFAULT_SELECTED_ISSUE_COLOR = new Color(26, 125, 196  );
     public static final Color DARCULA_ISSUE_COLOR = new Color(114, 62, 133);
     public static final Color DARCULA_SELECTED_ISSUE_COLOR = new Color(108, 32, 133);
 
+    // Links
     public static final Color ISSUE_LINK_COLOR = new Color(240, 216, 226);
     public static final Color DARK_ISSUE_LINK_COLOR = new Color(240, 187, 219);
 
@@ -39,6 +50,9 @@ public class JiraLabelUtil {
     public static final Color IN_PROGRESS_TEXT_COLOR = new Color(89, 67, 0);
     public static final Color DONE_COLOR = new Color(20, 137, 44);
 
+    // Attachments
+    public static final Color ISSUE_ATTACHMENT_COLOR = new Color(235, 240, 170);
+    public static final Color DARK_ISSUE_ATTACHMENT_COLOR = new Color(240, 233, 111);
 
     public static JBLabel createEmptyLabel(){
         return createLabel("");
@@ -99,7 +113,7 @@ public class JiraLabelUtil {
     }
 
     public static Color getFgRowColor(){
-        return UIUtil.isUnderDarcula()? DARCULA_TEXT_COLOR : Color.BLACK;
+        return UIUtil.isUnderDarcula()? DARCULA_TEXT_COLOR : BLACK;
     }
 
     public static Color getBgSelectedRowColor(){
@@ -107,7 +121,7 @@ public class JiraLabelUtil {
     }
 
     public static Color getFgSelectedRowColor(){
-        return UIUtil.isUnderDarcula()? DARCULA_TEXT_COLOR : Color.WHITE;
+        return UIUtil.isUnderDarcula()? DARCULA_TEXT_COLOR : WHITE;
     }
 
     public static Color getBgRowColor(boolean isSelected){

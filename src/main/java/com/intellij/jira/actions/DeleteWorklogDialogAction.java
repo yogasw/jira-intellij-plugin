@@ -37,11 +37,11 @@ public class DeleteWorklogDialogAction extends JiraIssueDialogAction {
         if(!userHasPermission){
             userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.DELETE_OWN_WORKLOGS);
             if(!userHasPermission){
-                throw new InvalidPermissionException("Deleted Work Log failed", "You don't have permission to delete Work Logs");
+                throw new InvalidPermissionException("Delete Work Log Failed", "You don't have permission to delete Work Logs");
             }
 
             if(nonNull(worklogToDelete) && !worklogToDelete.getAuthor().getName().equals(jiraRestApi.getUsername())){
-                throw new InvalidPermissionException("Deleted Work Log failed", "This comment not yours. You cannot delete it");
+                throw new InvalidPermissionException("Delete Work Log Failed", "This comment not yours. You cannot delete it");
             }
         }
 

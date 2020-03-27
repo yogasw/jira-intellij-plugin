@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 
 public class JiraRestApi {
@@ -75,12 +76,12 @@ public class JiraRestApi {
     }
 
 
-    public Result assignUserToIssue(String username, String issueKey){
+    public Result assignUserToIssue(String accountId,  String username, String issueKey){
         try {
-            String response = jiraRestClient.assignUserToIssue(username, issueKey);
+            String response = jiraRestClient.assignUserToIssue(accountId, username, issueKey);
             return EmptyResult.create(response);
         } catch (Exception e) {
-            log.error(String.format("Error assigning user '%s' to issue '%s'", username, issueKey));
+            log.error(String.format("Error assigning user with accoundId = '%s' to issue '%s'", accountId, issueKey));
             return EmptyResult.error();
         }
     }
@@ -262,6 +263,54 @@ public class JiraRestApi {
             return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
         } catch (Exception e) {
             log.error("Error deleting issue link");
+            return BodyResult.error();
+        }
+    }
+
+    public Result watchIssue(String issueKey) {
+        try {
+            Integer statusCode = jiraRestClient.watchIssue(issueKey);
+            return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error watching issue");
+            return BodyResult.error();
+        }
+    }
+
+    public Result unwatchIssue(String issueKey, String accountId, String username) {
+        try {
+            Integer statusCode = jiraRestClient.unwatchIssue(issueKey, accountId, username);
+            return statusCode == 204 ? BodyResult.ok(statusCode) :  BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error watching issue");
+            return BodyResult.error();
+        }
+    }
+
+    public Result getCurrentUser() {
+        try {
+            return BodyResult.ok(jiraRestClient.getCurrentUser());
+        } catch (Exception e) {
+            log.error("Error getting current user");
+            return BodyResult.error();
+        }
+    }
+
+    public Result addIssueAttachment(String issueKey, File attachment) {
+        try {
+            return BodyResult.ok(jiraRestClient.addIssueAttachment(issueKey, attachment));
+        } catch (Exception e) {
+            log.error("Error attaching on issue " + issueKey);
+            return BodyResult.error();
+        }
+    }
+
+    public Result deleteIssueAttachment(String attachmentId) {
+        try {
+            Integer statusCode = jiraRestClient.deleteIssueAttachment(attachmentId);
+            return statusCode == 204 ? BodyResult.ok(statusCode) : BodyResult.error();
+        } catch (Exception e) {
+            log.error("Error deleting attachment");
             return BodyResult.error();
         }
     }

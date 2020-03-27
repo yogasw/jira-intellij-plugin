@@ -70,7 +70,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
             content = JiraPanelUtil.createPlaceHolderPanel("No Jira server found");
         }else{
             List<JiraIssue> issues = myJiraRestApi.getIssues(getDefaultJQLSearcher());
-            issueDetailsPanel = new JiraIssueDetailsPanel();
+            issueDetailsPanel = new JiraIssueDetailsPanel(myProject);
 
             issueTable = new JiraIssueTableView(issues);
             issueTable.getSelectionModel().addListSelectionListener(event -> {

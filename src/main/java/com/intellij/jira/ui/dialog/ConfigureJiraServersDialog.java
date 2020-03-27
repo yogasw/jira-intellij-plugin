@@ -1,7 +1,7 @@
 package com.intellij.jira.ui.dialog;
 
 import com.intellij.jira.server.JiraServer;
-import com.intellij.jira.server.JiraServerEditor;
+import com.intellij.jira.server.editor.JiraServerEditor;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.util.JiraPanelUtil;
@@ -163,7 +163,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
     }
 
     private void addJiraServerEditor(JiraServer server, boolean selected){
-        JiraServerEditor editor = new JiraServerEditor(myProject,server, selected, myChangeListener, myChangeUrlListener);
+        JiraServerEditor editor = new JiraServerEditor(myProject, server, selected, myChangeListener, myChangeUrlListener);
         myEditors.add(editor);
         String name = myServerNames.get(server);
         myJiraServerEditor.add(editor.getPanel(), name);

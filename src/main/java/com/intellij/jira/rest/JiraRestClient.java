@@ -5,12 +5,16 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.*;
-import com.intellij.jira.util.JiraIssueField;
+import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,13 +46,14 @@ public class JiraRestClient {
 
     public JiraIssue getIssue(String issueIdOrKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueIdOrKey));
+        method.setQueryString(new NameValuePair[]{new NameValuePair("expand", "renderedFields")});
         String response = jiraRepository.executeMethod(method);
         return parseIssue(response);
     }
 
     public List<JiraIssue> findIssues(String searchQuery) throws Exception {
         GetMethod method = getBasicSearchMethod(searchQuery, MAX_ISSUES_RESULTS);
-        method.setQueryString(method.getQueryString() + "&fields=*all");
+        method.setQueryString(method.getQueryString() + "&fields=*all&expand=renderedFields");
         String response = jiraRepository.executeMethod(method);
         return parseIssues(response);
     }
@@ -89,8 +94,8 @@ public class JiraRestClient {
     }
 
 
-    public String assignUserToIssue(String username, String issueKey) throws Exception {
-        String requestBody = "{\"name\": \"" + username + "\"}";
+    public String assignUserToIssue(String accountId,  String username, String issueKey) throws Exception {
+        String requestBody = accountId != null ? JiraGsonUtil.createObject("accountId", accountId).toString() : JiraGsonUtil.createObject("name", username).toString();
         PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "assignee"));
         method.setRequestEntity(createJsonEntity(requestBody));
         return jiraRepository.executeMethod(method);
@@ -337,5 +342,49 @@ public class JiraRestClient {
         return method.getStatusCode();
     }
 
+    public Integer watchIssue(String issueKey) throws Exception {
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "watchers"));
+
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
+    }
+
+    public Integer unwatchIssue(String issueKey, String accountId, String username) throws Exception {
+        DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "watchers"));
+        if (accountId != null) {
+            method.setQueryString(new NameValuePair[]{new NameValuePair("accountId", accountId)});
+        } else {
+            // For compatibility
+            method.setQueryString(new NameValuePair[]{new NameValuePair("username", username)});
+        }
+
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
+    }
+
+    public JiraIssueUser getCurrentUser() throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("myself"));
+        String response = jiraRepository.executeMethod(method);
+
+        return parseUser(response);
+    }
+
+    public List<JiraIssueAttachment> addIssueAttachment(String issueKey, File attachment) throws Exception {
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, "attachments"));
+        method.addRequestHeader("X-Atlassian-Token", "no-check");
+        Part[] parts = {new FilePart("file", attachment)};
+
+        method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
+        String response = jiraRepository.executeMethod(method);
+
+        return parseIssueAttachments(response);
+    }
+
+    public Integer deleteIssueAttachment(String attachmentId) throws Exception {
+        DeleteMethod method = new DeleteMethod(this.jiraRepository.getRestUrl("attachment", attachmentId));
+
+        jiraRepository.executeMethod(method);
+        return method.getStatusCode();
+    }
 }
 
