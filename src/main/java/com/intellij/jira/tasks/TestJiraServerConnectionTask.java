@@ -29,7 +29,7 @@ public class TestJiraServerConnectionTask extends Task.Modal {
         this.myServer = server;
         this.myConnection = new TaskRepository.CancellableConnection() {
             protected void doTest() throws Exception {
-                JiraRestApi api = myProject.getComponent(JiraServerManager.class).getJiraRestApiFrom(myServer);
+                JiraRestApi api = JiraServerManager.getInstance(myProject).getJiraRestApiFrom(myServer);
                 api.testConnection();
             }
 

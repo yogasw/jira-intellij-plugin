@@ -25,7 +25,7 @@ public class JiraToolWindowFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         createContent(project, toolWindow);
 
-        project.getComponent(JiraServerManager.class).addConfigurationServerChangedListener(() -> {
+        JiraServerManager.getInstance(project).addConfigurationServerChangedListener(() -> {
             SwingUtilities.invokeLater(() -> createContent(project, toolWindow));
         });
 
@@ -36,7 +36,7 @@ public class JiraToolWindowFactory implements ToolWindowFactory {
         ContentManager contentManager = toolWindow.getContentManager();
         contentManager.removeAllContents(true);
 
-        JiraRestApi jiraRestApi = project.getComponent(JiraServerManager.class).getJiraRestApi();
+        JiraRestApi jiraRestApi = JiraServerManager.getInstance(project).getJiraRestApi();
         issuesPanel = new JiraIssuesPanel(jiraRestApi, project);
 
         Content content = contentManager.getFactory().createContent(issuesPanel, TAB_ISSUES, false);

@@ -17,55 +17,28 @@
         ]]>
     </description>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
-
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.tasks</depends>
-
-    <application-components>
-        <component>
-            <implementation-class>com.intellij.jira.components.JiraActionManager</implementation-class>
-        </component>
-        <component>
-            <implementation-class>com.intellij.jira.components.JiraNotificationManager</implementation-class>
-        </component>
-        <component>
-            <implementation-class>com.intellij.jira.components.JQLSearcherManager</implementation-class>
-        </component>
-        <component>
-            <implementation-class>com.intellij.jira.components.JQLSearcherApplicationManager</implementation-class>
-        </component>
-    </application-components>
-
-    <project-components>
-        <component>
-            <implementation-class>com.intellij.jira.components.JQLSearcherProjectManager</implementation-class>
-        </component>
-        <component>
-            <implementation-class>com.intellij.jira.components.JQLSearcherObserver</implementation-class>
-        </component>
-        <component>
-            <implementation-class>com.intellij.jira.server.JiraServerManager</implementation-class>
-        </component>
-        <component>
-            <implementation-class>com.intellij.jira.components.JiraIssueUpdater</implementation-class>
-        </component>
-    </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory"/>
 
+        <applicationService serviceImplementation="com.intellij.jira.components.JiraNotificationManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherApplicationManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherManager"/>
+
+        <projectService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
+        <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherObserver"/>
+        <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
+        <projectService serviceImplementation="com.intellij.jira.components.JiraIssueUpdater"/>
     </extensions>
 
     <actions>
         <action id="Jira.toolwindow.Refresh"
                 class="com.intellij.jira.actions.JiraIssuesRefreshAction"
-                text="Refresh issues"
+                text="Refresh Issues"
                 description="Updates the project issues"
                 icon="AllIcons.Actions.Refresh">
         </action>
-
-
     </actions>
 </idea-plugin>

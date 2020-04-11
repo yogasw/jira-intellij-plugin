@@ -67,7 +67,7 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
     }
 
     private JQLSearcherObserver getJQLSearcherObserver(){
-        return myProject.getComponent(JQLSearcherObserver.class);
+        return JQLSearcherObserver.getInstance(myProject);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.intellij.jira.actions.GoToIssuePopupAction;
 import com.intellij.jira.actions.JQLSearcherActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.components.JQLSearcherManager;
-import com.intellij.jira.components.JiraActionManager;
 import com.intellij.jira.components.JiraIssueUpdater;
 import com.intellij.jira.events.JiraIssueEventListener;
 import com.intellij.jira.rest.model.JiraIssue;
@@ -61,7 +60,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
     }
 
     private void addListeners() {
-        myProject.getComponent(JiraIssueUpdater.class).addListener(this);
+        JiraIssueUpdater.getInstance(myProject).addListener(this);
     }
 
     private void setContent() {
@@ -115,7 +114,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
 
     private ActionGroup createActionGroup(){
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(JiraActionManager.getInstance().getJiraIssuesRefreshAction());
+        group.add(ActionManager.getInstance().getAction("Jira.toolwindow.Refresh"));
         group.add(new JQLSearcherActionGroup());
         group.add(new GoToIssuePopupAction());
         group.add(Separator.getInstance());

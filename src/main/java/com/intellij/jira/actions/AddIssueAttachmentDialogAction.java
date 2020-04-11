@@ -14,7 +14,7 @@ public class AddIssueAttachmentDialogAction extends JiraIssueDialogAction {
 
     private static final ActionProperties properties = ActionProperties.of("Add Attachment",  AllIcons.General.Add);
 
-    private String issueKey;
+    private final String issueKey;
 
     public AddIssueAttachmentDialogAction(String issueKey) {
         super(properties);

@@ -26,13 +26,8 @@ public class JQLSearcherActionGroup extends DefaultActionGroup {
         if (isNull(project)|| !project.isInitialized() || project.isDisposed()) {
             event.getPresentation().setVisible(false);
         } else {
-            JiraServerManager manager = project.getComponent(JiraServerManager.class);
-            if(manager.hasJiraServerConfigured()){
-                event.getPresentation().setVisible(true);
-            }
-            else{
-                event.getPresentation().setVisible(false);
-            }
+            JiraServerManager manager = JiraServerManager.getInstance(project);
+            event.getPresentation().setVisible(manager.hasJiraServerConfigured());
         }
     }
 

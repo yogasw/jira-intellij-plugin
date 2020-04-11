@@ -2,6 +2,7 @@ package com.intellij.jira.server;
 
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.components.*;
+import com.intellij.openapi.project.Project;
 import com.intellij.tasks.jira.JiraRepository;
 import com.intellij.tasks.jira.JiraRepositoryType;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -16,11 +17,15 @@ import java.util.List;
 import static java.util.Objects.isNull;
 
 @State(name = "JiraServerManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
-public class JiraServerManager implements ProjectComponent, PersistentStateComponent<JiraServerManager.Config> {
+public class JiraServerManager implements PersistentStateComponent<JiraServerManager.Config> {
 
     private List<Runnable> myListeners = new ArrayList<>();
     private SimpleSelectableList<JiraServer> myJiraServers = new SimpleSelectableList<>();
     private Config myConfig = new Config();
+
+    public static JiraServerManager getInstance(@NotNull Project project) {
+        return ServiceManager.getService(project, JiraServerManager.class);
+    }
 
     @Nullable
     @Override

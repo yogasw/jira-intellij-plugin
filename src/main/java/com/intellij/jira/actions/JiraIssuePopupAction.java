@@ -25,7 +25,7 @@ public abstract class JiraIssuePopupAction extends JiraIssueAction{
                 return;
             }
 
-            JiraServerManager manager = project.getComponent(JiraServerManager.class);
+            JiraServerManager manager = JiraServerManager.getInstance(project);
             JiraRestApi jiraRestApi = manager.getJiraRestApi();
             if(isNull(jiraRestApi)) {
                 return;
@@ -33,7 +33,7 @@ public abstract class JiraIssuePopupAction extends JiraIssueAction{
 
             onClick(event, project, jiraRestApi);
 
-        }catch (Throwable error){
+        } catch (Throwable error){
             onError(error);
         }
     }

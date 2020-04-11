@@ -56,7 +56,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
     public ConfigureJiraServersDialog(@NotNull Project project) {
         super(project, false);
         this.myProject = project;
-        this.myManager = project.getComponent(JiraServerManager.class);
+        this.myManager = JiraServerManager.getInstance(project);
         init();
     }
 

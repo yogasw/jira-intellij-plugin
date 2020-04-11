@@ -32,13 +32,8 @@ public class ConfigureJQLSearchersAction extends AnAction {
         if (isNull(project)|| !project.isInitialized() || project.isDisposed()) {
             event.getPresentation().setEnabled(false);
         } else {
-            JiraServerManager manager = project.getComponent(JiraServerManager.class);
-            if(manager.hasJiraServerConfigured()){
-                event.getPresentation().setEnabled(true);
-            }
-            else{
-                event.getPresentation().setEnabled(false);
-            }
+            JiraServerManager manager = JiraServerManager.getInstance(project);
+            event.getPresentation().setEnabled(manager.hasJiraServerConfigured());
         }
     }
 

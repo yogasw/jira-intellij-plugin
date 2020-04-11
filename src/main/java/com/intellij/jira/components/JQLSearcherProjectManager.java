@@ -19,7 +19,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 @State(name = "JQLSearcherProjectManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
-public class JQLSearcherProjectManager implements ProjectComponent, PersistentStateComponent<JQLSearcherProjectManager.Config> {
+public class JQLSearcherProjectManager implements PersistentStateComponent<JQLSearcherProjectManager.Config> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JQLSearcherProjectManager.class);
     private final Project myProject;
@@ -31,6 +31,10 @@ public class JQLSearcherProjectManager implements ProjectComponent, PersistentSt
 
     protected JQLSearcherProjectManager(Project project) {
         this.myProject = project;
+    }
+
+    public static JQLSearcherProjectManager getInstance(@NotNull Project project) {
+        return ServiceManager.getService(project, JQLSearcherProjectManager.class);
     }
 
     @Nullable
@@ -105,7 +109,7 @@ public class JQLSearcherProjectManager implements ProjectComponent, PersistentSt
     }
 
     private JQLSearcherObserver getJqlSearcherObserver(){
-        return myProject.getComponent(JQLSearcherObserver.class);
+        return JQLSearcherObserver.getInstance(myProject);
     }
 
 

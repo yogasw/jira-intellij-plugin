@@ -32,7 +32,7 @@ public class JiraIssuePrioritiesPopupAction extends JiraIssueAction {
             return;
         }
 
-        JiraServerManager manager = project.getComponent(JiraServerManager.class);
+        JiraServerManager manager = JiraServerManager.getInstance(project);
         JiraRestApi jiraRestApi = manager.getJiraRestApi();
         if(isNull(jiraRestApi)){
            return;
