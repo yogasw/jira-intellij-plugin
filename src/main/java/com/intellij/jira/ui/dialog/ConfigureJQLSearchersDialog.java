@@ -12,6 +12,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ListTableModel;
+import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +73,8 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JBPanel myPanel = new JBPanel(new BorderLayout());
+        JPanel myPanel = new JBPanel(new BorderLayout());
+        myPanel.setMinimumSize(UI.size(500, 300));
         myPanel.add(ToolbarDecorator.createDecorator(myTable)
                         .setAddAction(button -> {
                             NewJQLSearcherDialog dlg = new NewJQLSearcherDialog(myProject, false);
