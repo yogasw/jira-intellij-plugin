@@ -16,6 +16,12 @@ import static java.util.Objects.isNull;
 public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
 
     private static final String TAB_KEY = "selectedTab";
+    private static final String TAB_PREVIEW = " Preview ";
+    private static final String TAB_ATTACHMENTS = " Attachments";
+    private static final String TAB_LINKS = " Links";
+    private static final String TAB_SUB_TASKS = " Sub-Tasks";
+    private static final String TAB_COMMENTS = " Comments";
+    private static final String TAB_WORK_LOG = " Work Log";
 
     private final Project myProject;
     private final Map<String, Integer> data = new HashMap<>();
@@ -31,12 +37,12 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
             setEmptyContent();
         }else{
             JiraTabbedPane tabbedPane = new JiraTabbedPane(JTabbedPane.BOTTOM);
-            tabbedPane.addTab("Preview", new JiraIssuePreviewPanel(myProject, issue));
-            tabbedPane.addTab(String.format("Attachments (%d)", issue.getAttachments().size()), new JiraIssueAttachmentsPanel(issue));
-            tabbedPane.addTab(String.format("Links (%d)", issue.getIssueLinks().size()), new JiraIssueLinksPanel(issue));
-            tabbedPane.addTab(String.format("Sub-Tasks (%d)", issue.getSubtasks().size()), new JiraIssueSubtasksPanel(issue));
-            tabbedPane.addTab(String.format("Comments (%d)", issue.getRenderedComments().getTotal()), new JiraIssueCommentsPanel(issue));
-            tabbedPane.addTab(String.format("Work Log (%d)", issue.getWorklogs().getTotal()), new JiraIssueWorkLogsPanel(issue));
+            tabbedPane.addTab(TAB_PREVIEW, new JiraIssuePreviewPanel(myProject, issue));
+            tabbedPane.addTab(TAB_ATTACHMENTS + appendTotal(issue.getAttachments().size()), new JiraIssueAttachmentsPanel(issue));
+            tabbedPane.addTab(TAB_LINKS + appendTotal(issue.getIssueLinks().size()), new JiraIssueLinksPanel(issue));
+            tabbedPane.addTab(TAB_SUB_TASKS + appendTotal(issue.getSubtasks().size()), new JiraIssueSubtasksPanel(issue));
+            tabbedPane.addTab(TAB_COMMENTS + appendTotal(issue.getRenderedComments().getTotal()), new JiraIssueCommentsPanel(issue));
+            tabbedPane.addTab(TAB_WORK_LOG + appendTotal(issue.getWorklogs().getTotal()), new JiraIssueWorkLogsPanel(issue));
 
             tabbedPane.addChangeListener(e -> data.put(TAB_KEY, tabbedPane.getSelectedIndex()));
             tabbedPane.setSelectedIndex(data.getOrDefault(TAB_KEY, 0));
@@ -50,4 +56,7 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
         setContent(JiraPanelUtil.createPlaceHolderPanel("Select issue to view details"));
     }
 
+    private String appendTotal(int total) {
+        return total > 0 ? " (" + total + ") " : " ";
+    }
 }
