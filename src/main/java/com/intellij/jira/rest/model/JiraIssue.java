@@ -6,6 +6,7 @@ import com.intellij.jira.rest.JiraIssueCommentsWrapper;
 import com.intellij.jira.rest.JiraIssueWorklogsWrapper;
 import com.intellij.jira.util.JiraGsonUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -90,8 +91,9 @@ public class JiraIssue {
         return JiraGsonUtil.getAs(renderedFields.get(COMMENT), JiraIssueCommentsWrapper.class);
     }
 
-    public JiraIssueWorklogsWrapper getWorklogs(){
-        return JiraGsonUtil.getAs(fields.get(WORKLOG), JiraIssueWorklogsWrapper.class);
+    public List<JiraIssueWorklog> getWorklogs(){
+        JiraIssueWorklogsWrapper worklog = JiraGsonUtil.getAs(fields.get(WORKLOG), JiraIssueWorklogsWrapper.class);
+        return Objects.nonNull(worklog) ? worklog.getWorklogs() : new ArrayList<>();
     }
 
     public JiraIssueTimeTracking getTimetracking(){
