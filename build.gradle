@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 
 group 'com.intellij'
-version '3.0.1'
+version '3.1.0'
 
 sourceCompatibility = 1.8
 
@@ -22,14 +22,14 @@ dependencies {
 }
 
 intellij {
-    version = '2020.1'
+    version = '2020.2'
     plugins 'tasks'
 }
 
 patchPluginXml {
     changeNotes """
-      Version 3.0.1<br>
+      Version 3.1.0<br>
       <ul>
-        <li>Bug fixes</li>
+        <li>Support 2020.2+</li>
       </ul>"""
 }
