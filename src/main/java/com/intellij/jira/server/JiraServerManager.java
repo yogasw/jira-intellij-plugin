@@ -1,5 +1,8 @@
 package com.intellij.jira.server;
 
+import com.intellij.credentialStore.CredentialAttributes;
+import com.intellij.credentialStore.Credentials;
+import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
@@ -13,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.isNull;
 
@@ -40,8 +44,17 @@ public class JiraServerManager implements PersistentStateComponent<JiraServerMan
         XmlSerializerUtil.copyBean(config, myConfig);
 
         myJiraServers.clear();
-        List<JiraServer> servers =  config.servers;
+        List<JiraServer> servers = config.servers;
         if (servers != null) {
+            for (JiraServer server : servers) {
+                CredentialAttributes credentialAttributes = new CredentialAttributes(server.getUrl());
+                Credentials credentials = PasswordSafe.getInstance().get(credentialAttributes);
+                if (Objects.nonNull(credentials)) {
+                    server.setUsername(credentials.getUserName());
+                    server.setPassword(credentials.getPasswordAsString());
+                }
+            }
+
             myJiraServers.addAll(servers);
         }
 
@@ -69,8 +82,30 @@ public class JiraServerManager implements PersistentStateComponent<JiraServerMan
     }
 
     public void setJiraServers(SimpleSelectableList<JiraServer> servers) {
+        List<JiraServer> oldJiraServers = new ArrayList<>(this.myJiraServers.getItems());
+        List<JiraServer> newJiraServers = servers.getItems();
+
+        oldJiraServers.removeAll(newJiraServers);
+        // Eliminamos las credenciales almacenadas que ya no sirven
+        for (JiraServer server : oldJiraServers) {
+            CredentialAttributes credentialAttributes = new CredentialAttributes(server.getUrl());
+            PasswordSafe.getInstance().set(credentialAttributes, null);
+        }
+
+        // Almacenamos las nuevas credenciales
+        storeCredentials(newJiraServers);
+
         this.myJiraServers = servers;
         onServersChanged();
+    }
+
+    private void storeCredentials(List<JiraServer> jiraServers) {
+        for (JiraServer server : jiraServers) {
+            CredentialAttributes credentialAttributes = new CredentialAttributes(server.getUrl());
+            Credentials credentials = new Credentials(server.getUsername(), server.getPassword());
+
+            PasswordSafe.getInstance().set(credentialAttributes, credentials);
+        }
     }
 
     @Nullable
@@ -91,8 +126,8 @@ public class JiraServerManager implements PersistentStateComponent<JiraServerMan
 
         JiraRepository repository = new JiraRepositoryType().createRepository();
         repository.setUrl(jiraServer.getUrl());
-        repository.setUsername(jiraServer.hasUserAndPassAuth() ? jiraServer.getUsername() : jiraServer.getUseremail());
-        repository.setPassword(jiraServer.hasUserAndPassAuth() ? jiraServer.getPassword() : jiraServer.getApiToken());
+        repository.setUsername(jiraServer.getUsername());
+        repository.setPassword(jiraServer.getPassword());
 
         return new JiraRestApi(repository);
     }

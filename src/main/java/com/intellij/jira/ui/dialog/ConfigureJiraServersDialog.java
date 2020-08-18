@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -24,6 +25,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -122,6 +124,19 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         return mySplitter;
     }
 
+    @NotNull
+    @Override
+    protected List<ValidationInfo> doValidateAll() {
+        List<ValidationInfo> validationInfos = new ArrayList<>();
+        for (JiraServerEditor editor : myEditors) {
+            ValidationInfo info = editor.validate();
+            if (Objects.nonNull(info)) {
+                validationInfos.add(info);
+            }
+        }
+
+        return validationInfos;
+    }
 
     @Override
     protected void doOKAction() {
