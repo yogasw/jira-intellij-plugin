@@ -26,6 +26,7 @@
         <applicationService serviceImplementation="com.intellij.jira.components.JiraNotificationManager"/>
         <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherApplicationManager"/>
         <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.settings.ChangelistSettings"/>
 
         <projectService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherObserver"/>

@@ -57,8 +57,7 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         group.add(new TransitIssueDialogAction(() -> issue));
         group.add(new JiraIssueAssigneePopupAction(() -> issue));
         group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
-        group.add(new AddIssueChangeListAction(issueKey));
-        group.add(new AddChangeListAction());
+        group.add(new ChangeListActionGroup(() -> issue));
 
         return group;
     }

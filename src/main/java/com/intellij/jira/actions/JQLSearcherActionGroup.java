@@ -13,7 +13,7 @@ public class JQLSearcherActionGroup extends DefaultActionGroup {
 
     public JQLSearcherActionGroup() {
         super("JQL Searchers", true);
-        getTemplatePresentation().setIcon(AllIcons.Vcs.Changelist);
+        getTemplatePresentation().setIcon(AllIcons.General.Filter);
         add(new AddJQLSearcherAction());
         add(new EditJQLSearcherAction());
         add(new Separator());
