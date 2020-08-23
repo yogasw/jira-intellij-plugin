@@ -56,7 +56,7 @@ public class JQLSearcherEditor {
 
         this.mySearchLabel = new JBLabel("Search:", 4);
         this.mySearchQueryField = new LanguageTextField(JqlLanguage.INSTANCE, this.myProject, mySearcher.getJql());
-        this.mySearchQueryField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.mySearchQueryField.setPreferredSize(UI.size(DEFAULT_WIDTH, 30));
 
         this.myDefaultSearcherCheckBox = new JCheckBox("Set Default");
         this.myDefaultSearcherCheckBox.setBorder(JBUI.Borders.emptyRight(4));

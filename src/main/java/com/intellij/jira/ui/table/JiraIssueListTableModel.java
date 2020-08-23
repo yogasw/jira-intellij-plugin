@@ -11,7 +11,7 @@ public class JiraIssueListTableModel extends ListTableModel<JiraIssue> {
 
     public JiraIssueListTableModel(@NotNull List<JiraIssue> jiraIssues) {
         super();
-        setColumnInfos(ColumnInfoHelper.getHelper().generateColumnsInfo());
+        setColumnInfos(ColumnInfoHelper.getHelper().generateColumnsInfo(jiraIssues));
         setItems(jiraIssues);
     }
 
