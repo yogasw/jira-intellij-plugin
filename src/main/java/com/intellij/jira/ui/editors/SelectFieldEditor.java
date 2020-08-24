@@ -82,7 +82,7 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
             Project project = e.getProject();
             if(nonNull(project)){
                 myProject = project;
-                myJiraRestApi = project.getComponent(JiraServerManager.class).getJiraRestApi();
+                myJiraRestApi = JiraServerManager.getInstance(project).getJiraRestApi();
             }
         }
     }

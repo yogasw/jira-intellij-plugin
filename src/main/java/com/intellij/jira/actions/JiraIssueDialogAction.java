@@ -26,7 +26,7 @@ public abstract class JiraIssueDialogAction extends AnAction {
                 return;
             }
 
-            JiraServerManager manager = project.getComponent(JiraServerManager.class);
+            JiraServerManager manager = JiraServerManager.getInstance(project);
             JiraRestApi jiraRestApi = manager.getJiraRestApi();
             if(isNull(jiraRestApi)) {
                 return;
@@ -34,7 +34,7 @@ public abstract class JiraIssueDialogAction extends AnAction {
 
             onClick(event, project, jiraRestApi);
 
-        }catch (Throwable error){
+        } catch (Throwable error){
             onError(error);
         }
     }

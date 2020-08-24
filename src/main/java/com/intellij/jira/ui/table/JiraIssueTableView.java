@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.table;
 
+import com.intellij.jira.helper.ColumnInfoHelper;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.ui.table.TableView;
 
@@ -32,6 +33,7 @@ public class JiraIssueTableView extends TableView<JiraIssue> {
     }
 
     public void updateModel(List<JiraIssue> issues){
+        model.setColumnInfos(ColumnInfoHelper.getHelper().generateColumnsInfo(issues));
         model.setItems(issues);
     }
 

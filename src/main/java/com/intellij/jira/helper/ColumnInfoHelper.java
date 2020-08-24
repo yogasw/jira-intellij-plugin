@@ -5,11 +5,14 @@ import com.intellij.jira.ui.renders.JiraIconAndTextTableCellRenderer;
 import com.intellij.jira.ui.renders.JiraIssueStatusTableCellRenderer;
 import com.intellij.jira.ui.renders.JiraIssueTableCellRenderer;
 import com.intellij.util.ui.ColumnInfo;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
+
+import java.util.List;
 
 import static com.intellij.jira.util.JiraIssueUtil.*;
 import static java.util.Objects.nonNull;
@@ -38,8 +41,8 @@ public class ColumnInfoHelper {
     }
 
     @NotNull
-    public ColumnInfo[] generateColumnsInfo() {
-        return new ColumnInfo[]{ new KeyColumnInfo(),
+    public ColumnInfo[] generateColumnsInfo(List<JiraIssue> issues) {
+        return new ColumnInfo[]{ new KeyColumnInfo(issues),
                                 new SummaryColumnInfo(),
                                 new AssigneeColumnInfo(),
                                 new IssueTypeColumnInfo(),
@@ -90,8 +93,16 @@ public class ColumnInfoHelper {
 
     private static class KeyColumnInfo extends JiraIssueColumnInfo{
 
-        KeyColumnInfo() {
+        private String myMaxString = "";
+
+        KeyColumnInfo(List<JiraIssue> issues) {
             super(KEY_COLUMN);
+
+            for (JiraIssue issue : issues) {
+                if (issue.getKey().length() > myMaxString.length()) {
+                    this.myMaxString = issue.getKey();
+                }
+            }
         }
 
         @Nullable
@@ -103,12 +114,12 @@ public class ColumnInfoHelper {
         @Nullable
         @Override
         public String getMaxStringValue() {
-            return "";
+            return this.myMaxString;
         }
 
         @Override
         public int getAdditionalWidth() {
-            return 90;
+            return UIUtil.DEFAULT_HGAP;
         }
 
         @Override

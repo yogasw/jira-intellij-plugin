@@ -1,9 +1,6 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
-import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
-import com.intellij.jira.actions.TransitIssueDialogAction;
+import com.intellij.jira.actions.*;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
@@ -16,6 +13,7 @@ import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vcs.changes.actions.AddChangeListAction;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
@@ -59,6 +57,7 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         group.add(new TransitIssueDialogAction(() -> issue));
         group.add(new JiraIssueAssigneePopupAction(() -> issue));
         group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
+        group.add(new ChangeListActionGroup(() -> issue));
 
         return group;
     }

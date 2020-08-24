@@ -21,7 +21,7 @@ public abstract class AbstractBackgroundableTask extends Task.Backgroundable {
 
     @NotNull
     public JiraRestApi getJiraRestApi() throws JiraServerConfigurationNotFoundException{
-        JiraServerManager jiraServerManager = myProject.getComponent(JiraServerManager.class);
+        JiraServerManager jiraServerManager = JiraServerManager.getInstance(myProject);
         JiraRestApi jiraRestApi = jiraServerManager.getJiraRestApi();
         if(isNull(jiraRestApi)) {
             throw new JiraServerConfigurationNotFoundException();
@@ -31,7 +31,7 @@ public abstract class AbstractBackgroundableTask extends Task.Backgroundable {
     }
 
     public JiraIssueUpdater getJiraIssueUpdater(){
-        return myProject.getComponent(JiraIssueUpdater.class);
+        return JiraIssueUpdater.getInstance(myProject);
     }
 
     public void showNotification(String title, String content){

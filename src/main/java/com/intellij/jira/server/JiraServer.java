@@ -20,41 +20,32 @@ public class JiraServer {
     private String username;
     private String password;
 
-    private String useremail;
-    private String apiToken;
-
     private AuthType type;
 
     public JiraServer() { }
 
-    private JiraServer(String url, String username, String password, String useremail, String apiToken, AuthType type) {
+    private JiraServer(String url, String username, String password, AuthType type) {
         this.url = url;
         this.username = username;
         this.password = password;
-        this.useremail = useremail;
-        this.apiToken = apiToken;
         this.type = type;
     }
 
     private JiraServer(JiraServer other){
-        this(other.getUrl(), other.getUsername(), other.getPassword(), other.getUseremail(), other.getApiToken(), other.getType());
+        this(other.getUrl(), other.getUsername(), other.getPassword(), other.getType());
     }
 
     public void withUserAndPass(String url, String username, String password) {
         setUrl(url);
         setUsername(username);
         setPassword(password);
-        setUseremail(null);
-        setApiToken(null);
         setType(AuthType.USER_PASS);
     }
 
     public void withApiToken(String url, String useremail, String apiToken) {
         setUrl(url);
-        setUsername(null);
-        setPassword(null);
-        setUseremail(useremail);
-        setApiToken(apiToken);
+        setUsername(useremail);
+        setPassword(apiToken);
         setType(AuthType.API_TOKEN);
     }
 
@@ -67,7 +58,7 @@ public class JiraServer {
         this.url = url;
     }
 
-    @Attribute("username")
+    @Transient
     public String getUsername() {
         return this.username;
     }
@@ -83,46 +74,6 @@ public class JiraServer {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @Attribute("password")
-    public String getEncodedPassword() {
-        return PasswordUtil.encodePassword(this.getPassword());
-    }
-
-    public void setEncodedPassword(String password) {
-        try {
-            this.setPassword(PasswordUtil.decodePassword(password));
-        } catch (NumberFormatException var3) { }
-    }
-
-    @Attribute("useremail")
-    public String getUseremail() {
-        return useremail;
-    }
-
-    public void setUseremail(String useremail) {
-        this.useremail = useremail;
-    }
-
-    @Transient
-    public String getApiToken() {
-        return apiToken;
-    }
-
-    @Attribute("apiToken")
-    public String getEncodedApiToken() {
-        return PasswordUtil.encodePassword(this.getApiToken());
-    }
-
-    public void setEncodedApiToken(String apiToken) {
-        try {
-            this.setApiToken(PasswordUtil.decodePassword(apiToken));
-        } catch (NumberFormatException var3) { }
-    }
-
-    public void setApiToken(String apiToken) {
-        this.apiToken = apiToken;
     }
 
     @Attribute("type")
@@ -154,8 +105,8 @@ public class JiraServer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        JiraServer that = (JiraServer) o;
-        return url.equals(that.url);
+        JiraServer server = (JiraServer) o;
+        return Objects.equals(url, server.url);
     }
 
     @Override

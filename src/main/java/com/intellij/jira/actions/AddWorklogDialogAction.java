@@ -16,8 +16,8 @@ public class AddWorklogDialogAction extends JiraIssueDialogAction {
 
     private static final ActionProperties properties = ActionProperties.of("Add Log Work",  AllIcons.General.Add);
 
-    private String issueKey;
-    private String projectKey;
+    private final String issueKey;
+    private final String projectKey;
     private JiraIssuTimeTrackingFactory timetrackingFactory;
 
     public AddWorklogDialogAction(String issueKey, String projectKey, JiraIssuTimeTrackingFactory timetrackingFactory) {

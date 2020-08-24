@@ -4,13 +4,18 @@ import com.intellij.jira.server.JiraServer;
 import com.intellij.jira.server.auth.AuthType;
 import com.intellij.jira.ui.JiraTabbedPane;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.FormBuilder;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class JiraServerEditor {
+
+    private static final int API_TOKEN_TAB = 1;
 
     private final Project myProject;
     private final JiraServer myServer;
@@ -20,6 +25,8 @@ public class JiraServerEditor {
     private Consumer<JiraServer> myChangeUrlListener;
 
     private JiraTabbedPane myTabbedPane;
+    private JiraServerAuthEditor userAndPassAuthEditor;
+    private JiraServerAuthEditor apiTokenAuthEditor;
 
     public JiraServerEditor(Project project, JiraServer server, boolean selected, BiConsumer<JiraServer, Boolean> changeListener, Consumer<JiraServer> changeUrlListener) {
         this.myProject = project;
@@ -30,20 +37,34 @@ public class JiraServerEditor {
     }
 
     public JPanel getPanel(){
-        JiraServerAuthEditor userAndPassAuthEditor = new JiraServerUserAndPassAuthEditor(myProject, myServer, mySelectedServer, myChangeListener, myChangeUrlListener);
-        JiraServerAuthEditor apiTokenAuthEditor = new JiraServerAPITokenAuthEditor(myProject, myServer, mySelectedServer, myChangeListener, myChangeUrlListener);
+        this.userAndPassAuthEditor = new JiraServerUserAndPassAuthEditor(myProject, myServer, mySelectedServer, myChangeListener, myChangeUrlListener);
+        this.apiTokenAuthEditor = new JiraServerAPITokenAuthEditor(myProject, myServer, mySelectedServer, myChangeListener, myChangeUrlListener);
 
         this.myTabbedPane = new JiraTabbedPane(JTabbedPane.NORTH);
         this.myTabbedPane.addTab("User And Pass", userAndPassAuthEditor.getPanel());
         this.myTabbedPane.addTab("API Token", apiTokenAuthEditor.getPanel());
 
         if (AuthType.API_TOKEN == myServer.getType()) {
-            this.myTabbedPane.setSelectedIndex(1);
+            this.myTabbedPane.setSelectedIndex(API_TOKEN_TAB);
         }
 
         return FormBuilder.createFormBuilder()
                 .addComponent(this.myTabbedPane)
                 .getPanel();
+    }
+
+
+    @Nullable
+    public ValidationInfo validate() {
+        if (isApiTokenAuthEditorSelected()) {
+            return this.apiTokenAuthEditor.validate();
+        }
+
+        return this.userAndPassAuthEditor.validate();
+    }
+
+    private boolean isApiTokenAuthEditorSelected() {
+        return this.myTabbedPane.getSelectedIndex() == API_TOKEN_TAB;
     }
 
 }

@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBLabel;
@@ -15,6 +16,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -80,7 +82,6 @@ public abstract class JiraServerAuthEditor {
         this.myTestPanel.add(myTestButton, BorderLayout.EAST);
     }
 
-
     protected void installListener(JTextField textField) {
         textField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
@@ -126,6 +127,15 @@ public abstract class JiraServerAuthEditor {
 
     private void defaultServerChanged(){
         this.myChangeListener.accept(myServer, myDefaultServerCheckbox.isSelected());
+    }
+
+    @Nullable
+    public ValidationInfo validate() {
+        if (StringUtil.isEmpty(StringUtil.trim(myUrlField.getText()))) {
+            return new ValidationInfo("Url is required.");
+        }
+
+        return null;
     }
 
 }

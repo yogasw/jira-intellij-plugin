@@ -25,7 +25,7 @@ public class RefreshIssuesTask extends AbstractBackgroundableTask {
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
 
-        JiraRestApi jiraRestApi = myProject.getComponent(JiraServerManager.class).getJiraRestApi();
+        JiraRestApi jiraRestApi = JiraServerManager.getInstance(myProject).getJiraRestApi();
 
         JQLSearcherManager jqlSearcherManager = JQLSearcherManager.getInstance();
         JQLSearcher searcher = jqlSearcherManager.getSelectedSearcher(myProject);
