@@ -57,4 +57,9 @@ public class JiraIssueUser {
 
     }
 
+    @Override
+    public String toString() {
+        return displayName;
+    }
+
 }
