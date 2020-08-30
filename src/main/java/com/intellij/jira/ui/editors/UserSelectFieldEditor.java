@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.intellij.jira.util.JiraGsonUtil.createArrayNameObjects;
 import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
@@ -21,9 +22,9 @@ import static com.intellij.util.containers.ContainerUtil.getFirstItem;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
-public class UserSelectFieldEditor extends SelectFieldEditor<String> {
+public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
 
-    private List<String> selectedUsers = new ArrayList<>();
+    private List<JiraIssueUser> selectedUsers = new ArrayList<>();
 
     public UserSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
         this(issueKey, fieldName, fieldValue, required, false);
@@ -32,10 +33,10 @@ public class UserSelectFieldEditor extends SelectFieldEditor<String> {
     public UserSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
         super(issueKey, fieldName, fieldValue, required, isMultiSelect);
         myButtonAction = new UserPickerDialogAction();
-        String username = getFieldValue();
-        if(StringUtil.isNotEmpty(username)) {
-            myTextField.setText(username);
-            selectedUsers.add(username);
+        JiraIssueUser user = getFieldValue();
+        if(Objects.nonNull(user)) {
+            myTextField.setText(user.getDisplayName());
+            selectedUsers.add(user);
         }
     }
 
@@ -45,20 +46,25 @@ public class UserSelectFieldEditor extends SelectFieldEditor<String> {
             return JsonNull.INSTANCE;
         }
 
+        List<String> selectedUserNames = getSelectedUserNames();
         if(isMultiSelect){
-            return createArrayNameObjects(selectedUsers);
+            return createArrayNameObjects(selectedUserNames);
         }
 
-        return createNameObject(getFirstItem(selectedUsers));
+        return createNameObject(getFirstItem(selectedUserNames));
     }
 
     @Override
-    public String getFieldValue() {
+    public JiraIssueUser getFieldValue() {
         if (Objects.isNull(fieldValue)) {
-            return "";
+            return null;
         }
 
-        return ((JiraIssueUser) fieldValue).getName();
+        return ((JiraIssueUser) fieldValue);
+    }
+
+    private List<String> getSelectedUserNames() {
+        return selectedUsers.stream().map(JiraIssueUser::getName).collect(toList());
     }
 
     private class UserPickerDialogAction extends PickerDialogAction {
@@ -71,7 +77,7 @@ public class UserSelectFieldEditor extends SelectFieldEditor<String> {
         public void actionPerformed(AnActionEvent e) {
             super.actionPerformed(e);
             if(nonNull(myJiraRestApi)){
-                List<String> users = myJiraRestApi.getAssignableUsers(issueKey).stream().map(JiraIssueUser::getKey).collect(toList());
+                List<JiraIssueUser> users = myJiraRestApi.getAssignableUsers(issueKey);
                 UserPickerDialog dialog = new UserPickerDialog(myProject, users, getFieldValue());
                 dialog.show();
             }
@@ -79,17 +85,16 @@ public class UserSelectFieldEditor extends SelectFieldEditor<String> {
         }
     }
 
-    class UserPickerDialog extends PickerDialog<String> {
+    class UserPickerDialog extends PickerDialog<JiraIssueUser> {
 
-        public UserPickerDialog(@Nullable Project project, List<String> items, String selectedUser) {
+        public UserPickerDialog(@Nullable Project project, List<JiraIssueUser> items, JiraIssueUser selectedUser) {
             super(project, "Users", items, Collections.singletonList(selectedUser));
         }
 
         @Override
         protected void doOKAction() {
             selectedUsers = myList.getSelectedValuesList();
-            myTextField.setText(selectedUsers.isEmpty() ? "" : String.join(", ", selectedUsers));
-
+            myTextField.setText(selectedUsers.isEmpty() ? "" : selectedUsers.stream().map(JiraIssueUser::getDisplayName).collect(Collectors.joining(", ")));
 
             super.doOKAction();
         }

@@ -13,9 +13,9 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.containers.IntArrayList;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.UI;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,7 +108,7 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
                 }
 
                 if (selectedIndices.size() > 0) {
-                    this.myList.setSelectedIndices(selectedIndices.toArray());
+                    this.myList.setSelectedIndices(selectedIndices.toIntArray());
                 }
             }
 
