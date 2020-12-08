@@ -33,9 +33,6 @@
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JiraIssueUpdater"/>
 
-        <projectService serviceImplementation="com.intellij.jira.converter.JiraProjectConverter"/>
-
-        <postStartupActivity implementation="com.intellij.jira.activity.UpdateWorkspaceActivity"/>
 
     </extensions>
 
