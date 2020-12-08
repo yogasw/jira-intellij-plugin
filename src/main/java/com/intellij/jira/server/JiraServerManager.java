@@ -6,6 +6,7 @@ import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import com.intellij.tasks.jira.JiraRepositoryType;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
 import static java.util.Objects.isNull;
 
 @State(name = "JiraServerManager", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
@@ -125,9 +127,9 @@ public class JiraServerManager implements PersistentStateComponent<JiraServerMan
         }
 
         JiraRepository repository = new JiraRepositoryType().createRepository();
-        repository.setUrl(jiraServer.getUrl());
-        repository.setUsername(jiraServer.getUsername());
-        repository.setPassword(jiraServer.getPassword());
+        repository.setUrl(StringUtil.defaultIfEmpty(jiraServer.getUrl(), EMPTY_TEXT));
+        repository.setUsername(StringUtil.defaultIfEmpty(jiraServer.getUsername(), EMPTY_TEXT));
+        repository.setPassword(StringUtil.defaultIfEmpty(jiraServer.getPassword(), EMPTY_TEXT));
 
         return new JiraRestApi(repository);
     }

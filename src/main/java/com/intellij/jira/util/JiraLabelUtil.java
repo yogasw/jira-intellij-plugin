@@ -16,6 +16,7 @@ import static javax.swing.SwingConstants.LEFT;
 
 public class JiraLabelUtil {
 
+    public static final String EMPTY_TEXT = "";
     public static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
 
     public static final JBFont BOLD = JBUI.Fonts.label().asBold();
@@ -55,7 +56,7 @@ public class JiraLabelUtil {
     public static final Color DARK_ISSUE_ATTACHMENT_COLOR = new Color(240, 233, 111);
 
     public static JBLabel createEmptyLabel(){
-        return createLabel("");
+        return createLabel(EMPTY_TEXT);
     }
 
     public static JBLabel createLabel(String text){
@@ -101,7 +102,7 @@ public class JiraLabelUtil {
     }
 
     public static JBLabel createEmptyStatusLabel(){
-        JBLabel label = new JBLabel("", LEFT);
+        JBLabel label = new JBLabel(EMPTY_TEXT, LEFT);
         label.setFont(JBFont.create(new Font("SansSerif", Font.BOLD, 9)));
         label.setBorder(JBUI.Borders.empty(2, 2, 2, 3));
         label.setOpaque(true);
