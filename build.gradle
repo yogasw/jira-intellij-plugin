@@ -11,7 +11,8 @@ apply plugin: 'idea'
 group 'com.intellij'
 version '3.2.1'
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
