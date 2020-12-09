@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
+import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
 import static com.intellij.jira.util.JiraLabelUtil.getBgRowColor;
 
 public class JiraIconAndTextTableCellRenderer extends IconTableCellRenderer {
@@ -20,17 +21,17 @@ public class JiraIconAndTextTableCellRenderer extends IconTableCellRenderer {
     }
 
     public void setLabel(String label) {
-        this.label = StringUtil.isNotEmpty(label) ? label : "";
+        this.label = StringUtil.isNotEmpty(label) ? label : EMPTY_TEXT;
     }
 
     public void emptyText(){
-        this.label = "";
+        this.label = EMPTY_TEXT;
     }
 
     @Nullable
     @Override
     protected Icon getIcon(@NotNull Object value, JTable table, int row) {
-        return JiraIconUtil.getSmallIcon(iconUrl);
+        return JiraIconUtil.getIcon(iconUrl);
     }
 
     @Override

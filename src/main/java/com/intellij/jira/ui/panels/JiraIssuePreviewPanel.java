@@ -132,14 +132,14 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
         JPanel priorityAndAssigneePanel = JiraPanelUtil.createWhitePanel(new GridLayout(1, 2)).withBorder(MARGIN_BOTTOM);
         JPanel priorityPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
         JBLabel priorityLabel = JiraLabelUtil.createLabel("Priority: ").withFont(BOLD);
-        JBLabel priorityValueLabel = nonNull(issue.getPriority()) ? createIconLabel(JiraIconUtil.getSmallIcon(issue.getPriority().getIconUrl()), issue.getPriority().getName()) : createEmptyLabel();
+        JBLabel priorityValueLabel = nonNull(issue.getPriority()) ? createIconLabel(JiraIconUtil.getIcon(issue.getPriority().getIconUrl()), issue.getPriority().getName()) : createEmptyLabel();
 
         priorityPanel.add(priorityLabel, LINE_START);
         priorityPanel.add(priorityValueLabel, CENTER);
 
         JPanel assigneePanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
         JBLabel assigneeLabel = JiraLabelUtil.createLabel("Assigne: ").withFont(BOLD);
-        JBLabel assigneeValueLabel = JiraLabelUtil.createLabel(issue.getAssignee() != null ? issue.getAssignee().getDisplayName() : "");
+        JBLabel assigneeValueLabel = JiraLabelUtil.createLabel(issue.getAssignee() != null ? issue.getAssignee().getDisplayName() : EMPTY_TEXT);
 
         assigneePanel.add(assigneeLabel, LINE_START);
         assigneePanel.add(assigneeValueLabel, CENTER);

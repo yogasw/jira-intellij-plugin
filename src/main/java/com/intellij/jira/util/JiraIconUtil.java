@@ -1,22 +1,18 @@
 package com.intellij.jira.util;
 
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.ui.ImageUtil;
-import org.imgscalr.Scalr;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static java.util.Objects.isNull;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JiraIconUtil {
 
-    private static final int SMALL_ICON = 16;
+    private static final Map<String, Icon> iconsCache = new ConcurrentHashMap<>();
 
 
     public static Icon getIcon(@Nullable String iconUrl){
@@ -24,25 +20,17 @@ public class JiraIconUtil {
             return null;
         }
 
-        try {
-            return IconLoader.findIcon(new URL(iconUrl));
-        } catch (MalformedURLException e) {
-            return null;
-        }
-    }
-
-
-    public static Icon getSmallIcon(@Nullable String iconUrl){
-        Icon icon = getIcon(iconUrl);
-        if(isNull(icon)){
-            return null;
+        Icon icon = iconsCache.get(iconUrl);
+        if (Objects.isNull(icon)) {
+            try {
+                icon = new ImageIcon(new URL(iconUrl));
+                iconsCache.put(iconUrl, icon);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
 
-        Image image = IconLoader.toImage(icon);
-        BufferedImage bufferedImage = ImageUtil.toBufferedImage(image);
-        BufferedImage resizeImage = Scalr.resize(bufferedImage, Scalr.Method.ULTRA_QUALITY, SMALL_ICON);
-
-        return new ImageIcon(resizeImage);
+        return icon;
     }
 
 }

@@ -73,10 +73,6 @@ public class JiraLabelUtil {
        return new JBLabel(text, icon, LEFT);
     }
 
-    public static JBLabel createIconLabel(String iconUrl, String text){
-        return new JBLabel(text, JiraIconUtil.getIcon(iconUrl), LEFT);
-    }
-
     public static JBLabel createBoldLabel(String text){
         return createLabel(text).withFont(BOLD);
     }
