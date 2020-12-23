@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -19,21 +20,21 @@ public class JiraIssueUtil {
     public static String getAssignee(@NotNull JiraIssue jiraIssue) {
         JiraIssueUser assignedUser = jiraIssue.getAssignee();
         if (isNull(assignedUser) || isNull(assignedUser.getEmailAddress())) {
-            return "";
+            return EMPTY_TEXT;
         }
 
         String useremail = assignedUser.getEmailAddress();
         int index = useremail.lastIndexOf('@');
 
-        return index >= 0 ? useremail.substring(0, index) : "";
+        return index >= 0 ? useremail.substring(0, index) : EMPTY_TEXT;
     }
 
     public static String getIssueType(@NotNull JiraIssue jiraIssue) {
-        return nonNull(jiraIssue.getIssuetype()) ? jiraIssue.getIssuetype().getName() : "";
+        return nonNull(jiraIssue.getIssuetype()) ? jiraIssue.getIssuetype().getName() : EMPTY_TEXT;
     }
 
     public static String getPriority(@NotNull JiraIssue jiraIssue) {
-        return nonNull(jiraIssue.getPriority()) ? jiraIssue.getPriority().getName() : "";
+        return nonNull(jiraIssue.getPriority()) ? jiraIssue.getPriority().getName() : EMPTY_TEXT;
     }
 
     public static String getStatus(@NotNull JiraIssue jiraIssue) {
@@ -50,7 +51,7 @@ public class JiraIssueUtil {
 
     public static String getPrettyBody(String body){
         if(isNull(body)){
-            return "";
+            return EMPTY_TEXT;
         }
 
         Matcher m = BODY_NAME_PATTERN.matcher(body);
@@ -66,7 +67,7 @@ public class JiraIssueUtil {
     }
 
     public static String getPrettyDateTime(Date date){
-        return nonNull(date) ? DateFormatUtil.formatPrettyDateTime(date) : "";
+        return nonNull(date) ? DateFormatUtil.formatPrettyDateTime(date) : EMPTY_TEXT;
     }
 
 }
