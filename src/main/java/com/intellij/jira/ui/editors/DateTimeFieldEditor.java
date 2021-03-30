@@ -8,15 +8,19 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import static com.intellij.openapi.util.text.StringUtil.*;
+import static com.intellij.openapi.util.text.StringUtil.isEmpty;
+import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
+import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class DateTimeFieldEditor extends DateFieldEditor {
 
-    private static final DateFormatter DATE_TIME_FORMATTER = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd HH:mm"));
-    private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.ss+0000";
+    private static final DateFormatter DATE_TIME = new DateFormatter(new SimpleDateFormat("yyyy-MM-dd HH:mm"));
+    private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private static final DateTimeFormatter ISO_8601 = DateTimeFormatter.ofPattern(ISO_8601_FORMAT);
 
     public DateTimeFieldEditor(String issueKey, String fieldName, boolean required) {
         super(issueKey, fieldName, null, required);
@@ -41,13 +45,14 @@ public class DateTimeFieldEditor extends DateFieldEditor {
 
         LocalDate ld = LocalDate.parse(words[0]);
         LocalTime lt = LocalTime.parse(words[1]);
+        LocalDateTime inputDate = LocalDateTime.of(ld, lt);
 
-        return DateTimeFormatter.ofPattern(ISO_FORMAT).format(LocalDateTime.of(ld, lt));
+        return inputDate.atZone(ZoneId.systemDefault()).format(ISO_8601);
     }
 
     @Override
     public DateFormatter getDateFormatter() {
-        return DATE_TIME_FORMATTER;
+        return DATE_TIME;
     }
 
     @Nullable
