@@ -13,10 +13,12 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
 import java.util.Objects;
 
 import static java.awt.BorderLayout.CENTER;
@@ -56,7 +58,10 @@ class JiraIssueCommentsPanel extends AbstractJiraPanel {
              SwingUtilities.invokeLater(this::updateToolbarActions);
         });
 
-        panel.add(ScrollPaneFactory.createScrollPane(issueCommentList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), CENTER);
+        JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(issueCommentList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(JBUI.Borders.empty());
+
+        panel.add(scrollPane, CENTER);
 
         setContent(panel);
     }

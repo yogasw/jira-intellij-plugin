@@ -25,8 +25,11 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -134,8 +137,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
                 JiraIssue issueToShow = issueTable.getModel().getItem(currentPosIssue);
                 issueTable.addSelection(issueToShow);
                 issueDetailsPanel.showIssue(issueToShow);
-            }
-            else{
+            } else{
                 issueDetailsPanel.setEmptyContent();
             }
         }

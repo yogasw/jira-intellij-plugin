@@ -21,7 +21,7 @@
     <depends>com.intellij.tasks</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory"/>
+        <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory" canCloseContents="true"/>
 
         <applicationService serviceImplementation="com.intellij.jira.components.JiraNotificationManager"/>
         <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherApplicationManager"/>

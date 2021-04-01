@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JTabbedPane;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,13 +15,13 @@ import static java.util.Objects.isNull;
 
 public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
 
-    private static final String TAB_KEY = "selectedTab";
+    public static final String TAB_KEY = "selectedTab";
     private static final String TAB_PREVIEW = " Preview ";
-    private static final String TAB_ATTACHMENTS = " Attachments";
-    private static final String TAB_LINKS = " Links";
-    private static final String TAB_SUB_TASKS = " Sub-Tasks";
-    private static final String TAB_COMMENTS = " Comments";
-    private static final String TAB_WORK_LOG = " Work Log";
+    public static final String TAB_ATTACHMENTS = " Attachments";
+    public static final String TAB_LINKS = " Links";
+    public static final String TAB_SUB_TASKS = " Sub-Tasks";
+    public static final String TAB_COMMENTS = " Comments";
+    public static final String TAB_WORK_LOG = " Work Log";
 
     private final Project myProject;
     private final Map<String, Integer> data = new HashMap<>();

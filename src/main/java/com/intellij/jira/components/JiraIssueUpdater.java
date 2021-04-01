@@ -3,12 +3,11 @@ package com.intellij.jira.components;
 import com.intellij.jira.events.JiraIssueEventListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +25,10 @@ public class JiraIssueUpdater implements Updater<JiraIssue>, Disposable {
 
     public void addListener(JiraIssueEventListener listener){
         listeners.add(listener);
+    }
+
+    public void removeListener(JiraIssueEventListener listener){
+        listeners.remove(listener);
     }
 
     @Override

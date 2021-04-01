@@ -6,9 +6,14 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.LayoutManager;
 
 import static javax.swing.SwingConstants.CENTER;
 
@@ -16,11 +21,18 @@ public class JiraPanelUtil {
 
     public static final Border MARGIN_BOTTOM = JBUI.Borders.emptyBottom(10);
 
+    public static JBPanel createWhiteGridPanel(int rows, int cols){
+        return createWhitePanel(new GridLayout(rows, cols));
+    }
+
+    public static JBPanel createWhiteBorderPanel(){
+        return createWhitePanel(new BorderLayout());
+    }
+
     public static JBPanel createWhitePanel(@NotNull LayoutManager layout){
         return new JBPanel(layout)
                 .withBackground(JBColor.WHITE);
     }
-
 
     public static JBPanel createPlaceHolderPanel(String text) {
         JBPanel panel = new JBPanel(new GridBagLayout());
