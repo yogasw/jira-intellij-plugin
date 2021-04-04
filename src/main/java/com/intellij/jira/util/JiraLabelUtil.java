@@ -1,5 +1,6 @@
 package com.intellij.jira.util;
 
+import com.intellij.jira.rest.model.JiraIssuePriority;
 import com.intellij.jira.rest.model.JiraIssueStatus;
 import com.intellij.jira.ui.labels.JiraLinkLabel;
 import com.intellij.openapi.util.text.StringUtil;
@@ -9,9 +10,12 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
 
+import static java.util.Objects.nonNull;
 import static javax.swing.SwingConstants.LEFT;
 
 public class JiraLabelUtil {
@@ -81,7 +85,9 @@ public class JiraLabelUtil {
         return createLabel(text).withFont(ITALIC);
     }
 
-
+    public static JBLabel createPriorityLabel(JiraIssuePriority priority) {
+        return nonNull(priority) ? createIconLabel(JiraIconUtil.getIcon(priority.getIconUrl()), priority.getName()) : createEmptyLabel();
+    }
 
     public static JBLabel createLinkLabel(String text, String url){
         return new JiraLinkLabel(text, url);

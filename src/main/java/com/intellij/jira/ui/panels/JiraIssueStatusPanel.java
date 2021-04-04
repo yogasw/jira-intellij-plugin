@@ -7,19 +7,16 @@ import com.intellij.jira.actions.TransitIssueDialogAction;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraProjectVersion;
 import com.intellij.jira.tasks.ToggleWatchIssueTask;
-import com.intellij.jira.util.JiraIconUtil;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import java.awt.FlowLayout;
@@ -32,13 +29,9 @@ import static com.intellij.jira.util.JiraLabelUtil.DARCULA_TEXT_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.DEFAULT_SELECTED_ISSUE_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
 import static com.intellij.jira.util.JiraLabelUtil.HAND_CURSOR;
-import static com.intellij.jira.util.JiraLabelUtil.createEmptyLabel;
-import static com.intellij.jira.util.JiraLabelUtil.createIconLabel;
 import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.LINE_START;
-import static java.util.Objects.nonNull;
-import static javax.swing.BoxLayout.X_AXIS;
 import static javax.swing.BoxLayout.Y_AXIS;
 
 public class JiraIssueStatusPanel extends AbstractJiraPanel {
@@ -50,24 +43,15 @@ public class JiraIssueStatusPanel extends AbstractJiraPanel {
         this.issue = issue;
         setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
 
-        JPanel mainPanel = new JBPanel().withBackground(JBColor.white).withBorder(JBUI.Borders.empty(5));
+        JPanel mainPanel = JiraPanelUtil.createWhiteBorderPanel().withBorder(JBUI.Borders.empty(5));
         mainPanel.setLayout(new BoxLayout(mainPanel, Y_AXIS));
 
         // Status
-        JPanel statusPanel = JiraPanelUtil.createWhiteBorderPanel();
-        statusPanel.setLayout(new BoxLayout( statusPanel, X_AXIS));
-        JLabel statusValueLabel = JiraLabelUtil.createStatusLabel(issue.getStatus());
-
-        statusPanel.add(statusValueLabel);
+        JPanel statusPanel = JiraPanelUtil.createStatusPanel(issue);
         mainPanel.add(statusPanel);
 
         // Priority
-        JPanel priorityPanel = JiraPanelUtil.createWhiteBorderPanel();
-        JBLabel priorityLabel = JiraLabelUtil.createBoldLabel("Priority: ");
-        JBLabel priorityValueLabel = nonNull(issue.getPriority()) ? createIconLabel(JiraIconUtil.getIcon(issue.getPriority().getIconUrl()), issue.getPriority().getName()) : createEmptyLabel();
-
-        priorityPanel.add(priorityLabel, LINE_START);
-        priorityPanel.add(priorityValueLabel, CENTER);
+        JPanel priorityPanel = JiraPanelUtil.createPriorityPanel(issue);
         mainPanel.add(priorityPanel);
 
         // Reporter
@@ -80,12 +64,7 @@ public class JiraIssueStatusPanel extends AbstractJiraPanel {
         mainPanel.add(reporterPanel);
 
         // Assignee
-        JPanel assigneePanel = JiraPanelUtil.createWhiteBorderPanel();
-        JBLabel assigneeLabel = JiraLabelUtil.createBoldLabel("Assignee: ");
-        JBLabel assigneeValueLabel = JiraLabelUtil.createLabel(issue.getAssignee() != null ? issue.getAssignee().getDisplayName() : EMPTY_TEXT);
-
-        assigneePanel.add(assigneeLabel, LINE_START);
-        assigneePanel.add(assigneeValueLabel, CENTER);
+        JPanel assigneePanel = JiraPanelUtil.createAssigneePanel(issue);
         mainPanel.add(assigneePanel);
 
         // Watches
@@ -111,12 +90,7 @@ public class JiraIssueStatusPanel extends AbstractJiraPanel {
         mainPanel.add(watchesPanel);
 
         // Versions
-        JPanel versionsPanel = JiraPanelUtil.createWhiteBorderPanel().withBorder(MARGIN_BOTTOM);
-        JBLabel versionsLabel = JiraLabelUtil.createBoldLabel("Versions: ");
-        JBLabel versionsValueLabel = JiraLabelUtil.createLabel(getVersionsNames(issue.getVersions()));
-
-        versionsPanel.add(versionsLabel, LINE_START);
-        versionsPanel.add(versionsValueLabel, CENTER);
+        JPanel versionsPanel = JiraPanelUtil.createVersionsPanel(issue);
         mainPanel.add(versionsPanel);
 
         setContent(mainPanel);
