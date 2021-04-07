@@ -22,12 +22,16 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBDimension;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,17 +97,17 @@ public class IssueTransitionDialog extends DialogWrapper {
         transitionsPanel.add(transitionList, BorderLayout.CENTER);
 
         transitionFieldsPanel = new JBPanel(new GridBagLayout());
-        transitionFieldsPanel.setMinimumSize(UI.size(450, 300));
+        transitionFieldsPanel.setMinimumSize(JBUI.size(450, 300));
         transitionFieldsPanel.setBorder(JBUI.Borders.empty(5));
         transitionFieldsPanel.add(JiraPanelUtil.createPlaceHolderPanel("Select transition"), new GridBagConstraints());
 
         transitionPreviewPanel = new JBPanel(new BorderLayout());
-        transitionPreviewPanel.setMinimumSize(UI.size(100, 300));
+        transitionPreviewPanel.setMinimumSize(JBUI.size(100, 300));
 
         panel.add(transitionsPanel, BorderLayout.WEST);
         panel.add(ScrollPaneFactory.createScrollPane(transitionFieldsPanel, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
         panel.add(transitionPreviewPanel, BorderLayout.EAST);
-        panel.setMinimumSize(UI.size(650, 300));
+        panel.setMinimumSize(JBUI.size(650, 300));
 
         return panel;
     }

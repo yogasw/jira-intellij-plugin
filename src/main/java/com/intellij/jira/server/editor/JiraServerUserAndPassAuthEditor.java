@@ -6,10 +6,13 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
-import com.intellij.util.ui.UI;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -36,12 +39,12 @@ public class JiraServerUserAndPassAuthEditor extends JiraServerAuthEditor {
         this.myUsernameLabel = new JBLabel("Username:", 4);
         this.myUsernameField = new JBTextField();
         this.myUsernameField.setText(myServer.hasUserAndPassAuth() ? myServer.getUsername() : "");
-        this.myUsernameField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.myUsernameField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         this.myPasswordLabel = new JBLabel("Password:", 4);
         this.myPasswordField = new JPasswordField();
         this.myPasswordField.setText(myServer.hasUserAndPassAuth() ? myServer.getPassword() : "");
-        this.myPasswordField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.myPasswordField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         installListeners();
 

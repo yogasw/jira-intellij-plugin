@@ -11,15 +11,18 @@ import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ColumnInfo;
+import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.ListTableModel;
-import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.ArrayList;
 
 import static com.intellij.jira.util.JiraLabelUtil.getBgRowColor;
@@ -74,7 +77,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
         JPanel myPanel = new JBPanel(new BorderLayout());
-        myPanel.setMinimumSize(UI.size(500, 300));
+        myPanel.setMinimumSize(JBUI.size(500, 300));
         myPanel.add(ToolbarDecorator.createDecorator(myTable)
                         .setAddAction(button -> {
                             NewJQLSearcherDialog dlg = new NewJQLSearcherDialog(myProject, false);
@@ -99,7 +102,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
                             }
                         })
                         .setRemoveAction(button -> {
-                            if (Messages.showOkCancelDialog(myProject, "You are going to delete this searcher, are you sure?","Delete Searcher", OK_BUTTON, CANCEL_BUTTON, Messages.getQuestionIcon()) == Messages.OK) {
+                            if (Messages.showOkCancelDialog(myProject, "You are going to delete this searcher, are you sure?","Delete Searcher", Messages.getOkButton(), Messages.getCancelButton(), Messages.getQuestionIcon()) == Messages.OK) {
 
                                 mySearchers.remove(myTable.getSelectedRow());
                                 myModel.removeRow(myTable.getSelectedRow());

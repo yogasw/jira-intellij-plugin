@@ -14,13 +14,17 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.FormBuilder;
-import com.intellij.util.ui.UI;
+import com.intellij.util.ui.JBUI;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.InputEvent;
 import java.util.List;
 import java.util.Objects;
@@ -116,14 +120,14 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
         }
 
         public Dimension getPreferredSizeList(){
-            return UI.size(75, 250);
+            return JBUI.size(75, 250);
         }
 
         @Nullable
         @Override
         protected JComponent createCenterPanel() {
             JBPanel panel = new JBPanel(new BorderLayout());
-            panel.setPreferredSize(UI.size(100, 250));
+            panel.setPreferredSize(JBUI.size(100, 250));
             panel.add(ScrollPaneFactory.createScrollPane(myList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);
 
             return panel;

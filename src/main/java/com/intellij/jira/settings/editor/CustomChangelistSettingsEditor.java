@@ -19,13 +19,13 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UI;
-import com.intellij.util.ui.UIUtil;
-import org.apache.xerces.impl.dv.ValidatedInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +80,7 @@ public class CustomChangelistSettingsEditor extends ChangelistSettingsEditor {
     public JPanel getPanel() {
 
         ToolbarDecorator toolbarDecorator = ToolbarDecorator.createDecorator(myFieldNamesList).disableUpDownActions();
-        toolbarDecorator.setPreferredSize(UI.size(300, -1));
+        toolbarDecorator.setPreferredSize(JBUI.size(300, -1));
         toolbarDecorator.setAddAction(anActionButton -> {
             DefaultActionGroup group = new DefaultActionGroup();
             group.add(new AddFieldAction("issueKey"));

@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
+import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,12 +37,12 @@ public class JiraServerAPITokenAuthEditor extends JiraServerAuthEditor {
         this.myEmailLabel = new JBLabel("Email:", 4);
         this.myEmailField = new JBTextField();
         this.myEmailField.setText(myServer.hasUserAndPassAuth() ? "" : myServer.getUsername());
-        this.myEmailField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.myEmailField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         this.myApiTokenLabel = new JBLabel("API Token:", 4);
         this.myApiTokenField = new JPasswordField();
         this.myApiTokenField.setText(myServer.hasUserAndPassAuth() ? "" : myServer.getPassword());
-        this.myApiTokenField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.myApiTokenField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         installListeners();
 
