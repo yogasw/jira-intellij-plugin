@@ -1,7 +1,6 @@
 package com.intellij.jira.server.editor;
 
 import com.intellij.jira.server.JiraServer;
-import com.intellij.jira.server.auth.AuthType;
 import com.intellij.jira.tasks.TestJiraServerConnectionTask;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProcessCanceledException;
@@ -14,24 +13,27 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.net.UnknownHostException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
-import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public abstract class JiraServerAuthEditor {
 
-    protected final static int DEFAULT_WIDTH = 450;
-    protected final static int DEFAULT_HEIGHT = 24;
+    protected static final int DEFAULT_WIDTH = 450;
+    protected static final int DEFAULT_HEIGHT = 24;
 
     protected final Project myProject;
     protected JiraServer myServer;
@@ -70,7 +72,7 @@ public abstract class JiraServerAuthEditor {
         this.myUrlLabel = new JBLabel("Server URL:", 4);
         this.myUrlField = new JBTextField();
         this.myUrlField.setText(myServer.getUrl());
-        this.myUrlField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.myUrlField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         this.myDefaultServerCheckbox = new JCheckBox("Set Default");
         this.myDefaultServerCheckbox.setBorder(JBUI.Borders.emptyRight(4));

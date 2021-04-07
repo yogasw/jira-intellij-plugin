@@ -9,19 +9,19 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 import static com.intellij.openapi.util.text.StringUtil.isEmpty;
 import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class JQLSearcherEditor {
 
-    private final static int DEFAULT_WIDTH = 300;
-    private final static int DEFAULT_HEIGHT = 24;
+    private static final int DEFAULT_WIDTH = 300;
+    private static final int DEFAULT_HEIGHT = 24;
 
     private final Project myProject;
     private final JQLSearcher mySearcher;
@@ -52,11 +52,11 @@ public class JQLSearcherEditor {
     private void init() {
         this.myAliasLabel = new JBLabel("Alias:", 4);
         this.myAliasField = new JBTextField(mySearcher.getAlias());
-        this.myAliasField.setPreferredSize(UI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        this.myAliasField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
         this.mySearchLabel = new JBLabel("Search:", 4);
         this.mySearchQueryField = new LanguageTextField(JqlLanguage.INSTANCE, this.myProject, mySearcher.getJql());
-        this.mySearchQueryField.setPreferredSize(UI.size(DEFAULT_WIDTH, 30));
+        this.mySearchQueryField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, 30));
 
         this.myDefaultSearcherCheckBox = new JCheckBox("Set Default");
         this.myDefaultSearcherCheckBox.setBorder(JBUI.Borders.emptyRight(4));

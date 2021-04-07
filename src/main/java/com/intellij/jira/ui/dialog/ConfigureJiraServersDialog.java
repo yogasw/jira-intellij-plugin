@@ -1,8 +1,8 @@
 package com.intellij.jira.ui.dialog;
 
 import com.intellij.jira.server.JiraServer;
-import com.intellij.jira.server.editor.JiraServerEditor;
 import com.intellij.jira.server.JiraServerManager;
+import com.intellij.jira.server.editor.JiraServerEditor;
 import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.jira.util.SimpleSelectableList;
@@ -11,17 +11,25 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.ui.*;
+import com.intellij.ui.CollectionListModel;
+import com.intellij.ui.ColoredListCellRenderer;
+import com.intellij.ui.JBSplitter;
+import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.containers.ConcurrentFactoryMap;
-import com.intellij.util.ui.UI;
+import com.intellij.util.ui.JBUI;
 import icons.TasksCoreIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +37,12 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static com.intellij.openapi.ui.Messages.CANCEL_BUTTON;
-import static com.intellij.openapi.ui.Messages.OK_BUTTON;
 import static java.util.Objects.nonNull;
 
 public class ConfigureJiraServersDialog extends DialogWrapper {
 
-    private final static JPanel EMPTY_PANEL = JiraPanelUtil.createPlaceHolderPanel("No server selected.").withMinimumWidth(450).withMinimumHeight(100);
-    private final static String EMPTY_PANEL_NAME = "empty.panel";
+    private static final JPanel EMPTY_PANEL = JiraPanelUtil.createPlaceHolderPanel("No server selected.").withMinimumWidth(450).withMinimumHeight(100);
+    private static final String EMPTY_PANEL_NAME = "empty.panel";
 
     private final Project myProject;
     private final JiraServerManager myManager;
@@ -153,13 +159,13 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         }
 
         JBPanel myPanel = new JBPanel(new BorderLayout());
-        myPanel.setMinimumSize(UI.size(-1, 200));
+        myPanel.setMinimumSize(JBUI.size(-1, 200));
         myPanel.add(ToolbarDecorator.createDecorator(myServersList)
                         .setAddAction(button -> {
                             addJiraServer();
                         })
                         .setRemoveAction(button -> {
-                            if (Messages.showOkCancelDialog(myProject, "You are going to delete this server, are you sure?","Delete Server", OK_BUTTON, CANCEL_BUTTON, Messages.getQuestionIcon()) == Messages.OK) {
+                            if (Messages.showOkCancelDialog(myProject, "You are going to delete this server, are you sure?","Delete Server", Messages.getOkButton(), Messages.getCancelButton(), Messages.getQuestionIcon()) == Messages.OK) {
                                 removeJiraServer();
                             }
                         })

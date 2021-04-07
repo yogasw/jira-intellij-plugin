@@ -33,7 +33,8 @@
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JiraIssueUpdater"/>
 
-
+        <notificationGroup id="Jira Balloon Notifications" displayType="BALLOON" />
+        <notificationGroup id="Jira Sticky Balloon Notifications" displayType="STICKY_BALLOON" isLogByDefault="true" />
     </extensions>
 
     <actions>

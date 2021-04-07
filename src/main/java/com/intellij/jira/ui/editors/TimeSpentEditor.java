@@ -3,10 +3,10 @@ package com.intellij.jira.ui.editors;
 import com.google.gson.JsonElement;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.util.ui.UI;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +32,7 @@ public class TimeSpentEditor extends TextFieldEditor {
 
     @Override
     public Dimension getFieldSize() {
-        return UI.size(150, 24);
+        return JBUI.size(150, 24);
     }
 
     @Override

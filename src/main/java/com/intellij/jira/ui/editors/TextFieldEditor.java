@@ -5,12 +5,12 @@ import com.google.gson.JsonNull;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
-import com.intellij.util.ui.UI;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.Objects;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
@@ -42,7 +42,7 @@ public class TextFieldEditor extends AbstractFieldEditor<String> {
     }
 
     public Dimension getFieldSize() {
-        return UI.size(250, 24);
+        return JBUI.size(250, 24);
     }
 
     @Override
