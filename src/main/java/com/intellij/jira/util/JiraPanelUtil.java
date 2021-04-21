@@ -3,14 +3,18 @@ package com.intellij.jira.util;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
+import com.intellij.jira.tasks.ToggleWatchIssueTask;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -19,10 +23,15 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.intellij.jira.util.JiraLabelUtil.DARCULA_TEXT_COLOR;
+import static com.intellij.jira.util.JiraLabelUtil.DEFAULT_SELECTED_ISSUE_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
+import static com.intellij.jira.util.JiraLabelUtil.HAND_CURSOR;
 import static java.awt.BorderLayout.LINE_START;
 import static javax.swing.SwingConstants.CENTER;
 
@@ -35,7 +44,8 @@ public class JiraPanelUtil {
     }
 
     public static JBPanel createWhiteBorderPanel(){
-        return createWhitePanel(new BorderLayout());
+        return createWhitePanel(new BorderLayout())
+                .withBorder(MARGIN_BOTTOM);
     }
 
     public static JBPanel createWhitePanel(@NotNull LayoutManager layout){
@@ -88,21 +98,45 @@ public class JiraPanelUtil {
         return createWhiteBorderPanel(assigneeLabel, assigneeValueLabel);
     }
 
-    public static JPanel createVersionsPanel(@NotNull JiraIssue issue) {
+    public static JBPanel createWatchesPanel(@NotNull JiraIssue issue, @NotNull Project project) {
+        JBPanel watchesPanel = JiraPanelUtil.createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 0)).withBorder(MARGIN_BOTTOM);
+        JBLabel watchesLabel = JiraLabelUtil.createBoldLabel("Watchers: ");
+        JBLabel watchesValueLabel = JiraLabelUtil.createLabel(issue.getWatches().getWatchCount() + " ");
+        boolean isWatching = issue.getWatches().isWatching();
+        JBLabel watchLabel = JiraLabelUtil.createLabel((isWatching ? "Stop " : "Start ") + "watching this issue");
+        watchLabel.setBackground(UIUtil.isUnderDarcula() ? DEFAULT_SELECTED_ISSUE_COLOR : DARCULA_TEXT_COLOR);
+        watchLabel.setBorder(JBUI.Borders.empty(2, 2, 2, 3));
+        watchLabel.setOpaque(true);
+        watchLabel.setCursor(HAND_CURSOR);
+        watchLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                SwingUtilities.invokeLater(() -> new ToggleWatchIssueTask(project, issue.getKey(), isWatching).queue());
+            }
+        });
+
+        watchesPanel.add(watchesLabel);
+        watchesPanel.add(watchesValueLabel);
+        watchesPanel.add(watchLabel);
+
+        return watchesPanel;
+    }
+
+    public static JBPanel createVersionsPanel(@NotNull JiraIssue issue) {
         JBLabel versionsLabel = JiraLabelUtil.createBoldLabel("Versions: ");
         JBLabel versionsValueLabel = JiraLabelUtil.createLabel(getVersionsNames(issue.getVersions()));
 
         return createWhiteBorderPanel(versionsLabel, versionsValueLabel);
     }
 
-    public static JPanel createComponentsPanel(@NotNull JiraIssue issue) {
+    public static JBPanel createComponentsPanel(@NotNull JiraIssue issue) {
         JBLabel componentsLabel = JiraLabelUtil.createBoldLabel("Components: ");
         JBLabel componentsValueLabel = JiraLabelUtil.createLabel(getComponentNames(issue.getComponents()));
 
         return createWhiteBorderPanel(componentsLabel, componentsValueLabel);
     }
 
-    public static JPanel createLabelsPanel(@NotNull JiraIssue issue) {
+    public static JBPanel createLabelsPanel(@NotNull JiraIssue issue) {
         JBLabel label = JiraLabelUtil.createBoldLabel("Labels: ");
         JBLabel valueLabel = JiraLabelUtil.createLabel(String.join(", ", issue.getLabels()));
 
@@ -124,8 +158,8 @@ public class JiraPanelUtil {
         };
     }
 
-    private static JPanel createWhiteBorderPanel(JLabel fieldName, JLabel fieldValue) {
-        JPanel panel = createWhiteBorderPanel();
+    private static JBPanel createWhiteBorderPanel(JLabel fieldName, JLabel fieldValue) {
+        JBPanel panel = createWhiteBorderPanel();
         panel.add(fieldName, LINE_START);
         panel.add(fieldValue, BorderLayout.CENTER);
 
@@ -133,7 +167,7 @@ public class JiraPanelUtil {
     }
 
     private static JPanel createWhiteLeftFlowPanel(JLabel... labels) {
-        JPanel panel = createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 1));
+        JPanel panel = createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 1)).withBorder(MARGIN_BOTTOM);
 
         for (JLabel label : labels) {
             panel.add(label);
