@@ -38,11 +38,14 @@ public class OpenNewJiraTabAction extends JiraIssueAction {
             ContentManager contentManager = jiraToolWindow.getContentManager();
 
             JiraIssue issue = this.issue.create();
-            JiraIssuePanel jiraIssuePanel = new JiraIssuePanel(project, issue);
+            Content content = contentManager.findContent(issue.getKey()); // Avoid creates same content
+            if (Objects.isNull(content)) {
+                JiraIssuePanel jiraIssuePanel = new JiraIssuePanel(project, issue);
 
-            Content content = ContentFactory.SERVICE.getInstance().createContent(jiraIssuePanel, issue.getKey(), false);
+                content = ContentFactory.SERVICE.getInstance().createContent(jiraIssuePanel, issue.getKey(), false);
+                contentManager.addContent(content);
+            }
 
-            contentManager.addContent(content);
             contentManager.setSelectedContent(content);
         }
 
