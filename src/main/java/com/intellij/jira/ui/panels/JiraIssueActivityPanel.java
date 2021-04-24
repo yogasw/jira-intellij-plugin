@@ -1,19 +1,18 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.components.JiraIssueUpdater;
-import com.intellij.jira.events.JiraIssueEventListener;
+import com.intellij.jira.listener.JiraIssueChangeListener;
+import com.intellij.jira.listener.JiraIssuesRefreshedListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTabbedPane;
-import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import java.util.List;
-import java.util.Objects;
 
-public class JiraIssueActivityPanel extends JiraTabbedPane implements JiraIssueEventListener, Disposable {
+public class JiraIssueActivityPanel extends JiraTabbedPane {
 
     private final Project project;
     private JiraIssue issue;
@@ -27,39 +26,12 @@ public class JiraIssueActivityPanel extends JiraTabbedPane implements JiraIssueE
 
         addTabs();
         setSelectedIndex(mySelectedTab);
-        addListeners();
+        addChangeListener(e -> mySelectedTab = getSelectedIndex());
+        subscribeTopic();
     }
 
     private String appendTotal(int total) {
         return total > 0 ? " (" + total + ") " : " ";
-    }
-
-    @Override
-    public void update(List<JiraIssue> issues) {
-        // Do nothing
-    }
-
-    @Override
-    public void update(JiraIssue issue) {
-        System.out.println("Updating JiraIssueActivityPanel");
-        this.issue = issue;
-
-        SwingUtilities.invokeLater(() -> {
-            Integer oldSelectedTab = Integer.valueOf(mySelectedTab.intValue());
-            while (getTabCount() > 0) {
-                remove(0);
-            }
-
-            addTabs();
-            setSelectedIndex(oldSelectedTab);
-            mySelectedTab = getSelectedIndex();
-        });
-    }
-
-    @Override
-    public void dispose() {
-        System.out.println("Removing listener JiraIssueActivityPanel");
-        JiraIssueUpdater.getInstance(project).removeIssueListener(issue.getKey(), this);
     }
 
     private void addTabs() {
@@ -70,9 +42,35 @@ public class JiraIssueActivityPanel extends JiraTabbedPane implements JiraIssueE
         addTab(JiraIssueDetailsPanel.TAB_WORK_LOG + appendTotal(issue.getWorklogs().size()), new JiraIssueWorkLogsPanel(issue));
     }
 
-    private void addListeners() {
-        JiraIssueUpdater.getInstance(project).addIssueListener(issue.getKey(),this);
-        addChangeListener(e -> mySelectedTab = getSelectedIndex());
+    private void subscribeTopic() {
+        MessageBusConnection connect = project.getMessageBus().connect();
+        connect.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
+            if (issue.getKey().equals(this.issue.getKey())) {
+                this.issue = issue;
+                updatePanel();
+            }
+        });
+
+        connect.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
+            int issueIndex = issues.indexOf(this.issue);
+            if (issueIndex > -1) {
+                this.issue = issues.get(issueIndex);
+                updatePanel();
+            }
+        });
+    }
+
+    private void updatePanel() {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            Integer oldSelectedTab = Integer.valueOf(mySelectedTab.intValue());
+            while (getTabCount() > 0) {
+                remove(0);
+            }
+
+            addTabs();
+            setSelectedIndex(oldSelectedTab);
+            mySelectedTab = getSelectedIndex();
+        });
     }
 
 }

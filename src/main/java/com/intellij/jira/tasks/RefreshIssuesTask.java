@@ -2,6 +2,7 @@ package com.intellij.jira.tasks;
 
 import com.intellij.jira.components.JQLSearcherManager;
 import com.intellij.jira.components.JiraNotificationManager;
+import com.intellij.jira.listener.JiraIssuesRefreshedListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.server.JiraRestApi;
@@ -19,7 +20,7 @@ import static java.util.Objects.nonNull;
 public class RefreshIssuesTask extends AbstractBackgroundableTask {
 
     public RefreshIssuesTask(@NotNull Project project) {
-        super(project, "Updating Issues from Server");
+        super(project, "Updating Issues from Server", null);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class RefreshIssuesTask extends AbstractBackgroundableTask {
             issues =  jiraRestApi.getIssues(searcher.getJql());
         }
 
-        getJiraIssueUpdater().update(issues);
+        myProject.getMessageBus().syncPublisher(JiraIssuesRefreshedListener.TOPIC).issuesRefreshed(issues);
     }
 
     @Override

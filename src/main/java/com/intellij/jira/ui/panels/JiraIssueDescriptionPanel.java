@@ -2,13 +2,12 @@ package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.actions.ChangeListActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.components.JiraIssueUpdater;
-import com.intellij.jira.events.JiraIssueEventListener;
+import com.intellij.jira.listener.JiraIssueChangeListener;
+import com.intellij.jira.listener.JiraIssuesRefreshedListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTextPane;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -16,6 +15,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import java.awt.BorderLayout;
-import java.util.List;
 
 import static com.intellij.jira.util.JiraLabelUtil.BOLD;
 import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
@@ -37,7 +36,7 @@ import static javax.swing.BoxLayout.Y_AXIS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-public class JiraIssueDescriptionPanel extends AbstractJiraPanel implements JiraIssueEventListener, Disposable {
+public class JiraIssueDescriptionPanel extends AbstractJiraPanel {
 
     private final Project project;
     private JiraIssue issue;
@@ -48,7 +47,7 @@ public class JiraIssueDescriptionPanel extends AbstractJiraPanel implements Jira
         this.issue = issue;
 
         init();
-        addListeners();
+        subscribeTopic();
     }
 
     @Override
@@ -57,24 +56,6 @@ public class JiraIssueDescriptionPanel extends AbstractJiraPanel implements Jira
         group.add(new ChangeListActionGroup(() -> issue));
 
         return group;
-    }
-
-    @Override
-    public void update(List<JiraIssue> issues) {
-        // Do nothing
-    }
-
-    @Override
-    public void update(JiraIssue issue) {
-        System.out.println("Updating JiraIssueDescriptionPanel");
-        this.issue = issue;
-        init();
-    }
-
-    @Override
-    public void dispose() {
-        System.out.println("Removing listener JiraIssueDescriptionPanel");
-        JiraIssueUpdater.getInstance(project).removeIssueListener(issueKey, this);
     }
 
     private void init() {
@@ -119,7 +100,22 @@ public class JiraIssueDescriptionPanel extends AbstractJiraPanel implements Jira
         setContent(scrollPane);
     }
 
-    private void addListeners() {
-        JiraIssueUpdater.getInstance(project).addIssueListener(issueKey, this);
+    private void subscribeTopic() {
+        MessageBusConnection connect = project.getMessageBus().connect();
+
+        connect.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
+            if (issue.getKey().equals(this.issue.getKey())) {
+                this.issue = issue;
+                init();
+            }
+        });
+
+        connect.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
+            int issueIndex = issues.indexOf(this.issue);
+            if (issueIndex > -1) {
+                this.issue = issues.get(issueIndex);
+                init();
+            }
+        });
     }
 }

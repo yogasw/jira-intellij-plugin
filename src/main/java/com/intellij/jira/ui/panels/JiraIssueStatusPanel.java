@@ -4,29 +4,27 @@ import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
 import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
 import com.intellij.jira.actions.TransitIssueDialogAction;
-import com.intellij.jira.components.JiraIssueUpdater;
-import com.intellij.jira.events.JiraIssueEventListener;
+import com.intellij.jira.listener.JiraIssueChangeListener;
+import com.intellij.jira.listener.JiraIssuesRefreshedListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-
-import java.util.List;
 
 import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.LINE_START;
 import static javax.swing.BoxLayout.Y_AXIS;
 
-public class JiraIssueStatusPanel extends AbstractJiraPanel implements JiraIssueEventListener, Disposable {
+public class JiraIssueStatusPanel extends AbstractJiraPanel {
 
     private final Project project;
     private JiraIssue issue;
@@ -37,7 +35,7 @@ public class JiraIssueStatusPanel extends AbstractJiraPanel implements JiraIssue
         this.issue = issue;
 
         init();
-        addListeners();
+        subscribeTopic();
     }
 
     @Override
@@ -48,24 +46,6 @@ public class JiraIssueStatusPanel extends AbstractJiraPanel implements JiraIssue
         group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
 
         return group;
-    }
-
-    @Override
-    public void update(List<JiraIssue> issues) {
-        // Do nothing
-    }
-
-    @Override
-    public void update(JiraIssue issue) {
-        System.out.println("Updating JiraIssueStatusPanel");
-        this.issue = issue;
-        init();
-    }
-
-    @Override
-    public void dispose() {
-        System.out.println("Removing listener JiraIssueStatusPanel");
-        JiraIssueUpdater.getInstance(project).removeIssueListener(issueKey, this);
     }
 
     private void init() {
@@ -106,7 +86,24 @@ public class JiraIssueStatusPanel extends AbstractJiraPanel implements JiraIssue
         setContent(mainPanel);
     }
 
-    private void addListeners() {
-        JiraIssueUpdater.getInstance(project).addIssueListener(issueKey, this);
+    private void subscribeTopic() {
+        MessageBusConnection connect = project.getMessageBus().connect();
+
+        connect.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
+            if (issue.getKey().equals(this.issue.getKey())) {
+                this.issue = issue;
+                init();
+            }
+        });
+
+        connect.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
+            int issueIndex = issues.indexOf(this.issue);
+            if (issueIndex > -1) {
+               this.issue = issues.get(issueIndex);
+               init();
+           }
+        });
+
     }
+
 }

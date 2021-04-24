@@ -3,7 +3,6 @@ package com.intellij.jira.tasks;
 import com.google.gson.JsonElement;
 import com.intellij.jira.exceptions.InvalidResultException;
 import com.intellij.jira.helper.TransitionFieldHelper;
-import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.util.result.Result;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -14,14 +13,12 @@ import java.util.List;
 
 public class EditWorklogTask extends AbstractBackgroundableTask {
 
-    private String issueKey;
     private String workLogId;
     private List<TransitionFieldHelper.FieldEditorInfo> worklogFields;
     private String remainingEstimate;
 
     public EditWorklogTask(@NotNull Project project, String issueKey, String workLogId, List<TransitionFieldHelper.FieldEditorInfo> worklogFields, JsonElement remainingEstimateValue) {
-        super(project, "Editing Work Log");
-        this.issueKey = issueKey;
+        super(project, "Editing Work Log", issueKey);
         this.workLogId = workLogId;
         this.worklogFields = worklogFields;
         this.remainingEstimate = remainingEstimateValue.getAsString();
@@ -31,22 +28,16 @@ public class EditWorklogTask extends AbstractBackgroundableTask {
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
 
-        Result result = jiraRestApi.editIssueWorklog(issueKey, workLogId, worklogFields, remainingEstimate);
+        Result result = jiraRestApi.editIssueWorklog(issueIdOrKey, workLogId, worklogFields, remainingEstimate);
         if(!result.isValid()) {
             throw new InvalidResultException("Error", "Issue Work Log has not been edited");
         }
 
-        // Retrieve updated issue
-        Result issueResult = jiraRestApi.getIssue(issueKey);
-        if(issueResult.isValid()){
-            JiraIssue issue = (JiraIssue) issueResult.get();
-            // Update panels
-            getJiraIssueUpdater().update(issue);
-        }
     }
 
     @Override
     public void onSuccess() {
+        super.onSuccess();
         showNotification("Jira", "Work Log edited successfully");
     }
 
