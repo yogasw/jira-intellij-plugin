@@ -1,6 +1,5 @@
 package com.intellij.jira.tasks;
 
-import com.intellij.jira.components.JiraIssueUpdater;
 import com.intellij.jira.exceptions.JiraServerConfigurationNotFoundException;
 import com.intellij.jira.components.JiraNotificationManager;
 import com.intellij.jira.listener.JiraIssueChangeListener;
@@ -35,10 +34,6 @@ public abstract class AbstractBackgroundableTask extends Task.Backgroundable {
         }
 
         return jiraRestApi;
-    }
-
-    public JiraIssueUpdater getJiraIssueUpdater(){
-        return JiraIssueUpdater.getInstance(myProject);
     }
 
     @Override
