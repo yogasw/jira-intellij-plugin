@@ -8,13 +8,13 @@ import com.intellij.jira.rest.model.JiraIssueLink;
 import com.intellij.jira.ui.JiraIssueLinkListModel;
 import com.intellij.jira.ui.renders.JiraIssueLinkListCellRenderer;
 import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,7 +51,7 @@ class JiraIssueLinksPanel extends AbstractJiraPanel {
         issueLinkList.setCellRenderer(new JiraIssueLinkListCellRenderer());
         issueLinkList.setSelectionMode(SINGLE_SELECTION);
         issueLinkList.addListSelectionListener(e -> {
-            SwingUtilities.invokeLater(this::updateToolbarActions);
+            ApplicationManager.getApplication().invokeLater(this::updateToolbarActions);
         });
 
         panel.add(ScrollPaneFactory.createScrollPane(issueLinkList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), CENTER);

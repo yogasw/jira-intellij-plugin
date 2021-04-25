@@ -8,14 +8,13 @@ import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueAttachment;
 import com.intellij.jira.ui.JiraIssueAttachmentListModel;
 import com.intellij.jira.ui.renders.JiraIssueAttachmentListCellRenderer;
-import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,7 +52,7 @@ public class JiraIssueAttachmentsPanel extends AbstractJiraPanel {
         issueAttachmentList.setCellRenderer(new JiraIssueAttachmentListCellRenderer());
         issueAttachmentList.setSelectionMode(SINGLE_SELECTION);
         issueAttachmentList.addListSelectionListener(e -> {
-            SwingUtilities.invokeLater(this::updateToolbarActions);
+            ApplicationManager.getApplication().invokeLater(this::updateToolbarActions);
         });
 
         panel.add(ScrollPaneFactory.createScrollPane(issueAttachmentList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), CENTER);

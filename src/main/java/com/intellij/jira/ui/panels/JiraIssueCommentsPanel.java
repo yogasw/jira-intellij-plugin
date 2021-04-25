@@ -10,6 +10,7 @@ import com.intellij.jira.rest.model.JiraIssueComment;
 import com.intellij.jira.ui.JiraIssueCommentListModel;
 import com.intellij.jira.ui.renders.JiraIssueCommentListCellRenderer;
 import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -17,7 +18,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.util.Objects;
 
@@ -55,7 +55,7 @@ class JiraIssueCommentsPanel extends AbstractJiraPanel {
         issueCommentList.setCellRenderer(new JiraIssueCommentListCellRenderer());
         issueCommentList.setSelectionMode(SINGLE_SELECTION);
         issueCommentList.addListSelectionListener(e -> {
-             SwingUtilities.invokeLater(this::updateToolbarActions);
+            ApplicationManager.getApplication().invokeLater(this::updateToolbarActions);
         });
 
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(issueCommentList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);

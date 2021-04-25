@@ -10,6 +10,7 @@ import com.intellij.jira.ui.JiraIssueTransitionListModel;
 import com.intellij.jira.ui.renders.JiraIssueTransitionListCellRenderer;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -28,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -88,7 +88,7 @@ public class IssueTransitionDialog extends DialogWrapper {
         transitionList.setPreferredSize(new JBDimension(100, 300));
         transitionList.setBorder(BorderFactory.createLineBorder(JBColor.border()));
         transitionList.addListSelectionListener(e -> {
-                SwingUtilities.invokeLater(() -> {
+            ApplicationManager.getApplication().invokeLater(() -> {
                     updateTransitionFieldPanel(transitionList.getSelectedValue());
                     updateTransitionPreviewPanel(transitionList.getSelectedValue());
                 });

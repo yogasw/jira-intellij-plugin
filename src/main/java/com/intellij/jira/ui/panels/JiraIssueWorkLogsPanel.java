@@ -10,13 +10,13 @@ import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.ui.JiraIssueWorklogListModel;
 import com.intellij.jira.ui.renders.JiraIssueWorklogListCellRender;
 import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,7 +57,7 @@ class JiraIssueWorkLogsPanel extends AbstractJiraPanel {
         issueWorklogList.setCellRenderer(new JiraIssueWorklogListCellRender());
         issueWorklogList.setSelectionMode(SINGLE_SELECTION);
         issueWorklogList.addListSelectionListener(e -> {
-            SwingUtilities.invokeLater(this::updateToolbarActions);
+            ApplicationManager.getApplication().invokeLater(this::updateToolbarActions);
         });
 
         panel.add(ScrollPaneFactory.createScrollPane(issueWorklogList, VERTICAL_SCROLLBAR_AS_NEEDED), CENTER);

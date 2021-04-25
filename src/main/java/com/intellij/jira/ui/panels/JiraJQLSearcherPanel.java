@@ -5,6 +5,7 @@ import com.intellij.jira.components.JQLSearcherObserver;
 import com.intellij.jira.events.JQLSearcherEventListener;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.tasks.RefreshIssuesTask;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.CollectionComboBoxModel;
@@ -12,8 +13,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventLis
             JQLSearcher selectedItem = (JQLSearcher) this.myComboBox.getSelectedItem();
             if(nonNull(selectedItem)){
                 myManager.update(myProject, selectedItem.getAlias(), selectedItem, true);
-                SwingUtilities.invokeLater(() -> new RefreshIssuesTask(myProject).queue());
+                ApplicationManager.getApplication().invokeLater(() -> new RefreshIssuesTask(myProject).queue());
             }
         });
 
