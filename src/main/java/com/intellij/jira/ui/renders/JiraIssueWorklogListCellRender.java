@@ -1,22 +1,26 @@
 package com.intellij.jira.ui.renders;
 
 import com.intellij.jira.rest.model.JiraIssueWorklog;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 
 import static com.intellij.jira.util.JiraLabelUtil.BOLD;
 import static com.intellij.jira.util.JiraLabelUtil.ITALIC;
 
 public class JiraIssueWorklogListCellRender extends DefaultJiraListCellRender {
 
-    private JBPanel worklogPanel;
+    private JPanel worklogPanel;
     private JBLabel authorLabel;
     private JBLabel createdLabel;
     private JBLabel timeSpentLabel;
@@ -47,13 +51,13 @@ public class JiraIssueWorklogListCellRender extends DefaultJiraListCellRender {
     }
 
     private void init() {
-        worklogPanel = new JBPanel(new BorderLayout())
+        worklogPanel = new JiraPanel(new BorderLayout())
                 .withBorder(JBUI.Borders.emptyLeft(5)).andTransparent();
 
-        JBPanel subPanel = new JBPanel(new BorderLayout())
+        JPanel subPanel = new JiraPanel(new BorderLayout())
                 .withBorder(JBUI.Borders.empty(4, 2, 4 , 5)).andTransparent();
 
-        JBPanel authorPanel = JiraPanelUtil.createWhitePanel(new GridLayout(1,2));
+        JPanel authorPanel = JiraPanelUtil.createWhitePanel(new GridLayout(1,2));
         authorLabel = JiraLabelUtil.createEmptyLabel().withFont(BOLD);
         createdLabel = JiraLabelUtil.createEmptyLabel().withFont(ITALIC);
         createdLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -63,7 +67,7 @@ public class JiraIssueWorklogListCellRender extends DefaultJiraListCellRender {
 
         subPanel.add(authorPanel, BorderLayout.PAGE_START);
 
-        JBPanel timeSpentPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+        JPanel timeSpentPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
         timeSpentLabel = JiraLabelUtil.createEmptyLabel();
 
         timeSpentPanel.add(timeSpentLabel);

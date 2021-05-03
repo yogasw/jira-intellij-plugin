@@ -3,9 +3,10 @@ package com.intellij.jira.ui.labels;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.jira.util.JiraLabelUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBLabel;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -27,7 +28,7 @@ public class JiraLinkLabel extends JBLabel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                SwingUtilities.invokeLater(() -> BrowserUtil.open(url));
+                ApplicationManager.getApplication().invokeLater(() -> BrowserUtil.open(url));
             }
         });
     }

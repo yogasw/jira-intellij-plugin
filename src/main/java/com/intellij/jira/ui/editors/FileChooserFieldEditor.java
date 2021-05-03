@@ -37,8 +37,6 @@ public class FileChooserFieldEditor extends AbstractFieldEditor<String>{
                 mySelectedFile = selectedFile;
                 myTextField.setText(selectedFile.getName());
                 myButton.setEnabled(true);
-
-                System.out.println("Selected file: " + selectedFile.getAbsolutePath());
             }
         });
 

@@ -1,7 +1,6 @@
 package com.intellij.jira.tasks;
 
 import com.intellij.jira.exceptions.InvalidResultException;
-import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.util.result.Result;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -12,35 +11,27 @@ public class AssignUserTask extends AbstractBackgroundableTask {
 
     private String accountId;
     private String username;
-    private String issueKey;
 
     public AssignUserTask(@NotNull Project project, String accountId,  String username, String issueKey) {
-        super(project, "Assigning User to Issue...");
+        super(project, "Assigning User to Issue...", issueKey);
         this.accountId = accountId;
         this.username = username;
-        this.issueKey = issueKey;
     }
 
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
-        Result result = jiraRestApi.assignUserToIssue(accountId, username, issueKey);
+        Result result = jiraRestApi.assignUserToIssue(accountId, username, issueIdOrKey);
         if(!result.isValid()) {
             throw new InvalidResultException("Assignment error", "Issue has not been updated");
         }
 
-        // Retrieve updated issue
-        Result issueResult = jiraRestApi.getIssue(issueKey);
-        if(issueResult.isValid()){
-            JiraIssue issue = (JiraIssue) issueResult.get();
-            // Update panels
-            getJiraIssueUpdater().update(issue);
-        }
     }
 
 
     @Override
     public void onSuccess() {
+        super.onSuccess();
         showNotification("Assignment successful", "Issue assignee has been updated");
     }
 

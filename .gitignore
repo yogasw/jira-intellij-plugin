@@ -2,3 +2,6 @@
 *.jar
 .idea/
 out/
+.gradle/
+gradle/
+build/
