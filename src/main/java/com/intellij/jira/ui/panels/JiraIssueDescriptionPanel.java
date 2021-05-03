@@ -35,7 +35,7 @@ import static javax.swing.BoxLayout.Y_AXIS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-public class JiraIssueDescriptionPanel extends AbstractJiraPanel {
+public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
 
     private final Project project;
     private JiraIssue issue;

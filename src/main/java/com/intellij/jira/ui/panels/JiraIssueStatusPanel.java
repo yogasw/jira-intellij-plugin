@@ -24,7 +24,7 @@ import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.LINE_START;
 import static javax.swing.BoxLayout.Y_AXIS;
 
-public class JiraIssueStatusPanel extends AbstractJiraPanel {
+public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
 
     private final Project project;
     private JiraIssue issue;

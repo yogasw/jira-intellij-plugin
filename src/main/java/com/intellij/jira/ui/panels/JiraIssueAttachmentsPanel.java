@@ -23,7 +23,7 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-public class JiraIssueAttachmentsPanel extends AbstractJiraPanel {
+public class JiraIssueAttachmentsPanel extends AbstractJiraToolWindowPanel {
 
     private JiraIssueAttachment issueAttachment;
     private JBList<JiraIssueAttachment> issueAttachmentList;

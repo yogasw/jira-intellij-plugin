@@ -24,7 +24,7 @@ import static java.awt.BorderLayout.CENTER;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-class JiraIssueWorkLogsPanel extends AbstractJiraPanel {
+class JiraIssueWorkLogsPanel extends AbstractJiraToolWindowPanel {
 
     private JiraIssueWorklog worklog;
     private JiraIssueTimeTracking timeTracking;
