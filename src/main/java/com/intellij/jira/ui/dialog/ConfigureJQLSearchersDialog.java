@@ -3,12 +3,12 @@ package com.intellij.jira.ui.dialog;
 import com.intellij.jira.components.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.tasks.RefreshIssuesTask;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ToolbarDecorator;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.JBUI;
@@ -27,8 +27,6 @@ import java.util.ArrayList;
 
 import static com.intellij.jira.util.JiraLabelUtil.getBgRowColor;
 import static com.intellij.jira.util.JiraLabelUtil.getFgRowColor;
-import static com.intellij.openapi.ui.Messages.CANCEL_BUTTON;
-import static com.intellij.openapi.ui.Messages.OK_BUTTON;
 
 public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
@@ -76,7 +74,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JPanel myPanel = new JBPanel(new BorderLayout());
+        JPanel myPanel = new JiraPanel(new BorderLayout());
         myPanel.setMinimumSize(JBUI.size(500, 300));
         myPanel.add(ToolbarDecorator.createDecorator(myTable)
                         .setAddAction(button -> {

@@ -1,23 +1,25 @@
 package com.intellij.jira.ui.dialog;
 
 import com.intellij.jira.tasks.DeleteIssueLinkTask;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
 
 import static java.util.Objects.nonNull;
 
 public class DeleteIssueLinkDialog extends DialogWrapper {
 
-    private Project project;
-    private String issueKey;
-    private String issueLinkId;
+    private final Project project;
+    private final String issueKey;
+    private final String issueLinkId;
 
     public DeleteIssueLinkDialog(Project project, String issueKey, String issueLinkId) {
         super(project, false);
@@ -36,7 +38,7 @@ public class DeleteIssueLinkDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JBPanel panel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
         JBLabel label = new JBLabel("Are you sure you want to delete this link?");
         panel.add(label, BorderLayout.CENTER);
 

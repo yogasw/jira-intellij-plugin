@@ -3,6 +3,7 @@ package com.intellij.jira.ui.dialog;
 import com.intellij.jira.rest.model.JiraIssueComment;
 import com.intellij.jira.rest.model.JiraVisibility;
 import com.intellij.jira.tasks.EditCommentTask;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraIssueUtil;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.openapi.project.Project;
@@ -12,13 +13,16 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import java.awt.BorderLayout;
 import java.util.List;
 
 import static com.intellij.jira.util.JiraIssueUtil.escapeComment;
@@ -56,7 +60,7 @@ public class EditCommentDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JBPanel panel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
         commentArea = new JTextArea(6, 60);
         commentArea.setBorder(BorderFactory.createLineBorder(JBColor.border()));
         commentArea.setLineWrap(true);

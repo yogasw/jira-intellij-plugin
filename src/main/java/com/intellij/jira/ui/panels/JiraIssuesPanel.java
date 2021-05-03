@@ -6,8 +6,8 @@ import com.intellij.jira.actions.GoToIssuePopupAction;
 import com.intellij.jira.actions.JQLSearcherActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.components.JQLSearcherManager;
-import com.intellij.jira.components.JiraIssueUpdater;
-import com.intellij.jira.events.JiraIssueEventListener;
+import com.intellij.jira.listener.JiraIssueChangeListener;
+import com.intellij.jira.listener.JiraIssuesRefreshedListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.table.JiraIssueListTableModel;
@@ -17,16 +17,19 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.components.JBPanel;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +39,7 @@ import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueEventListener {
+public class JiraIssuesPanel extends SimpleToolWindowPanel {
 
     private final JiraRestApi myJiraRestApi;
     private final Project myProject;
@@ -50,37 +53,68 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
         this.myJiraRestApi = server;
         this.myProject = project;
         this.myManager = JQLSearcherManager.getInstance();
+
         init();
+        subscribeTopic();
+    }
+
+    private void subscribeTopic() {
+        MessageBusConnection connection = myProject.getMessageBus().connect();
+
+        connection.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
+            if(nonNull(issueTable)){
+                JiraIssueListTableModel model = issueTable.getModel();
+                int postItem = model.indexOf(issue);
+                if(postItem < 0){
+                    return;
+                }
+
+                model.removeRow(postItem);
+                model.insertRow(postItem, issue);
+                issueTable.addSelection(issue);
+            }
+        });
+
+        connection.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
+            if(nonNull(issueTable)){
+                JiraIssue lastSelectedIssue = issueTable.getSelectedObject();
+                ApplicationManager.getApplication().invokeLater(() -> {
+
+                    issueTable.updateModel(issues);
+                    int currentPosIssue = issueTable.getModel().indexOf(lastSelectedIssue);
+                    // if the last selected issue exists in the new list, we select it
+                    if(currentPosIssue >= 0) {
+                        JiraIssue issueToShow = issueTable.getModel().getItem(currentPosIssue);
+                        issueTable.addSelection(issueToShow);
+                    } else {
+                        issueDetailsPanel.setEmptyContent();
+                    }
+                });
+            }
+        });
+
     }
 
     private void init() {
         setToolbar();
         setContent();
-        addListeners();
-    }
-
-    private void addListeners() {
-        JiraIssueUpdater.getInstance(myProject).addListener(this);
     }
 
     private void setContent() {
         JComponent content;
-        if(isNull(myJiraRestApi)){
+        if(isNull(myJiraRestApi)) {
             content = JiraPanelUtil.createPlaceHolderPanel("No Jira server found");
-        }else{
+        } else {
             List<JiraIssue> issues = myJiraRestApi.getIssues(getDefaultJQLSearcher());
             issueDetailsPanel = new JiraIssueDetailsPanel(myProject);
 
             issueTable = new JiraIssueTableView(issues);
-            issueTable.getSelectionModel().addListSelectionListener(event -> {
-                SwingUtilities.invokeLater(() -> this.issueDetailsPanel.showIssue(issueTable.getSelectedObject()));
-            });
-
+            issueTable.getSelectionModel().addListSelectionListener(event ->  this.issueDetailsPanel.showIssue(issueTable.getSelectedObject()));
 
             JPanel issuesPanel = new JPanel(new BorderLayout());
             issuesPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
 
-            JPanel jqlPanel = new JBPanel(new BorderLayout());
+            JPanel jqlPanel = new JiraPanel(new BorderLayout());
             jqlPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 1, 0));
             jqlPanel.add(new JiraJQLSearcherPanel(myProject), BorderLayout.WEST);
 
@@ -99,10 +133,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
         }
 
         super.setContent(content);
-
     }
-
-
 
     private void setToolbar(){
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(TOOL_WINDOW_ID, createActionGroup(), false);
@@ -121,42 +152,6 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel implements JiraIssueE
         group.add(new ConfigureJiraServersAction());
         return group;
     }
-
-
-    @Override
-    public void update(List<JiraIssue> issues) {
-        if(nonNull(issueTable)){
-            JiraIssue lastSelectedIssue = issueTable.getSelectedObject();
-            issueTable.updateModel(issues);
-            int currentPosIssue = issueTable.getModel().indexOf(lastSelectedIssue);
-            // if the last selected issue exist in the new list
-            if(currentPosIssue >= 0){
-                JiraIssue issueToShow = issueTable.getModel().getItem(currentPosIssue);
-                issueTable.addSelection(issueToShow);
-                issueDetailsPanel.showIssue(issueToShow);
-            }
-            else{
-                issueDetailsPanel.setEmptyContent();
-            }
-        }
-    }
-
-    @Override
-    public void update(JiraIssue issue) {
-        if(nonNull(issueTable)){
-            int postItem = issueTable.getModel().indexOf(issue);
-            if(postItem < 0){
-                return;
-            }
-
-            issueTable.getModel().removeRow(postItem);
-            issueTable.getModel().insertRow(postItem, issue);
-            issueTable.addSelection(issue);
-
-            issueDetailsPanel.showIssue(issue);
-        }
-    }
-
 
     public JiraIssueListTableModel getTableListModel(){
         return issueTable.getModel();

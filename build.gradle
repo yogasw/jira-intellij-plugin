@@ -40,6 +40,6 @@ patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Support 2021.1+</li>
+        <li>New feature: open issue in tab</li>
       </ul>"""
 }

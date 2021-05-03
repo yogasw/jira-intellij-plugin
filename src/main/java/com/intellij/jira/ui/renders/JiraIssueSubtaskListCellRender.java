@@ -2,15 +2,19 @@ package com.intellij.jira.ui.renders;
 
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueStatus;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Component;
 
-import static com.intellij.jira.util.JiraLabelUtil.*;
+import static com.intellij.jira.util.JiraLabelUtil.BOLD;
+import static com.intellij.jira.util.JiraLabelUtil.DARCULA_TEXT_COLOR;
+import static com.intellij.jira.util.JiraLabelUtil.IN_PROGRESS_TEXT_COLOR;
 import static com.intellij.openapi.util.text.StringUtil.toUpperCase;
 
 public class JiraIssueSubtaskListCellRender extends DefaultJiraListCellRender {
@@ -25,7 +29,7 @@ public class JiraIssueSubtaskListCellRender extends DefaultJiraListCellRender {
     }
 
     private void init() {
-        JBPanel issuePanel = new JBPanel(new BorderLayout())
+        JPanel issuePanel = new JiraPanel(new BorderLayout())
                 .withBorder(JBUI.Borders.empty(4, 5)).andTransparent();
         keyLabel =  JiraLabelUtil.createEmptyLabel().withFont(BOLD);
         summaryLabel =  JiraLabelUtil.createEmptyLabel().withBorder(JBUI.Borders.emptyLeft(10));

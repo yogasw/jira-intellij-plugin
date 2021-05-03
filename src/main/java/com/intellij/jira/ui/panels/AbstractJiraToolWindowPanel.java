@@ -10,20 +10,20 @@ import javax.swing.*;
 
 import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 
-public abstract class AbstractJiraPanel extends SimpleToolWindowPanel {
+public abstract class AbstractJiraToolWindowPanel extends SimpleToolWindowPanel {
 
     protected final String issueKey;
     protected final String projectKey;
 
-    AbstractJiraPanel(JiraIssue issue) {
+    AbstractJiraToolWindowPanel(JiraIssue issue) {
         this(false, issue);
     }
 
-    AbstractJiraPanel(boolean borderless, JiraIssue issue) {
+    AbstractJiraToolWindowPanel(boolean borderless, JiraIssue issue) {
         this(true, borderless, issue);
     }
 
-    public AbstractJiraPanel(boolean vertical, boolean borderless, JiraIssue issue) {
+    public AbstractJiraToolWindowPanel(boolean vertical, boolean borderless, JiraIssue issue) {
         super(vertical, borderless);
         this.issueKey = issue.getKey();
         this.projectKey = issue.getProject().getKey();

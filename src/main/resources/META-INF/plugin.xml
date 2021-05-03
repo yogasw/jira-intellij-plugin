@@ -21,7 +21,7 @@
     <depends>com.intellij.tasks</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory"/>
+        <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory" canCloseContents="true"/>
 
         <applicationService serviceImplementation="com.intellij.jira.components.JiraNotificationManager"/>
         <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherApplicationManager"/>
@@ -31,7 +31,6 @@
         <projectService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherObserver"/>
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
-        <projectService serviceImplementation="com.intellij.jira.components.JiraIssueUpdater"/>
 
         <notificationGroup id="Jira Balloon Notifications" displayType="BALLOON" />
         <notificationGroup id="Jira Sticky Balloon Notifications" displayType="STICKY_BALLOON" isLogByDefault="true" />

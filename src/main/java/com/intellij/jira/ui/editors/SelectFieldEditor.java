@@ -3,6 +3,7 @@ package com.intellij.jira.ui.editors;
 import com.intellij.ide.DataManager;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.server.JiraServerManager;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -12,7 +13,6 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -126,7 +126,7 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
         @Nullable
         @Override
         protected JComponent createCenterPanel() {
-            JBPanel panel = new JBPanel(new BorderLayout());
+            JPanel panel = new JiraPanel(new BorderLayout());
             panel.setPreferredSize(JBUI.size(100, 250));
             panel.add(ScrollPaneFactory.createScrollPane(myList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED), CENTER);
 

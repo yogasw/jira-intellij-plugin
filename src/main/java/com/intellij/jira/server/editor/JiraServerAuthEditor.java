@@ -21,7 +21,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import java.awt.BorderLayout;
 import java.net.UnknownHostException;
@@ -102,21 +101,22 @@ public abstract class JiraServerAuthEditor {
 
     private void installListener(JButton button){
         button.addActionListener((event) -> {
-            SwingUtilities.invokeLater(() -> {
+            ApplicationManager.getApplication().invokeLater(() -> {
                 TestJiraServerConnectionTask task = new TestJiraServerConnectionTask(myProject, myServer);
                 ProgressManager.getInstance().run(task);
                 Exception e = task.getException();
                 if (e == null) {
                     Messages.showMessageDialog(myProject, "Connection is successful", "Connection", Messages.getInformationIcon());
-                }
-                else if (!(e instanceof ProcessCanceledException)) {
+                } else if (!(e instanceof ProcessCanceledException)) {
                     String message = e.getMessage();
                     if (e instanceof UnknownHostException) {
                         message = "Unknown host: " + message;
                     }
+
                     if (message == null) {
                         message = "Unknown error";
                     }
+
                     Messages.showErrorDialog(myProject, StringUtil.capitalize(message), "Error");
                 }
             });
