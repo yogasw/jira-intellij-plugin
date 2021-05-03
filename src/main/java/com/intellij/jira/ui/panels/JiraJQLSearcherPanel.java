@@ -9,7 +9,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.CollectionComboBoxModel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +18,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-public class JiraJQLSearcherPanel extends JBPanel implements JQLSearcherEventListener {
+public class JiraJQLSearcherPanel extends JiraPanel implements JQLSearcherEventListener {
 
     private final Project myProject;
     private final JQLSearcherManager myManager;

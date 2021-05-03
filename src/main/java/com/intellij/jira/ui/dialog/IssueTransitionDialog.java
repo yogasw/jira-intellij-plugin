@@ -7,6 +7,7 @@ import com.intellij.jira.rest.model.JiraIssueFieldProperties;
 import com.intellij.jira.rest.model.JiraIssueTransition;
 import com.intellij.jira.tasks.TransitIssueTask;
 import com.intellij.jira.ui.JiraIssueTransitionListModel;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.ui.renders.JiraIssueTransitionListCellRenderer;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
@@ -19,7 +20,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBDimension;
 import com.intellij.util.ui.JBUI;
@@ -78,8 +78,8 @@ public class IssueTransitionDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JBPanel panel = new JBPanel(new BorderLayout());
-        transitionsPanel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
+        transitionsPanel = new JiraPanel(new BorderLayout());
         JBList<JiraIssueTransition> transitionList = new JBList<>();
         transitionList.setEmptyText("No transitions");
         transitionList.setModel(new JiraIssueTransitionListModel(transitions));
@@ -96,12 +96,12 @@ public class IssueTransitionDialog extends DialogWrapper {
 
         transitionsPanel.add(transitionList, BorderLayout.CENTER);
 
-        transitionFieldsPanel = new JBPanel(new GridBagLayout());
+        transitionFieldsPanel = new JiraPanel(new GridBagLayout());
         transitionFieldsPanel.setMinimumSize(JBUI.size(450, 300));
         transitionFieldsPanel.setBorder(JBUI.Borders.empty(5));
         transitionFieldsPanel.add(JiraPanelUtil.createPlaceHolderPanel("Select transition"), new GridBagConstraints());
 
-        transitionPreviewPanel = new JBPanel(new BorderLayout());
+        transitionPreviewPanel = new JiraPanel(new BorderLayout());
         transitionPreviewPanel.setMinimumSize(JBUI.size(100, 300));
 
         panel.add(transitionsPanel, BorderLayout.WEST);
@@ -142,14 +142,14 @@ public class IssueTransitionDialog extends DialogWrapper {
     private void updateTransitionPreviewPanel(JiraIssueTransition transition){
         transitionPreviewPanel.removeAll();
 
-        JBPanel sourceStatusPanel = new JBPanel();
+        JPanel sourceStatusPanel = new JiraPanel();
         sourceStatusPanel.setBorder(JBUI.Borders.empty(5));
         JBLabel sourceStatusLabel = JiraLabelUtil.createStatusLabel(issue.getStatus());
         sourceStatusPanel.add(sourceStatusLabel);
 
         JPanel verticalLinePanel = createPanelWithVerticalLine();
 
-        JBPanel targetStatusPanel = new JBPanel();
+        JPanel targetStatusPanel = new JiraPanel();
         targetStatusPanel.setBorder(JBUI.Borders.empty(5));
         JBLabel targetStatusLabel = JiraLabelUtil.createStatusLabel(transition.getTo());
         targetStatusPanel.add(targetStatusLabel);

@@ -14,7 +14,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -62,7 +61,7 @@ public class JiraIssueDescriptionPanel extends AbstractJiraPanel {
         setBackground(JBColor.WHITE);
         setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
 
-        JPanel issueDetails = new JBPanel().withBackground(JBColor.WHITE).withBorder(JBUI.Borders.empty(5, 5, 1, 5));
+        JPanel issueDetails = new JiraPanel().withBackground(JBColor.WHITE).withBorder(JBUI.Borders.empty(5, 5, 1, 5));
         issueDetails.setLayout(new BoxLayout(issueDetails, Y_AXIS));
 
         // Summary

@@ -1,20 +1,25 @@
 package com.intellij.jira.ui.renders;
 
 import com.intellij.jira.rest.model.JiraIssueAttachment;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraLabelUtil;
-import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
 
 import static com.intellij.jira.util.JiraIssueUtil.getPrettyDateTime;
-import static com.intellij.jira.util.JiraLabelUtil.*;
+import static com.intellij.jira.util.JiraLabelUtil.BOLD;
+import static com.intellij.jira.util.JiraLabelUtil.DARK_ISSUE_ATTACHMENT_COLOR;
+import static com.intellij.jira.util.JiraLabelUtil.ISSUE_ATTACHMENT_COLOR;
+import static com.intellij.jira.util.JiraLabelUtil.ITALIC;
 
 public class JiraIssueAttachmentListCellRenderer extends DefaultJiraListCellRender {
 
@@ -28,13 +33,13 @@ public class JiraIssueAttachmentListCellRenderer extends DefaultJiraListCellRend
     }
 
     private void init() {
-        JPanel issueLinkpanel = new JBPanel(new BorderLayout()).withBorder(JBUI.Borders.empty(4, 5)).andTransparent();
+        JPanel issueLinkpanel = new JiraPanel(new BorderLayout()).withBorder(JBUI.Borders.empty(4, 5)).andTransparent();
         iconAndNameLabel =  JiraLabelUtil.createEmptyLabel().withFont(BOLD);
 
         FlowLayout flowLayout = new FlowLayout(FlowLayout.RIGHT);
         flowLayout.setVgap(0);
 
-        JPanel authorAndCreatePanel = new JBPanel(flowLayout).andTransparent();
+        JPanel authorAndCreatePanel = new JiraPanel(flowLayout).andTransparent();
         createdLabel = JiraLabelUtil.createEmptyLabel().withFont(ITALIC);
         authorLabel = JiraLabelUtil.createEmptyLabel().withFont(BOLD);
 

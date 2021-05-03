@@ -23,14 +23,12 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
@@ -116,7 +114,7 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel {
             JPanel issuesPanel = new JPanel(new BorderLayout());
             issuesPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
 
-            JPanel jqlPanel = new JBPanel(new BorderLayout());
+            JPanel jqlPanel = new JiraPanel(new BorderLayout());
             jqlPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 1, 0));
             jqlPanel.add(new JiraJQLSearcherPanel(myProject), BorderLayout.WEST);
 

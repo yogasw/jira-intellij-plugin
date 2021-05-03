@@ -11,9 +11,9 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +43,7 @@ class JiraIssueLinksPanel extends AbstractJiraPanel {
     }
 
     private void initContent(List<JiraIssueLink> issueLinks) {
-        JBPanel panel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
 
         issueLinkList = new JBList<>();
         issueLinkList.setEmptyText("No links");

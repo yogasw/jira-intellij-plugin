@@ -4,6 +4,7 @@ import com.intellij.jira.server.JiraServer;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.server.editor.JiraServerEditor;
 import com.intellij.jira.tasks.RefreshIssuesTask;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.project.Project;
@@ -17,7 +18,6 @@ import com.intellij.ui.JBSplitter;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.containers.ConcurrentFactoryMap;
 import com.intellij.util.ui.JBUI;
 import icons.TasksCoreIcons;
@@ -158,7 +158,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
             myServersList.setSelectedValue(myServers.getSelectedItem(), true);
         }
 
-        JBPanel myPanel = new JBPanel(new BorderLayout());
+        JPanel myPanel = new JiraPanel(new BorderLayout());
         myPanel.setMinimumSize(JBUI.size(-1, 200));
         myPanel.add(ToolbarDecorator.createDecorator(myServersList)
                         .setAddAction(button -> {

@@ -6,8 +6,8 @@ import com.intellij.jira.ui.renders.JiraIssueSubtaskListCellRender;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class JiraIssueSubtasksPanel extends SimpleToolWindowPanel {
     }
 
     private void initContent(List<JiraIssue> issueSubtasks) {
-        JBPanel panel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
 
         JBList<JiraIssue> subtasks = new JBList<>();
         subtasks.setEmptyText("No sub-tasks");

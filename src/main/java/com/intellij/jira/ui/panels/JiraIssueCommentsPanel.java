@@ -13,10 +13,10 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.util.Objects;
@@ -47,7 +47,7 @@ class JiraIssueCommentsPanel extends AbstractJiraPanel {
     }
 
     private void initContent(JiraIssueCommentsWrapper comments){
-        JBPanel panel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
 
         issueCommentList = new JBList<>();
         issueCommentList.setEmptyText("No comments");

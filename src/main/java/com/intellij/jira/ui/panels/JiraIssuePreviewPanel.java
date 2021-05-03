@@ -17,7 +17,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +73,7 @@ class JiraIssuePreviewPanel extends AbstractJiraPanel {
 
         // Key and updated
         JPanel keyAndUpdatedPanel = JiraPanelUtil.createWhiteGridPanel(1, 2).withBorder(MARGIN_BOTTOM);
-        JPanel issueAndProjectKeyPanel = new JBPanel().withBackground(JBColor.WHITE);
+        JPanel issueAndProjectKeyPanel = new JiraPanel().withBackground(JBColor.WHITE);
         issueAndProjectKeyPanel.setLayout(new BoxLayout(issueAndProjectKeyPanel, X_AXIS));
         JBLabel projectKeyLabel = JiraLabelUtil.createLinkLabel(issue.getProject().getName(), issue.getProject().getUrl());
         JBLabel separatorLabel = JiraLabelUtil.createLabel(" / ");

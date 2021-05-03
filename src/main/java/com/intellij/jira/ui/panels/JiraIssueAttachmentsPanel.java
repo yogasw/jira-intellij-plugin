@@ -12,8 +12,8 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
@@ -44,7 +44,7 @@ public class JiraIssueAttachmentsPanel extends AbstractJiraPanel {
     }
 
     private void initContent(List<JiraIssueAttachment> issueAttachments) {
-        JBPanel panel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
 
         issueAttachmentList = new JBList<>();
         issueAttachmentList.setEmptyText("No attachments");

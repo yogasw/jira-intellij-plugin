@@ -4,10 +4,10 @@ import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
 import com.intellij.jira.tasks.ToggleWatchIssueTask;
+import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
@@ -37,24 +37,26 @@ import static javax.swing.SwingConstants.CENTER;
 
 public class JiraPanelUtil {
 
+    private JiraPanelUtil() { }
+
     public static final Border MARGIN_BOTTOM = JBUI.Borders.emptyBottom(10);
 
-    public static JBPanel createWhiteGridPanel(int rows, int cols){
+    public static JiraPanel createWhiteGridPanel(int rows, int cols){
         return createWhitePanel(new GridLayout(rows, cols));
     }
 
-    public static JBPanel createWhiteBorderPanel(){
+    public static JiraPanel createWhiteBorderPanel(){
         return createWhitePanel(new BorderLayout())
                 .withBorder(MARGIN_BOTTOM);
     }
 
-    public static JBPanel createWhitePanel(@NotNull LayoutManager layout){
-        return new JBPanel(layout)
+    public static JiraPanel createWhitePanel(@NotNull LayoutManager layout){
+        return new JiraPanel(layout)
                 .withBackground(JBColor.WHITE);
     }
 
-    public static JBPanel createPlaceHolderPanel(String text) {
-        JBPanel panel = new JBPanel(new GridBagLayout());
+    public static JiraPanel createPlaceHolderPanel(String text) {
+        JiraPanel panel = new JiraPanel(new GridBagLayout());
         JBLabel messageLabel = new JBLabel(text);
         messageLabel.setHorizontalAlignment(CENTER);
         messageLabel.setVerticalAlignment(CENTER);
@@ -98,8 +100,8 @@ public class JiraPanelUtil {
         return createWhiteBorderPanel(assigneeLabel, assigneeValueLabel);
     }
 
-    public static JBPanel createWatchesPanel(@NotNull JiraIssue issue, @NotNull Project project) {
-        JBPanel watchesPanel = JiraPanelUtil.createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 0)).withBorder(MARGIN_BOTTOM);
+    public static JiraPanel createWatchesPanel(@NotNull JiraIssue issue, @NotNull Project project) {
+        JiraPanel watchesPanel = JiraPanelUtil.createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 0)).withBorder(MARGIN_BOTTOM);
         JBLabel watchesLabel = JiraLabelUtil.createBoldLabel("Watchers: ");
         JBLabel watchesValueLabel = JiraLabelUtil.createLabel(issue.getWatches().getWatchCount() + " ");
         boolean isWatching = issue.getWatches().isWatching();
@@ -122,21 +124,21 @@ public class JiraPanelUtil {
         return watchesPanel;
     }
 
-    public static JBPanel createVersionsPanel(@NotNull JiraIssue issue) {
+    public static JiraPanel createVersionsPanel(@NotNull JiraIssue issue) {
         JBLabel versionsLabel = JiraLabelUtil.createBoldLabel("Versions: ");
         JBLabel versionsValueLabel = JiraLabelUtil.createLabel(getVersionsNames(issue.getVersions()));
 
         return createWhiteBorderPanel(versionsLabel, versionsValueLabel);
     }
 
-    public static JBPanel createComponentsPanel(@NotNull JiraIssue issue) {
+    public static JiraPanel createComponentsPanel(@NotNull JiraIssue issue) {
         JBLabel componentsLabel = JiraLabelUtil.createBoldLabel("Components: ");
         JBLabel componentsValueLabel = JiraLabelUtil.createLabel(getComponentNames(issue.getComponents()));
 
         return createWhiteBorderPanel(componentsLabel, componentsValueLabel);
     }
 
-    public static JBPanel createLabelsPanel(@NotNull JiraIssue issue) {
+    public static JiraPanel createLabelsPanel(@NotNull JiraIssue issue) {
         JBLabel label = JiraLabelUtil.createBoldLabel("Labels: ");
         JBLabel valueLabel = JiraLabelUtil.createLabel(String.join(", ", issue.getLabels()));
 
@@ -158,8 +160,8 @@ public class JiraPanelUtil {
         };
     }
 
-    private static JBPanel createWhiteBorderPanel(JLabel fieldName, JLabel fieldValue) {
-        JBPanel panel = createWhiteBorderPanel();
+    private static JiraPanel createWhiteBorderPanel(JLabel fieldName, JLabel fieldValue) {
+        JiraPanel panel = createWhiteBorderPanel();
         panel.add(fieldName, LINE_START);
         panel.add(fieldValue, BorderLayout.CENTER);
 

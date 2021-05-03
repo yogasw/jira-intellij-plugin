@@ -13,9 +13,9 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
@@ -49,7 +49,7 @@ class JiraIssueWorkLogsPanel extends AbstractJiraPanel {
     }
 
     private void initContent(List<JiraIssueWorklog> worklogs){
-        JBPanel panel = new JBPanel(new BorderLayout());
+        JPanel panel = new JiraPanel(new BorderLayout());
 
         issueWorklogList = new JBList<>();
         issueWorklogList.setEmptyText("No work logs");
