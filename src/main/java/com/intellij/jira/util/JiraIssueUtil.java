@@ -17,6 +17,9 @@ public class JiraIssueUtil {
 
     private static final Pattern BODY_NAME_PATTERN = Pattern.compile("(\\[~(\\w+)])");
 
+    private JiraIssueUtil() { }
+
+    @NotNull
     public static String getAssignee(@NotNull JiraIssue jiraIssue) {
         JiraIssueUser assignedUser = jiraIssue.getAssignee();
         if (isNull(assignedUser) || isNull(assignedUser.getEmailAddress())) {
@@ -29,10 +32,12 @@ public class JiraIssueUtil {
         return index >= 0 ? useremail.substring(0, index) : EMPTY_TEXT;
     }
 
+    @NotNull
     public static String getIssueType(@NotNull JiraIssue jiraIssue) {
         return nonNull(jiraIssue.getIssuetype()) ? jiraIssue.getIssuetype().getName() : EMPTY_TEXT;
     }
 
+    @NotNull
     public static String getPriority(@NotNull JiraIssue jiraIssue) {
         return nonNull(jiraIssue.getPriority()) ? jiraIssue.getPriority().getName() : EMPTY_TEXT;
     }

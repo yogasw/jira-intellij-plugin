@@ -42,9 +42,22 @@ public class ColumnInfoHelper {
 
     @NotNull
     public ColumnInfo[] generateColumnsInfo(List<JiraIssue> issues) {
-        return new ColumnInfo[]{ new KeyColumnInfo(issues),
+        String myMaxKeySize = "";
+        String myMaxAssigneeSize = "";
+        for (JiraIssue issue : issues) {
+            if (issue.getKey().length() > myMaxKeySize.length()) {
+                myMaxKeySize = issue.getKey();
+            }
+
+            String assignee = getAssignee(issue);
+            if (assignee.length() > myMaxAssigneeSize.length()) {
+                myMaxAssigneeSize = assignee;
+            }
+        }
+
+        return new ColumnInfo[]{ new KeyColumnInfo(myMaxKeySize),
                                 new SummaryColumnInfo(),
-                                new AssigneeColumnInfo(),
+                                new AssigneeColumnInfo(myMaxAssigneeSize),
                                 new IssueTypeColumnInfo(),
                                 new PriorityColumnInfo(),
                                 new StatusColumnInfo(),
@@ -93,16 +106,11 @@ public class ColumnInfoHelper {
 
     private static class KeyColumnInfo extends JiraIssueColumnInfo{
 
-        private String myMaxString = "";
+        private final String myMaxKeySize;
 
-        KeyColumnInfo(List<JiraIssue> issues) {
+        KeyColumnInfo(String maxKeySize) {
             super(KEY_COLUMN);
-
-            for (JiraIssue issue : issues) {
-                if (issue.getKey().length() > myMaxString.length()) {
-                    this.myMaxString = issue.getKey();
-                }
-            }
+            this.myMaxKeySize = maxKeySize;
         }
 
         @Nullable
@@ -114,7 +122,7 @@ public class ColumnInfoHelper {
         @Nullable
         @Override
         public String getMaxStringValue() {
-            return this.myMaxString;
+            return this.myMaxKeySize;
         }
 
         @Override
@@ -157,8 +165,11 @@ public class ColumnInfoHelper {
 
     private static class AssigneeColumnInfo extends JiraIssueColumnInfo {
 
-        AssigneeColumnInfo() {
+        private final String myMaxAssigneeSize;
+
+        AssigneeColumnInfo(String maxAssigneeSize) {
             super(ASSIGNEE_COLUMN);
+            this.myMaxAssigneeSize = maxAssigneeSize;
         }
 
         @Nullable
@@ -170,12 +181,12 @@ public class ColumnInfoHelper {
         @Nullable
         @Override
         public String getMaxStringValue() {
-            return "";
+            return this.myMaxAssigneeSize;
         }
 
         @Override
         public int getAdditionalWidth() {
-            return 70;
+            return UIUtil.DEFAULT_HGAP;
         }
 
     }
