@@ -8,6 +8,7 @@ import com.intellij.jira.rest.model.JiraIssueTransition;
 import com.intellij.jira.tasks.TransitIssueTask;
 import com.intellij.jira.ui.JiraIssueTransitionListModel;
 import com.intellij.jira.ui.panels.JiraPanel;
+import com.intellij.jira.ui.panels.JiraTransitionTaskPanel;
 import com.intellij.jira.ui.renders.JiraIssueTransitionListCellRenderer;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
@@ -47,8 +48,8 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class IssueTransitionDialog extends DialogWrapper {
 
-    private Project project;
-    private JiraIssue issue;
+    private final Project project;
+    private final JiraIssue issue;
 
     private List<JiraIssueTransition> transitions;
     private JiraIssueTransition selectedIssueTransition;
@@ -57,10 +58,12 @@ public class IssueTransitionDialog extends DialogWrapper {
     private JPanel transitionFieldsPanel;
     private JPanel transitionPreviewPanel;
 
+    private JiraTransitionTaskPanel jiraTransitionTaskPanel;
+
     private Map<String, FieldEditorInfo> transitionFields = new HashMap<>();
 
 
-    public IssueTransitionDialog(@Nullable Project project, @NotNull JiraIssue issue, List<JiraIssueTransition> transitions) {
+    public IssueTransitionDialog(@NotNull Project project, @NotNull JiraIssue issue, List<JiraIssueTransition> transitions) {
         super(project, false);
         this.project = project;
         this.issue = issue;
@@ -87,12 +90,12 @@ public class IssueTransitionDialog extends DialogWrapper {
         transitionList.setSelectionMode(SINGLE_SELECTION);
         transitionList.setPreferredSize(new JBDimension(100, 300));
         transitionList.setBorder(BorderFactory.createLineBorder(JBColor.border()));
-        transitionList.addListSelectionListener(e -> {
+        transitionList.addListSelectionListener(e ->
             ApplicationManager.getApplication().invokeLater(() -> {
                     updateTransitionFieldPanel(transitionList.getSelectedValue());
                     updateTransitionPreviewPanel(transitionList.getSelectedValue());
-                });
-        });
+                })
+        );
 
         transitionsPanel.add(transitionList, BorderLayout.CENTER);
 
@@ -109,7 +112,13 @@ public class IssueTransitionDialog extends DialogWrapper {
         panel.add(transitionPreviewPanel, BorderLayout.EAST);
         panel.setMinimumSize(JBUI.size(650, 300));
 
-        return panel;
+        jiraTransitionTaskPanel = new JiraTransitionTaskPanel(project, issue);
+
+        return FormBuilder.createFormBuilder()
+                .addComponent(panel)
+                .addSeparator()
+                .addComponent(jiraTransitionTaskPanel)
+                .getPanel();
     }
 
     private void updateTransitionFieldPanel(JiraIssueTransition transition) {
