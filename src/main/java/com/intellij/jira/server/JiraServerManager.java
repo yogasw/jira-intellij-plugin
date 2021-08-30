@@ -4,7 +4,10 @@ import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.credentialStore.Credentials;
 import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.jira.util.SimpleSelectableList;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
@@ -30,7 +33,7 @@ public class JiraServerManager implements PersistentStateComponent<JiraServerMan
     private Config myConfig = new Config();
 
     public static JiraServerManager getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, JiraServerManager.class);
+        return project.getService(JiraServerManager.class);
     }
 
     @Nullable

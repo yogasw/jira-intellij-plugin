@@ -2,7 +2,10 @@ package com.intellij.jira.components;
 
 import com.intellij.configurationStore.XmlSerializer;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializationException;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -34,7 +37,7 @@ public class JQLSearcherProjectManager implements PersistentStateComponent<JQLSe
     }
 
     public static JQLSearcherProjectManager getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, JQLSearcherProjectManager.class);
+        return project.getService(JQLSearcherProjectManager.class);
     }
 
     @Nullable

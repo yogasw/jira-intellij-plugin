@@ -3,7 +3,10 @@ package com.intellij.jira.components;
 import com.intellij.configurationStore.XmlSerializer;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.util.xmlb.XmlSerializationException;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Tag;
@@ -86,7 +89,7 @@ public class JQLSearcherApplicationManager implements PersistentStateComponent<J
     }
 
     public static JQLSearcherApplicationManager getInstance() {
-        return ServiceManager.getService(JQLSearcherApplicationManager.class);
+        return ApplicationManager.getApplication().getService(JQLSearcherApplicationManager.class);
     }
 
     public static class Config{

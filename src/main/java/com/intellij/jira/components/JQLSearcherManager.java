@@ -2,7 +2,7 @@ package com.intellij.jira.components;
 
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.util.SimpleSelectableList;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +16,7 @@ import static java.util.Objects.isNull;
 public class JQLSearcherManager {
 
     public static JQLSearcherManager getInstance(){
-        return ServiceManager.getService(JQLSearcherManager.class);
+        return ApplicationManager.getApplication().getService(JQLSearcherManager.class);
     }
 
     public List<JQLSearcher> getSearchers(Project project) {
