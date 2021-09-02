@@ -8,7 +8,7 @@ import com.intellij.jira.rest.model.JiraIssueTransition;
 import com.intellij.jira.tasks.TransitIssueTask;
 import com.intellij.jira.ui.JiraIssueTransitionListModel;
 import com.intellij.jira.ui.panels.JiraPanel;
-import com.intellij.jira.ui.panels.JiraTransitionTaskPanel;
+import com.intellij.jira.ui.panels.JiraTransitionTaskEditor;
 import com.intellij.jira.ui.renders.JiraIssueTransitionListCellRenderer;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
@@ -58,7 +58,7 @@ public class IssueTransitionDialog extends DialogWrapper {
     private JPanel transitionFieldsPanel;
     private JPanel transitionPreviewPanel;
 
-    private JiraTransitionTaskPanel jiraTransitionTaskPanel;
+    private JiraTransitionTaskEditor jiraTransitionTaskEditor;
 
     private Map<String, FieldEditorInfo> transitionFields = new HashMap<>();
 
@@ -112,12 +112,11 @@ public class IssueTransitionDialog extends DialogWrapper {
         panel.add(transitionPreviewPanel, BorderLayout.EAST);
         panel.setMinimumSize(JBUI.size(650, 300));
 
-        jiraTransitionTaskPanel = new JiraTransitionTaskPanel(project, issue);
+        jiraTransitionTaskEditor = new JiraTransitionTaskEditor(project, issue);
 
         return FormBuilder.createFormBuilder()
                 .addComponent(panel)
-                .addSeparator()
-                .addComponent(jiraTransitionTaskPanel)
+                .addComponent(jiraTransitionTaskEditor.createPanel())
                 .getPanel();
     }
 
@@ -214,13 +213,14 @@ public class IssueTransitionDialog extends DialogWrapper {
 
         }
 
-        return null;
+        return jiraTransitionTaskEditor.validate();
     }
 
 
     @Override
     protected void doOKAction() {
-        if(nonNull(project)){
+        if (nonNull(project)) {
+            jiraTransitionTaskEditor.doTask();
             new TransitIssueTask(project, issue.getId(), selectedIssueTransition.getId(), transitionFields).queue();
         }
 
@@ -234,6 +234,5 @@ public class IssueTransitionDialog extends DialogWrapper {
             return this;
         }
     }
-
 
 }
