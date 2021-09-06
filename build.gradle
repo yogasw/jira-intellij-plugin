@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.intellij' version '0.7.2'
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -33,14 +33,13 @@ intellij {
     version ideaVersion
     println "Building for IntelliJ version: ${version}"
 
-    plugins 'tasks'
+    plugins = ['tasks']
 }
 
 patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Support 2021.2+</li>
-        <li>Fix key and assignee column width</li>
+        <li>New feature: posibility to create changelist on transit dialog</li>
       </ul>"""
 }

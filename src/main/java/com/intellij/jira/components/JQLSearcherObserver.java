@@ -4,8 +4,6 @@ import com.intellij.jira.events.JQLSearcherEventListener;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.panels.JiraJQLSearcherPanel;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +34,7 @@ public class JQLSearcherObserver implements Updater<JQLSearcher>, Disposable {
     }
 
     public static JQLSearcherObserver getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, JQLSearcherObserver.class);
+        return project.getService(JQLSearcherObserver.class);
     }
 
     @Override
