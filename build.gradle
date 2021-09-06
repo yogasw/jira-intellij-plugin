@@ -40,7 +40,6 @@ patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Support 2021.2+</li>
-        <li>Fix key and assignee column width</li>
+        <li>New feature: posibility to create changelist on transit dialog</li>
       </ul>"""
 }
