@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
@@ -112,7 +113,6 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel {
             issueTable.getSelectionModel().addListSelectionListener(event ->  this.issueDetailsPanel.showIssue(issueTable.getSelectedObject()));
 
             JPanel issuesPanel = new JPanel(new BorderLayout());
-            issuesPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
 
             JPanel jqlPanel = new JiraPanel(new BorderLayout());
             jqlPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 1, 0));
@@ -122,12 +122,9 @@ public class JiraIssuesPanel extends SimpleToolWindowPanel {
             issuesPanel.add(ScrollPaneFactory.createScrollPane(issueTable), BorderLayout.CENTER);
 
 
-            JBSplitter splitter = new JBSplitter();
-            splitter.setProportion(0.6f);
+            JBSplitter splitter = new OnePixelSplitter(0.6f);
             splitter.setFirstComponent(issuesPanel);
             splitter.setSecondComponent(issueDetailsPanel);
-            splitter.setShowDividerIcon(false);
-            splitter.setDividerWidth(1);
 
             content = splitter;
         }

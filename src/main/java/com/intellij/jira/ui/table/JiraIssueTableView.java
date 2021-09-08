@@ -3,9 +3,9 @@ package com.intellij.jira.ui.table;
 import com.intellij.jira.helper.ColumnInfoHelper;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.ui.table.TableView;
+import com.intellij.util.ui.JBUI;
 
 import javax.swing.table.TableColumnModel;
-import java.awt.*;
 import java.util.List;
 
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
@@ -19,9 +19,10 @@ public class JiraIssueTableView extends TableView<JiraIssue> {
         model = new JiraIssueListTableModel(issues);
         setModelAndUpdateColumns(model);
         setSelectionMode(SINGLE_SELECTION);
-        setIntercellSpacing(new Dimension());
+        setIntercellSpacing(JBUI.emptySize());
         setShowGrid(false);
         setRowHeight(25);
+        setTableHeader(new InvisibleResizableHeader());
     }
 
 

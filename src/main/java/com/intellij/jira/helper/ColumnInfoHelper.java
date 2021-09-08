@@ -205,7 +205,7 @@ public class ColumnInfoHelper {
 
     }
 
-    private static class PriorityColumnInfo extends AbstractColumnInfo{
+    private static class PriorityColumnInfo extends AbstractColumnInfo {
 
         PriorityColumnInfo() {
             super(PRIORITY_COLUMN);

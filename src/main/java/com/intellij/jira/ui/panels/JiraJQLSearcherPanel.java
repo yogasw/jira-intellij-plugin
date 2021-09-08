@@ -9,7 +9,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.CollectionComboBoxModel;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.BorderLayout;
@@ -36,8 +35,6 @@ public class JiraJQLSearcherPanel extends JiraPanel implements JQLSearcherEventL
     }
 
     private void init() {
-        setBorder(JBUI.Borders.empty(2, 4));
-
         myComboBoxItems = new CollectionComboBoxModel(new ArrayList());
         for(JQLSearcher searcher : myManager.getSearchers(myProject)){
             JQLSearcher clone = searcher.clone();
