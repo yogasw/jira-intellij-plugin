@@ -1,8 +1,8 @@
 package com.intellij.jira.ui.renders;
 
 import com.intellij.jira.ui.panels.JiraPanel;
-import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 
@@ -30,18 +30,15 @@ public class JiraIssueStatusTableCellRenderer extends JiraIssueTableCellRenderer
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        Component label = super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
+        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        JiraPanel panel = new JiraPanel(new BorderLayout()).withBackground(label.getBackground());
-        if(!isSelected){
-            panel.withBackground(JiraLabelUtil.getBgRowColor());
-        }
+        JiraPanel panel = new JiraPanel(new BorderLayout()).withBackground(getBackground());
 
         setText(StringUtil.toUpperCase(statusName));
         setBackground(statusCategoryColor);
-        setForeground(isInProgressCategory ? IN_PROGRESS_TEXT_COLOR : Color.white);
+        setForeground(isInProgressCategory ? IN_PROGRESS_TEXT_COLOR : JBColor.WHITE);
         setFont(JBFont.create(new Font("SansSerif", Font.BOLD, 8)));
-        setBorder(JBUI.Borders.empty(4, 3));
+        setBorder(JBUI.Borders.empty(4, 5));
 
         panel.setBorder(JBUI.Borders.empty(4, 3));
         panel.add(this, LINE_START);

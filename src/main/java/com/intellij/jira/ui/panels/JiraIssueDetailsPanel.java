@@ -5,9 +5,10 @@ import com.intellij.jira.ui.JiraTabbedPane;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,13 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
     private final Project myProject;
     private final Map<String, Integer> data = new HashMap<>();
 
+    private JiraIssuePreviewPanel myJiraIssuePreviewPanel;
+    private JiraIssueAttachmentsPanel myJiraIssueAttachmentsPanel;
+    private JiraIssueLinksPanel myJiraIssueLinksPanel;
+    private JiraIssueSubtasksPanel myJiraIssueSubtasksPanel;
+    private JiraIssueCommentsPanel myJiraIssueCommentsPanel;
+    private JiraIssueWorkLogsPanel myJiraIssueWorkLogsPanel;
+
     public JiraIssueDetailsPanel(Project project){
         super(true);
         this.myProject = project;
@@ -33,16 +41,24 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
     }
 
     public void showIssue(@Nullable JiraIssue issue) {
-        if(isNull(issue)){
+        if (isNull(issue)) {
             setEmptyContent();
-        }else{
+        } else {
+
+            myJiraIssuePreviewPanel = new JiraIssuePreviewPanel(myProject, issue);
+            myJiraIssueAttachmentsPanel = new JiraIssueAttachmentsPanel(issue);
+            myJiraIssueLinksPanel = new JiraIssueLinksPanel(issue);
+            myJiraIssueSubtasksPanel = new JiraIssueSubtasksPanel(issue);
+            myJiraIssueCommentsPanel = new JiraIssueCommentsPanel(issue);
+            myJiraIssueWorkLogsPanel = new JiraIssueWorkLogsPanel(issue);
+
             JiraTabbedPane tabbedPane = new JiraTabbedPane(JTabbedPane.BOTTOM);
-            tabbedPane.addTab(TAB_PREVIEW, new JiraIssuePreviewPanel(myProject, issue));
-            tabbedPane.addTab(TAB_ATTACHMENTS + appendTotal(issue.getAttachments().size()), new JiraIssueAttachmentsPanel(issue));
-            tabbedPane.addTab(TAB_LINKS + appendTotal(issue.getIssueLinks().size()), new JiraIssueLinksPanel(issue));
-            tabbedPane.addTab(TAB_SUB_TASKS + appendTotal(issue.getSubtasks().size()), new JiraIssueSubtasksPanel(issue));
-            tabbedPane.addTab(TAB_COMMENTS + appendTotal(issue.getRenderedComments().getTotal()), new JiraIssueCommentsPanel(issue));
-            tabbedPane.addTab(TAB_WORK_LOG + appendTotal(issue.getWorklogs().size()), new JiraIssueWorkLogsPanel(issue));
+            tabbedPane.addTab(TAB_PREVIEW, myJiraIssuePreviewPanel);
+            tabbedPane.addTab(TAB_ATTACHMENTS + appendTotal(issue.getAttachments().size()), myJiraIssueAttachmentsPanel);
+            tabbedPane.addTab(TAB_LINKS + appendTotal(issue.getIssueLinks().size()), myJiraIssueLinksPanel);
+            tabbedPane.addTab(TAB_SUB_TASKS + appendTotal(issue.getSubtasks().size()), myJiraIssueSubtasksPanel);
+            tabbedPane.addTab(TAB_COMMENTS + appendTotal(issue.getRenderedComments().getTotal()), myJiraIssueCommentsPanel);
+            tabbedPane.addTab(TAB_WORK_LOG + appendTotal(issue.getWorklogs().size()), myJiraIssueWorkLogsPanel);
 
             tabbedPane.addChangeListener(e -> data.put(TAB_KEY, tabbedPane.getSelectedIndex()));
             tabbedPane.setSelectedIndex(data.getOrDefault(TAB_KEY, 0));
@@ -59,4 +75,13 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
     private String appendTotal(int total) {
         return total > 0 ? " (" + total + ") " : " ";
     }
+
+    public void setToolbarHeightReferent(@NotNull JComponent referent) {
+        myJiraIssuePreviewPanel.setToolbarHeightReferent(referent);
+        myJiraIssueAttachmentsPanel.setToolbarHeightReferent(referent);
+        myJiraIssueLinksPanel.setToolbarHeightReferent(referent);
+        myJiraIssueCommentsPanel.setToolbarHeightReferent(referent);
+        myJiraIssueWorkLogsPanel.setToolbarHeightReferent(referent);
+    }
+
 }

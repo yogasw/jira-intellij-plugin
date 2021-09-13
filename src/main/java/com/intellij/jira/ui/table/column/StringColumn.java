@@ -1,0 +1,33 @@
+package com.intellij.jira.ui.table.column;
+
+import com.intellij.jira.ui.renders.JiraIssueTableCellRenderer;
+import com.intellij.util.ui.UIUtil;
+
+import javax.swing.table.TableCellRenderer;
+
+public abstract class StringColumn<T> extends JiraIssueColumn<T, String> {
+
+    public final TableCellRenderer DEFAULT_JIRA_ISSUE_TABLE_CELL_RENDERER = new JiraIssueTableCellRenderer();
+
+    protected StringColumn(String id, String name) {
+        super(id, name);
+    }
+
+    protected StringColumn(String id, String name, boolean resizable) {
+        super(id, name, resizable);
+    }
+
+    protected StringColumn(String id, String name, boolean resizable, boolean hideable) {
+        super(id, name, resizable, hideable);
+    }
+
+    @Override
+    public TableCellRenderer getRenderer(T t) {
+        return DEFAULT_JIRA_ISSUE_TABLE_CELL_RENDERER;
+    }
+
+    @Override
+    public int getAdditionalWidth() {
+        return UIUtil.DEFAULT_HGAP;
+    }
+}
