@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.AddWorklogDialogAction;
 import com.intellij.jira.actions.DeleteWorklogDialogAction;
 import com.intellij.jira.actions.EditWorklogDialogAction;
@@ -14,6 +15,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -41,11 +43,23 @@ class JiraIssueWorkLogsPanel extends AbstractJiraToolWindowPanel {
     @Override
     public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new AddWorklogDialogAction(issueKey, projectKey, () -> timeTracking));
-        group.add(new EditWorklogDialogAction(issueKey, projectKey, () -> worklog, () -> timeTracking));
-        group.add(new DeleteWorklogDialogAction(issueKey, () -> worklog, () -> timeTracking));
+        group.add(new AddWorklogDialogAction());
+        group.add(new EditWorklogDialogAction());
+        group.add(new DeleteWorklogDialogAction());
 
         return group;
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull String dataId) {
+        if (JiraDataKeys.ISSUE_WORKLOG.is(dataId)
+                && Objects.nonNull(issueWorklogList.getSelectedValue())) {
+            return worklog;
+        } else if (JiraDataKeys.ISSUE_TIME_TRACKING.is(dataId)) {
+            return timeTracking;
+        }
+
+        return super.getData(dataId);
     }
 
     private void initContent(List<JiraIssueWorklog> worklogs){
@@ -69,7 +83,6 @@ class JiraIssueWorkLogsPanel extends AbstractJiraToolWindowPanel {
         JiraIssueWorklog selectedWorklog = issueWorklogList.getSelectedValue();
         if(!Objects.equals(worklog, selectedWorklog)){
             worklog = selectedWorklog;
-            initToolbar();
         }
     }
 

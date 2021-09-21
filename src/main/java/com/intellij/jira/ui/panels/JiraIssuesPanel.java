@@ -1,5 +1,7 @@
 package com.intellij.jira.ui.panels;
 
+import com.google.common.util.concurrent.SettableFuture;
+import com.intellij.jira.JiraUiDataKeys;
 import com.intellij.jira.listener.JiraIssueChangeListener;
 import com.intellij.jira.listener.JiraIssuesRefreshedListener;
 import com.intellij.jira.rest.model.JiraIssue;
@@ -8,6 +10,7 @@ import com.intellij.jira.ui.table.JiraIssueListTableModel;
 import com.intellij.jira.ui.table.JiraIssueTable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -16,16 +19,21 @@ import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.messages.MessageBusConnection;
 import net.miginfocom.swing.MigLayout;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Future;
 
 import static java.util.Objects.nonNull;
 
-public class JiraIssuesPanel extends JiraPanel {
+public class JiraIssuesPanel extends JiraPanel implements DataProvider {
 
     private final JComponent myToolbar;
     private final JiraIssueTable myJiraIssueTable;
@@ -62,6 +70,15 @@ public class JiraIssuesPanel extends JiraPanel {
 
     }
 
+    @Override
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
+        if (JiraUiDataKeys.ISSUES_PANEL.is(dataId)) {
+            return this;
+        }
+
+        return null;
+    }
+
     @NotNull
     private JComponent createActionsToolbar(@NotNull Project project) {
         DefaultActionGroup toolbarGroup = new DefaultActionGroup();
@@ -79,6 +96,24 @@ public class JiraIssuesPanel extends JiraPanel {
         panel.add(toolbar.getComponent());
 
         return panel;
+    }
+
+    public JiraIssueTable getJiraIssueTable() {
+        return myJiraIssueTable;
+    }
+
+    public Future goToIssue(String issueKey) {
+        SettableFuture<Boolean> future = SettableFuture.create();
+        future.set(false);
+        Optional<JiraIssue> targetIssue = myJiraIssueTable.getItems().stream().filter(issue -> Objects.equals(issue.getKey(), issueKey)).findFirst();
+        if(targetIssue.isPresent()){
+            future.set(true);
+            myJiraIssueTable.addSelection(targetIssue.get());
+            myJiraIssueTable.scrollRectToVisible(myJiraIssueTable.getCellRect(myJiraIssueTable.getSelectedRow(), myJiraIssueTable.getSelectedColumn(), true));
+            myJiraIssueDetailsPanel.showIssue(targetIssue.get());
+        }
+
+        return future;
     }
 
 

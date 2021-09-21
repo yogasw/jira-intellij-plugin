@@ -1,9 +1,9 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.panels.JiraIssuePanel;
-import com.intellij.jira.util.factory.JiraIssueFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -21,11 +21,9 @@ import static java.util.Objects.nonNull;
 public class OpenNewJiraTabAction extends JiraIssueAction {
 
     private static final ActionProperties properties = ActionProperties.of("Open Issue in Tab", AllIcons.Actions.OpenNewTab);
-    private final JiraIssueFactory issue;
 
-    public OpenNewJiraTabAction(JiraIssueFactory factory) {
+    public OpenNewJiraTabAction() {
         super(properties);
-        this.issue = factory;
     }
 
     @Override
@@ -37,7 +35,7 @@ public class OpenNewJiraTabAction extends JiraIssueAction {
             ToolWindow jiraToolWindow = toolWindowManager.getToolWindow(TOOL_WINDOW_ID);
             ContentManager contentManager = jiraToolWindow.getContentManager();
 
-            JiraIssue issue = this.issue.create();
+            JiraIssue issue = e.getRequiredData(JiraDataKeys.ISSUE);
             Content content = contentManager.findContent(issue.getKey()); // Avoid creates same content
             if (Objects.isNull(content)) {
                 JiraIssuePanel jiraIssuePanel = new JiraIssuePanel(project, issue);
@@ -53,6 +51,6 @@ public class OpenNewJiraTabAction extends JiraIssueAction {
 
     @Override
     public void update(AnActionEvent e) {
-        e.getPresentation().setEnabled(nonNull(issue.create()));
+        e.getPresentation().setEnabled(nonNull(e.getData(JiraDataKeys.ISSUE)));
     }
 }

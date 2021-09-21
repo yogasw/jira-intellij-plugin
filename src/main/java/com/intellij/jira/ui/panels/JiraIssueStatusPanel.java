@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
 import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
@@ -15,9 +16,11 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
 import static java.awt.BorderLayout.CENTER;
@@ -41,11 +44,20 @@ public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
     @Override
     public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new TransitIssueDialogAction(() -> issue));
-        group.add(new JiraIssueAssigneePopupAction(() -> issue));
-        group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
+        group.add(new TransitIssueDialogAction());
+        group.add(new JiraIssueAssigneePopupAction());
+        group.add(new JiraIssuePrioritiesPopupAction());
 
         return group;
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
+        if (JiraDataKeys.ISSUE.is(dataId)) {
+            return issue;
+        }
+
+        return super.getData(dataId);
     }
 
     private void init() {

@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.AddIssueAttachmentDialogAction;
 import com.intellij.jira.actions.DeleteIssueAttachmentDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
@@ -12,6 +13,8 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -36,11 +39,21 @@ public class JiraIssueAttachmentsPanel extends AbstractJiraToolWindowPanel {
     @Override
     public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new AddIssueAttachmentDialogAction(issueKey));
-        group.add(new DeleteIssueAttachmentDialogAction(issueKey, () -> issueAttachment));
-        group.add(new OpenAttachmentInBrowserAction(() -> issueAttachment));
+        group.add(new AddIssueAttachmentDialogAction());
+        group.add(new DeleteIssueAttachmentDialogAction());
+        group.add(new OpenAttachmentInBrowserAction());
 
         return group;
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull String dataId) {
+        if (JiraDataKeys.ISSUE_ATTACHMENT.is(dataId)
+                && Objects.nonNull(issueAttachmentList.getSelectedValue())) {
+            return  issueAttachment;
+        }
+
+        return super.getData(dataId);
     }
 
     private void initContent(List<JiraIssueAttachment> issueAttachments) {
@@ -64,7 +77,6 @@ public class JiraIssueAttachmentsPanel extends AbstractJiraToolWindowPanel {
         JiraIssueAttachment selectedAttachment = issueAttachmentList.getSelectedValue();
         if(!Objects.equals(issueAttachment, selectedAttachment)){
             issueAttachment = selectedAttachment;
-            initToolbar();
         }
     }
 

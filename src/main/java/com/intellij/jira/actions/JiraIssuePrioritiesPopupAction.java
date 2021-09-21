@@ -1,12 +1,12 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssuePriority;
-import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.server.JiraRestApi;
+import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.popup.JiraIssuePrioritiesPopup;
-import com.intellij.jira.util.factory.JiraIssueFactory;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -18,11 +18,9 @@ import static java.util.Objects.nonNull;
 
 public class JiraIssuePrioritiesPopupAction extends JiraIssueAction {
     private static final ActionProperties properties = ActionProperties.of("Change priority",  AllIcons.Ide.UpDown);
-    private JiraIssueFactory issue;
 
-    public JiraIssuePrioritiesPopupAction(JiraIssueFactory factory) {
+    public JiraIssuePrioritiesPopupAction() {
         super(properties);
-        this.issue = factory;
     }
 
     @Override
@@ -38,7 +36,7 @@ public class JiraIssuePrioritiesPopupAction extends JiraIssueAction {
            return;
         }
 
-        JiraIssue issue = this.issue.create();
+        JiraIssue issue = e.getRequiredData(JiraDataKeys.ISSUE);
         List<JiraIssuePriority> priorities = jiraRestApi.getIssuePriorities();
 
         JiraIssuePrioritiesPopup popup = new JiraIssuePrioritiesPopup(createActionGroup(priorities, issue), project);
@@ -48,7 +46,7 @@ public class JiraIssuePrioritiesPopupAction extends JiraIssueAction {
 
     @Override
     public void update(AnActionEvent e) {
-        e.getPresentation().setEnabled(nonNull(issue.create()));
+        e.getPresentation().setEnabled(nonNull(e.getData(JiraDataKeys.ISSUE)));
     }
 
     private ActionGroup createActionGroup(List<JiraIssuePriority> priorities, JiraIssue issue) {

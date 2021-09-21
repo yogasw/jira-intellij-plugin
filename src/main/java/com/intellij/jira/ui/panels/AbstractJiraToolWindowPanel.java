@@ -1,12 +1,15 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.components.panels.Wrapper;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -32,6 +35,17 @@ public abstract class AbstractJiraToolWindowPanel extends SimpleToolWindowPanel 
         this.projectKey = issue.getProject().getKey();
 
         initToolbar();
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
+        if (JiraDataKeys.ISSUE_KEY.is(dataId)) {
+            return issueKey;
+        } else if (JiraDataKeys.PROJECT_KEY.is(dataId)) {
+            return projectKey;
+        }
+
+        return super.getData(dataId);
     }
 
     public void initToolbar(){

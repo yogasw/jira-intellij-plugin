@@ -1,6 +1,7 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.actions.ChangeListActionGroup;
+import com.intellij.jira.JiraDataKeys;
+import com.intellij.jira.actions.ChangelistActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.listener.JiraIssueChangeListener;
 import com.intellij.jira.listener.JiraIssuesRefreshedListener;
@@ -17,17 +18,14 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 
-import static com.intellij.jira.util.JiraLabelUtil.BOLD;
-import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
-import static com.intellij.jira.util.JiraLabelUtil.WHITE;
+import static com.intellij.jira.util.JiraLabelUtil.*;
 import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.PAGE_START;
@@ -52,9 +50,18 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
     @Override
     public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new ChangeListActionGroup(() -> issue));
+        group.add(new ChangelistActionGroup());
 
         return group;
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
+        if (JiraDataKeys.ISSUE.is(dataId)) {
+            return issue;
+        }
+
+        return super.getData(dataId);
     }
 
     private void init() {

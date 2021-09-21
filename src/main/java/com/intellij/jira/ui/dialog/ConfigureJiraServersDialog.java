@@ -76,7 +76,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
 
         myServers = new SimpleSelectableList<>();
 
-        CollectionListModel listModel = new CollectionListModel(new ArrayList());
+        CollectionListModel listModel = new CollectionListModel<>(new ArrayList());
         for(JiraServer server : myManager.getJiraServers()){
             JiraServer clone = server.clone();
             listModel.add(clone);
@@ -86,7 +86,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         myServers.selectItem(myManager.getSelectedJiraServerIndex());
 
         this.myChangeListener = (server, selected) -> myServers.updateSelectedItem(server, selected);
-        this.myChangeUrlListener = (server) -> ((CollectionListModel)myServersList.getModel()).contentsChanged(server);
+        this.myChangeUrlListener = server -> ((CollectionListModel)myServersList.getModel()).contentsChanged(server);
 
 
         for(int i = 0; i < myServers.getItems().size(); i++){
@@ -94,7 +94,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         }
 
 
-        myServersList = new JBList();
+        myServersList = new JBList<>();
         myServersList.setEmptyText("No servers");
         myServersList.setModel(listModel);
         myServersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -107,16 +107,15 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
             }
         });
 
-        myServersList.setCellRenderer(new ColoredListCellRenderer() {
+        myServersList.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
-            protected void customizeCellRenderer(@NotNull JList list, Object value, int index, boolean selected, boolean hasFocus) {
-                JiraServer server = (JiraServer)value;
+            protected void customizeCellRenderer(@NotNull JList<? extends JiraServer> list, JiraServer value, int index, boolean selected, boolean hasFocus) {
                 setIcon(TasksCoreIcons.Jira);
-                append(server.getPresentableName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                append(value.getPresentableName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
             }
         });
 
-                setTitle("Configure Servers");
+        setTitle("Configure Servers");
         super.init();
     }
 

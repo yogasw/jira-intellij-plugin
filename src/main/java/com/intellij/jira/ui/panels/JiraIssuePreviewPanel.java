@@ -1,11 +1,7 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.actions.ChangeListActionGroup;
-import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
-import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
-import com.intellij.jira.actions.OpenNewJiraTabAction;
-import com.intellij.jira.actions.TransitIssueDialogAction;
+import com.intellij.jira.JiraDataKeys;
+import com.intellij.jira.actions.*;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTextPane;
 import com.intellij.jira.util.JiraIssueUtil;
@@ -19,16 +15,13 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
-import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
-import static com.intellij.jira.util.JiraLabelUtil.ITALIC;
-import static com.intellij.jira.util.JiraLabelUtil.WHITE;
+import static com.intellij.jira.util.JiraLabelUtil.*;
 import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.PAGE_START;
@@ -54,14 +47,23 @@ class JiraIssuePreviewPanel extends AbstractJiraToolWindowPanel {
     @Override
     public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new TransitIssueDialogAction(() -> issue));
-        group.add(new JiraIssueAssigneePopupAction(() -> issue));
-        group.add(new JiraIssuePrioritiesPopupAction(() -> issue));
-        group.add(new ChangeListActionGroup(() -> issue));
+        group.add(new TransitIssueDialogAction());
+        group.add(new JiraIssueAssigneePopupAction());
+        group.add(new JiraIssuePrioritiesPopupAction());
+        group.add(new ChangelistActionGroup());
         group.addSeparator();
-        group.add(new OpenNewJiraTabAction(() -> issue));
+        group.add(new OpenNewJiraTabAction());
 
         return group;
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
+        if (JiraDataKeys.ISSUE.is(dataId)) {
+            return issue;
+        }
+
+        return super.getData(dataId);
     }
 
     private void initContent() {

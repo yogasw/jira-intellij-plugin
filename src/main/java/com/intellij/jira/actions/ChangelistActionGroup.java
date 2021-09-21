@@ -1,16 +1,15 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.jira.util.factory.JiraIssueFactory;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Separator;
 
-public class ChangeListActionGroup extends DefaultActionGroup {
+public class ChangelistActionGroup extends DefaultActionGroup {
 
-    public ChangeListActionGroup(JiraIssueFactory factory) {
+    public ChangelistActionGroup() {
         super("Changelist", true);
         getTemplatePresentation().setIcon(AllIcons.Vcs.Changelist);
-        add(new AddIssueChangeListAction(factory));
+        add(new AddIssueChangeListAction());
         add(new Separator());
         add(new ChangelistSettingsDialogAction());
     }

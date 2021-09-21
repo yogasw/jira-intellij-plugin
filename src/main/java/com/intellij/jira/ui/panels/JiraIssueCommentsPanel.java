@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.AddCommentDialogAction;
 import com.intellij.jira.actions.DeleteCommentDialogAction;
 import com.intellij.jira.actions.EditCommentDialogAction;
@@ -15,6 +16,7 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -39,11 +41,20 @@ class JiraIssueCommentsPanel extends AbstractJiraToolWindowPanel {
     @Override
     public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new AddCommentDialogAction(projectKey, issueKey));
-        group.add(new EditCommentDialogAction(projectKey, issueKey, () -> comment));
-        group.add(new DeleteCommentDialogAction(issueKey, () -> comment));
+        group.add(new AddCommentDialogAction());
+        group.add(new EditCommentDialogAction());
+        group.add(new DeleteCommentDialogAction());
 
         return group;
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull String dataId) {
+        if (JiraDataKeys.ISSUE_COMMENT.is(dataId) && Objects.nonNull(issueCommentList.getSelectedValue())) {
+            return comment;
+        }
+
+        return super.getData(dataId);
     }
 
     private void initContent(JiraIssueCommentsWrapper comments){
@@ -70,7 +81,6 @@ class JiraIssueCommentsPanel extends AbstractJiraToolWindowPanel {
         JiraIssueComment selectedComment = issueCommentList.getSelectedValue();
         if(!Objects.equals(comment, selectedComment)){
             comment = selectedComment;
-            initToolbar();
         }
     }
 
