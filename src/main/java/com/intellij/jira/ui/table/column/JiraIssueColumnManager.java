@@ -17,7 +17,7 @@ public class JiraIssueColumnManager {
 
     private static final List<JiraIssueColumn<?, ?>> defaultColumns = List.of(IssueType.INSTANCE, Priority.INSTANCE, Key.INSTANCE,
                                                                             Summary.INSTANCE, Assignee.INSTANCE, Status.INSTANCE,
-                                                                            Created.INSTANCE);
+                                                                            ProjectKey.INSTANCE, Created.INSTANCE);
 
     private static final Map<Integer, JiraIssueColumn<?, ?>> currentColumns = new HashMap<>();
     private static final Map<String, Integer> currentColumnIndexes = new HashMap<>();
