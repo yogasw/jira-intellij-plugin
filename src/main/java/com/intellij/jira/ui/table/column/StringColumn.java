@@ -28,6 +28,6 @@ public abstract class StringColumn<T> extends JiraIssueColumn<T, String> {
 
     @Override
     public int getAdditionalWidth() {
-        return UIUtil.DEFAULT_HGAP;
+        return UIUtil.DEFAULT_VGAP;
     }
 }

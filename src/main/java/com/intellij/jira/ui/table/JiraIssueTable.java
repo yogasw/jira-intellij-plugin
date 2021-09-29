@@ -3,11 +3,9 @@ package com.intellij.jira.ui.table;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraIssueUiProperties;
 import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
-import com.intellij.jira.ui.table.column.JiraIssueColumnUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.TableView;
-import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,13 +55,11 @@ public class JiraIssueTable extends TableView<JiraIssue> {
     }
 
     public void updateModel(List<JiraIssue> issues) {
-        getModel().initializeColumnsWidth(issues);
-        updateColumns();
-        getModel().setItems(issues);
+        setModelAndUpdateColumns(new JiraIssueListTableModel(issues));
     }
 
     private void updateColumns() {
-        getModel().setColumnInfos(JiraIssueColumnUtils.getVisibleColumns().toArray(new ColumnInfo[0]));
+        updateModel(getModel().getItems());
     }
 
 }
