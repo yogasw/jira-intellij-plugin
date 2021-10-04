@@ -78,7 +78,7 @@ public class JiraTransitionTaskEditor implements Editor {
 
     public void doTask() {
         ValidationInfo info = validate();
-        if (Objects.isNull(info)) {
+        if (createChangelistCheck.isSelected() && Objects.isNull(info)) {
             new AddChangelistTask(project, getChangelistName(), isNewChangelistSetActive()).queue();
         }
     }
