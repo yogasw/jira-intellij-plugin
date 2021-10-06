@@ -16,6 +16,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.ui.OnePixelSplitter;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.util.messages.MessageBusConnection;
 import net.miginfocom.swing.MigLayout;
@@ -23,9 +24,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,7 +56,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider {
 
         JComponent toolbarAndTable = new JPanel(new BorderLayout());
         toolbarAndTable.add(myToolbar, BorderLayout.NORTH);
-        toolbarAndTable.add(myJiraIssueTable, BorderLayout.CENTER);
+        toolbarAndTable.add(ScrollPaneFactory.createScrollPane(myJiraIssueTable, true), BorderLayout.CENTER);
 
         myIssuesBrowserSplitter = new OnePixelSplitter(0.6f);
         myIssuesBrowserSplitter.setFirstComponent(toolbarAndTable);

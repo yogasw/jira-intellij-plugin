@@ -3,7 +3,7 @@ package com.intellij.jira.util;
 import com.intellij.jira.rest.model.JiraIssuePriority;
 import com.intellij.jira.rest.model.JiraIssueStatus;
 import com.intellij.jira.ui.labels.JiraLinkLabel;
-import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.jira.ui.labels.JiraStatusLightLabel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBFont;
@@ -11,6 +11,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -26,8 +27,8 @@ public class JiraLabelUtil {
     public static final JBFont BOLD = JBUI.Fonts.label().asBold();
     public static final JBFont ITALIC = JBUI.Fonts.label().asItalic();
 
-    public static final Color BLACK = Color.BLACK;
-    public static final Color WHITE = Color.WHITE;
+    public static final Color BLACK = JBColor.BLACK;
+    public static final Color WHITE = JBColor.WHITE;
 
     public static final Color LINK_COLOR = JBColor.BLUE;
 
@@ -35,8 +36,8 @@ public class JiraLabelUtil {
 
     public static final Color DEFAULT_ISSUE_COLOR = new Color(211, 232, 240  );
     public static final Color DEFAULT_SELECTED_ISSUE_COLOR = new Color(26, 125, 196  );
-    public static final Color DARCULA_ISSUE_COLOR = new Color(114, 62, 133);
-    public static final Color DARCULA_SELECTED_ISSUE_COLOR = new Color(108, 32, 133);
+    public static final Color DARCULA_ISSUE_COLOR = new Color(66, 85, 93);
+    public static final Color DARCULA_SELECTED_ISSUE_COLOR = new Color(36, 59, 68);
 
     // Links
     public static final Color ISSUE_LINK_COLOR = new Color(240, 216, 226);
@@ -61,6 +62,10 @@ public class JiraLabelUtil {
 
     public static JBLabel createEmptyLabel(){
         return createLabel(EMPTY_TEXT);
+    }
+
+    public static JLabel space() {
+        return createLabel(" ");
     }
 
     public static JBLabel createLabel(String text){
@@ -94,13 +99,7 @@ public class JiraLabelUtil {
     }
 
     public static JBLabel createStatusLabel(JiraIssueStatus status){
-        JBLabel label = new JBLabel(StringUtil.toUpperCase(status.getName()), LEFT);
-        label.setFont(JBFont.create(new Font("SansSerif", Font.BOLD, 9)));
-        label.setBorder(JBUI.Borders.empty(2, 2, 2, 3));
-        label.setBackground(status.getCategoryColor());
-        label.setForeground(status.isInProgressCategory() ?  IN_PROGRESS_TEXT_COLOR : Color.white);
-        label.setOpaque(true);
-        return label;
+        return new JiraStatusLightLabel(status);
     }
 
     public static JBLabel createEmptyStatusLabel(){

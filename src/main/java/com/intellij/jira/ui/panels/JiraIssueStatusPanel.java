@@ -8,12 +8,10 @@ import com.intellij.jira.actions.TransitIssueDialogAction;
 import com.intellij.jira.listener.JiraIssueChangeListener;
 import com.intellij.jira.listener.JiraIssuesRefreshedListener;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NonNls;
@@ -22,9 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-import static com.intellij.jira.util.JiraLabelUtil.EMPTY_TEXT;
-import static java.awt.BorderLayout.CENTER;
-import static java.awt.BorderLayout.LINE_START;
 import static javax.swing.BoxLayout.Y_AXIS;
 
 public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
@@ -75,12 +70,7 @@ public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
         mainPanel.add(priorityPanel);
 
         // Reporter
-        JPanel reporterPanel = JiraPanelUtil.createWhiteBorderPanel();
-        JBLabel reporterLabel = JiraLabelUtil.createBoldLabel("Reporter: ");
-        JBLabel reporterValueLabel = JiraLabelUtil.createLabel(issue.getAssignee() != null ? issue.getReporter().getDisplayName() : EMPTY_TEXT);
-
-        reporterPanel.add(reporterLabel, LINE_START);
-        reporterPanel.add(reporterValueLabel, CENTER);
+        JPanel reporterPanel = JiraPanelUtil.createReporterPanel(issue);
         mainPanel.add(reporterPanel);
 
         // Assignee

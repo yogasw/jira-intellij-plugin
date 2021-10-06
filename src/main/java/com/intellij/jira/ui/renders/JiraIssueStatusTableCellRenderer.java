@@ -1,31 +1,23 @@
 package com.intellij.jira.ui.renders;
 
+import com.intellij.jira.rest.model.JiraIssueStatus;
+import com.intellij.jira.ui.labels.JiraStatusLightLabel;
 import com.intellij.jira.ui.panels.JiraPanel;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.ui.JBColor;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
+import com.intellij.jira.util.JiraBorders;
+import com.intellij.ui.components.JBLabel;
 
-import javax.swing.JTable;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 
-import static com.intellij.jira.util.JiraLabelUtil.IN_PROGRESS_TEXT_COLOR;
 import static java.awt.BorderLayout.LINE_START;
 
 public class JiraIssueStatusTableCellRenderer extends JiraIssueTableCellRenderer {
 
-    private String statusName;
-    private Color statusCategoryColor;
-    private boolean isInProgressCategory;
+    private final JiraIssueStatus jiraIssueStatus;
 
-    public JiraIssueStatusTableCellRenderer(String statusName, Color statusCategoryColor, boolean isInProgressCategory) {
+    public JiraIssueStatusTableCellRenderer(JiraIssueStatus jiraIssueStatus) {
         super();
-        this.statusName = statusName;
-        this.statusCategoryColor = statusCategoryColor;
-        this.isInProgressCategory = isInProgressCategory;
+        this.jiraIssueStatus = jiraIssueStatus;
     }
 
     @Override
@@ -33,15 +25,10 @@ public class JiraIssueStatusTableCellRenderer extends JiraIssueTableCellRenderer
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
         JiraPanel panel = new JiraPanel(new BorderLayout()).withBackground(getBackground());
+        JBLabel jiraStatusLabel = new JiraStatusLightLabel(jiraIssueStatus);
 
-        setText(StringUtil.toUpperCase(statusName));
-        setBackground(statusCategoryColor);
-        setForeground(isInProgressCategory ? IN_PROGRESS_TEXT_COLOR : JBColor.WHITE);
-        setFont(JBFont.create(new Font("SansSerif", Font.BOLD, 8)));
-        setBorder(JBUI.Borders.empty(4, 5));
-
-        panel.setBorder(JBUI.Borders.empty(4, 3));
-        panel.add(this, LINE_START);
+        panel.setBorder(JiraBorders.empty(4, 3));
+        panel.add(jiraStatusLabel, LINE_START);
 
         return panel;
     }
