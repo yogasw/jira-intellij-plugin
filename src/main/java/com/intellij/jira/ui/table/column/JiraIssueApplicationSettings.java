@@ -1,15 +1,16 @@
 package com.intellij.jira.ui.table.column;
 
 import com.intellij.jira.ui.JiraIssueUiProperties;
+import com.intellij.jira.ui.highlighters.JiraIssueHighlighterProperty;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 
 @State(name = "Jira.Issues.App.Settings", storages = @Storage("issues.xml"))
@@ -19,8 +20,9 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
 
     private State myState = new State();
 
+    @NotNull
     @Override
-    public @Nullable State getState() {
+    public State getState() {
         return myState;
     }
 
@@ -42,6 +44,13 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
                 return (T)Boolean.TRUE;
             }
 
+        } else if (property instanceof JiraIssueHighlighterProperty) {
+            Boolean result = getState().HIGHLIGHTERS.get(((JiraIssueHighlighterProperty)property).getId());
+            if (result == null) {
+                return (T)Boolean.TRUE;
+            }
+
+            return (T)result;
         }
 
         return (T)Boolean.FALSE;
@@ -50,7 +59,9 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
     @Override
     public <T> void set(@NotNull JiraIssueUiProperty<T> property, @NotNull T value) {
         if (property instanceof JiraIssueColumnProperties.TableColumnVisibilityProperty) {
-            myState.COLUMN_ID_VISIBILITY.put(property.getName(), (Boolean)value);
+            getState().COLUMN_ID_VISIBILITY.put(property.getName(), (Boolean)value);
+        } else if (property instanceof JiraIssueHighlighterProperty) {
+            getState().HIGHLIGHTERS.put(((JiraIssueHighlighterProperty)property).getId(), (Boolean)value);
         }
 
         myEventDispatcher.getMulticaster().onChanged(property);
@@ -58,7 +69,8 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
 
     @Override
     public <T> boolean exists(@NotNull JiraIssueUiProperty<T> property) {
-        return property instanceof JiraIssueColumnProperties.TableColumnVisibilityProperty;
+        return property instanceof JiraIssueColumnProperties.TableColumnVisibilityProperty
+                || property instanceof JiraIssueHighlighterProperty;
     }
 
     @Override
@@ -72,6 +84,7 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
     }
 
     public static class State {
+        public Map<String, Boolean> HIGHLIGHTERS = new TreeMap<>();
         public Map<String, Boolean> COLUMN_ID_VISIBILITY = new HashMap<>();
     }
 

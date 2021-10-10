@@ -25,6 +25,10 @@
 
     <depends>com.intellij.tasks</depends>
 
+    <extensionPoints>
+        <extensionPoint name="issueHighlighterFactory" interface="com.intellij.jira.ui.highlighters.JiraIssueHighlighterFactory" dynamic="true"/>
+    </extensionPoints>
+
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Jira" anchor="bottom" icon="/icons/jiraIcon.svg" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory" canCloseContents="true"/>
 
@@ -37,9 +41,14 @@
         <projectService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherObserver"/>
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
+        <projectService serviceImplementation="com.intellij.jira.components.JiraUserProvider"/>
 
         <notificationGroup id="Jira Balloon Notifications" displayType="BALLOON" />
         <notificationGroup id="Jira Sticky Balloon Notifications" displayType="STICKY_BALLOON" isLogByDefault="true" />
+
+        <jira.issueHighlighterFactory implementation="com.intellij.jira.ui.highlighters.MyIssuesHighlighter$Factory"/>
+        <jira.issueHighlighterFactory implementation="com.intellij.jira.ui.highlighters.ResolvedIssuesHighlighter$Factory"/>
+
     </extensions>
 
     <actions>
@@ -64,8 +73,14 @@
             <reference id="Jira.Issue.Jql.Configure"/>
         </group>
 
-        <group id="Jira.Issues.PresentationSettings" class="com.intellij.jira.actions.ToggleIssueColumnActionGroup"
-               icon="AllIcons.Actions.Show" popup="true"/>
+        <group class="com.intellij.jira.actions.HighlightersActionGroup" id="Jira.Issue.HighlightersActionGroup"/>
+        <action class="com.intellij.jira.actions.ToggleIssueColumnActionGroup" id="Jira.Issue.ToggleColumns"/>
+
+        <group id="Jira.Issues.PresentationSettings" class="com.intellij.jira.actions.JiraIssueToolbarPopupActionGroup"
+               icon="AllIcons.Actions.Show" popup="true">
+            <reference id="Jira.Issue.HighlightersActionGroup"/>
+            <reference id="Jira.Issue.ToggleColumns"/>
+        </group>
 
         <group id="Jira.Issues.Toolbar">
             <reference id="Jira.Issues.Jql"/>

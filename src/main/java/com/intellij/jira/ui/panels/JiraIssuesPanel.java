@@ -8,6 +8,7 @@ import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
 import com.intellij.jira.ui.table.JiraIssueListTableModel;
 import com.intellij.jira.ui.table.JiraIssueTable;
+import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DataProvider;
@@ -45,7 +46,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider {
         super(new BorderLayout());
         myToolbar = createActionsToolbar(project);
 
-        myJiraIssueTable = new JiraIssueTable(issues);
+        myJiraIssueTable = new JiraIssueTable(project, issues);
         myJiraIssueDetailsPanel = new JiraIssueDetailsPanel(project);
 
         myJiraIssueTable.getSelectionModel()
@@ -74,6 +75,8 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider {
     public @Nullable Object getData(@NotNull @NonNls String dataId) {
         if (JiraUiDataKeys.ISSUES_PANEL.is(dataId)) {
             return this;
+        } else if (JiraUiDataKeys.JIRA_UI_PROPERTIES.is(dataId)) {
+            return ApplicationManager.getApplication().getService(JiraIssueApplicationSettings.class);
         }
 
         return null;
@@ -127,6 +130,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider {
                 if(postItem < 0){
                     return;
                 }
+
 
                 model.removeRow(postItem);
                 model.insertRow(postItem, issue);

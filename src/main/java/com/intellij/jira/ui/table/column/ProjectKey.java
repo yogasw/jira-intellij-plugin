@@ -1,7 +1,10 @@
 package com.intellij.jira.ui.table.column;
 
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.ui.renders.JiraIssueStringCellRenderer;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.table.TableCellRenderer;
 
 public class ProjectKey extends StringColumn<JiraIssue> {
 
@@ -15,4 +18,10 @@ public class ProjectKey extends StringColumn<JiraIssue> {
     public @Nullable String valueOf(JiraIssue issue) {
         return issue.getProject().getKey();
     }
+
+    @Override
+    public TableCellRenderer getRenderer(JiraIssue issue) {
+        return new JiraIssueStringCellRenderer(issue);
+    }
+
 }

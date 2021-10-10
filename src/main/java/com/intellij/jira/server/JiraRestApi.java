@@ -200,8 +200,8 @@ public class JiraRestApi {
         return jiraRestClient.getDefaultSearchQuery();
     }
 
-    public boolean testConnection() throws Exception {
-        return jiraRestClient.testConnection();
+    public boolean testConnection() {
+        return getCurrentUser().isValid();
     }
 
     public List<String> getProjectRoles(String projectKey) {

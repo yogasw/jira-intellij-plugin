@@ -1,7 +1,10 @@
 package com.intellij.jira.ui.table.column;
 
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.ui.renders.JiraIssueStringCellRenderer;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.table.TableCellRenderer;
 
 public class Key extends StringColumn<JiraIssue> {
 
@@ -16,5 +19,8 @@ public class Key extends StringColumn<JiraIssue> {
         return issue.getKey();
     }
 
-
+    @Override
+    public TableCellRenderer getRenderer(JiraIssue issue) {
+        return new JiraIssueStringCellRenderer(issue);
+    }
 }

@@ -4,6 +4,7 @@ import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraIssueUiProperties;
 import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.JBUI;
@@ -16,8 +17,12 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 public class JiraIssueTable extends TableView<JiraIssue> {
 
-    public JiraIssueTable(@NotNull List<JiraIssue> issues) {
+    private Project project;
+
+    public JiraIssueTable(@NotNull Project project, @NotNull List<JiraIssue> issues) {
         super(new JiraIssueListTableModel(issues));
+
+        this.project = project;
 
         setBorder(JBUI.Borders.customLine(JBColor.border(),1, 0, 0, 0));
         setShowGrid(false);
@@ -56,6 +61,10 @@ public class JiraIssueTable extends TableView<JiraIssue> {
 
     public void updateModel(List<JiraIssue> issues) {
         setModelAndUpdateColumns(new JiraIssueListTableModel(issues));
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     private void updateColumns() {
