@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTabbedPane;
 import com.intellij.jira.util.JiraPanelUtil;
@@ -34,9 +35,9 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
     private JiraIssueCommentsPanel myJiraIssueCommentsPanel;
     private JiraIssueWorkLogsPanel myJiraIssueWorkLogsPanel;
 
-    public JiraIssueDetailsPanel(Project project){
+    public JiraIssueDetailsPanel(@NotNull JiraIssuesData issuesData){
         super(true);
-        this.myProject = project;
+        this.myProject = issuesData.getProject();
         setEmptyContent();
     }
 

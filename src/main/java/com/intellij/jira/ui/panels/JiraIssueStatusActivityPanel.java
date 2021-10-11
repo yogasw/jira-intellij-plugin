@@ -1,25 +1,23 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBSplitter;
+import com.intellij.ui.OnePixelSplitter;
 import org.jetbrains.annotations.NotNull;
 
-public class JiraIssueStatusActivityPanel extends JBSplitter {
+public class JiraIssueStatusActivityPanel extends OnePixelSplitter {
 
-    private JiraIssueStatusPanel jiraIssueStatusPanel;
-    private JiraIssueActivityPanel jiraIssueActivityPanel;
+    private final JiraIssueStatusPanel jiraIssueStatusPanel;
+    private final JiraIssueActivityPanel jiraIssueActivityPanel;
 
-    public JiraIssueStatusActivityPanel(@NotNull Project project, JiraIssue issue) {
-        super(false);
+    public JiraIssueStatusActivityPanel(@NotNull JiraIssuesData issuesData, JiraIssue issue) {
+        super(0.35f);
 
-        this.jiraIssueStatusPanel = new JiraIssueStatusPanel(project, issue);
-        this.jiraIssueActivityPanel = new JiraIssueActivityPanel(project, issue);
+        this.jiraIssueStatusPanel = new JiraIssueStatusPanel(issuesData, issue);
+        this.jiraIssueActivityPanel = new JiraIssueActivityPanel(issuesData, issue);
 
-        setProportion(0.35f);
         setFirstComponent(this.jiraIssueStatusPanel);
         setSecondComponent(this.jiraIssueActivityPanel);
-        setDividerWidth(1);
     }
 
 }

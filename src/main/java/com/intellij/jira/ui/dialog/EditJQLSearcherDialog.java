@@ -43,7 +43,7 @@ public class EditJQLSearcherDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        return myEditor.getPanel();
+        return myEditor.createPanel();
     }
 
 

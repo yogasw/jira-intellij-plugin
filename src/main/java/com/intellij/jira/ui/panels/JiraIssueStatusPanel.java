@@ -5,14 +5,14 @@ import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
 import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
 import com.intellij.jira.actions.TransitIssueDialogAction;
-import com.intellij.jira.listener.JiraIssueChangeListener;
-import com.intellij.jira.listener.JiraIssuesRefreshedListener;
+import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.listener.IssueChangeListener;
+import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import com.intellij.util.messages.MessageBusConnection;
+import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -24,13 +24,13 @@ import static javax.swing.BoxLayout.Y_AXIS;
 
 public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
 
-    private final Project project;
-    private JiraIssue issue;
+    private final JiraIssuesData myIssuesData;
+    private JiraIssue myIssue;
 
-    public JiraIssueStatusPanel(Project project, JiraIssue issue) {
+    public JiraIssueStatusPanel(@NotNull JiraIssuesData issuesData, JiraIssue issue) {
         super(issue);
-        this.project = project;
-        this.issue = issue;
+        myIssuesData = issuesData;
+        this.myIssue = issue;
 
         init();
         subscribeTopic();
@@ -49,61 +49,61 @@ public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
     @Override
     public @Nullable Object getData(@NotNull @NonNls String dataId) {
         if (JiraDataKeys.ISSUE.is(dataId)) {
-            return issue;
+            return myIssue;
         }
 
         return super.getData(dataId);
     }
 
     private void init() {
-        setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
-
         JPanel mainPanel = JiraPanelUtil.createWhiteBorderPanel().withBorder(JBUI.Borders.empty(5));
         mainPanel.setLayout(new BoxLayout(mainPanel, Y_AXIS));
 
+        FormBuilder formBuilder = FormBuilder.createFormBuilder();
+
         // Status
-        JPanel statusPanel = JiraPanelUtil.createStatusPanel(issue);
-        mainPanel.add(statusPanel);
+        JPanel statusPanel = JiraPanelUtil.createStatusPanel(myIssue);
+        formBuilder.addComponent(statusPanel);
 
         // Priority
-        JPanel priorityPanel = JiraPanelUtil.createPriorityPanel(issue);
-        mainPanel.add(priorityPanel);
+        JPanel priorityPanel = JiraPanelUtil.createPriorityPanel(myIssue);
+        formBuilder.addComponent(priorityPanel,0);
 
         // Reporter
-        JPanel reporterPanel = JiraPanelUtil.createReporterPanel(issue);
-        mainPanel.add(reporterPanel);
+        JPanel reporterPanel = JiraPanelUtil.createReporterPanel(myIssue);
+        formBuilder.addComponent(reporterPanel,0);
 
         // Assignee
-        JPanel assigneePanel = JiraPanelUtil.createAssigneePanel(issue);
-        mainPanel.add(assigneePanel);
+        JPanel assigneePanel = JiraPanelUtil.createAssigneePanel(myIssue);
+        formBuilder.addComponent(assigneePanel,0);
 
         // Watches
-        JPanel watchesPanel = JiraPanelUtil.createWatchesPanel(issue, project);
-        mainPanel.add(watchesPanel);
+        JPanel watchesPanel = JiraPanelUtil.createWatchesPanel(myIssue, myIssuesData.getProject());
+        formBuilder.addComponent(watchesPanel,0);
 
         // Versions
-        JPanel versionsPanel = JiraPanelUtil.createVersionsPanel(issue);
-        mainPanel.add(versionsPanel);
+        JPanel versionsPanel = JiraPanelUtil.createVersionsPanel(myIssue);
+        formBuilder.addComponentFillVertically(versionsPanel, 0);
 
+        mainPanel.add(formBuilder.getPanel());
         setContent(mainPanel);
     }
 
     private void subscribeTopic() {
-        MessageBusConnection connect = project.getMessageBus().connect();
+        MessageBusConnection connect = myIssuesData.getProject().getMessageBus().connect();
 
-        connect.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
-            if (issue.getKey().equals(this.issue.getKey())) {
-                this.issue = issue;
+        connect.subscribe(IssueChangeListener.TOPIC, issueKey -> {
+            if (issueKey.equals(this.myIssue.getKey())) {
+                this.myIssue = myIssuesData.getIssue(issueKey);
+
                 init();
             }
         });
 
-        connect.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
-            int issueIndex = issues.indexOf(this.issue);
-            if (issueIndex > -1) {
-               this.issue = issues.get(issueIndex);
-               init();
-           }
+        connect.subscribe(RefreshIssuesListener.TOPIC, () -> {
+            this.myIssue = myIssuesData.getIssue(issueKey);
+
+            init();
         });
 
     }

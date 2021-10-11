@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.table;
 
+import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.table.column.JiraIssueColumn;
 import com.intellij.jira.ui.table.column.JiraIssueColumnManager;
@@ -13,8 +14,13 @@ import java.util.List;
 
 public class JiraIssueListTableModel extends ListTableModel<JiraIssue> {
 
-    public JiraIssueListTableModel(@NotNull List<JiraIssue> issues) {
+    private final JiraIssuesData myIssuesData;
+
+    public JiraIssueListTableModel(@NotNull JiraIssuesData issuesData) {
         super();
+
+        myIssuesData = issuesData;
+        List<JiraIssue> issues = issuesData.getIssues();
 
         initializeColumnsWidth(issues);
         setColumnInfos(getIssueColumns());

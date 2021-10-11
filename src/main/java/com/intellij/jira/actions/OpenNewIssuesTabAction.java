@@ -1,10 +1,11 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.jira.JiraDataKeys;
+import com.intellij.jira.components.JQLSearcherManager;
 import com.intellij.jira.data.JiraIssuesData;
-import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.ui.panels.JiraIssuePanel;
+import com.intellij.jira.rest.model.jql.JQLSearcher;
+import com.intellij.jira.ui.JiraIssuesUi;
+import com.intellij.jira.ui.JiraIssuesUiFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -17,13 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
-import static java.util.Objects.nonNull;
 
-public class OpenNewJiraTabAction extends JiraIssueAction {
+public class OpenNewIssuesTabAction extends JiraIssueAction {
+    private static final ActionProperties properties = ActionProperties.of("Open New Issues Tab With Selected Jql", AllIcons.Actions.OpenNewTab);
 
-    private static final ActionProperties properties = ActionProperties.of("Open Issue in Tab", AllIcons.Actions.OpenNewTab);
-
-    public OpenNewJiraTabAction() {
+    public OpenNewIssuesTabAction() {
         super(properties);
     }
 
@@ -36,23 +35,18 @@ public class OpenNewJiraTabAction extends JiraIssueAction {
             ToolWindow jiraToolWindow = toolWindowManager.getToolWindow(TOOL_WINDOW_ID);
             ContentManager contentManager = jiraToolWindow.getContentManager();
 
-            JiraIssue issue = e.getRequiredData(JiraDataKeys.ISSUE);
-            Content content = contentManager.findContent(issue.getKey()); // Avoid creates same content
+            JQLSearcher selectedSearcher = JQLSearcherManager.getInstance().getSelectedSearcher(project);
+            String jqlAlias = selectedSearcher.getAlias();
+            Content content = contentManager.findContent(jqlAlias); // Avoid creates same content
             if (Objects.isNull(content)) {
-                JiraIssuesData issuesData = new JiraIssuesData(project);
-                JiraIssuePanel jiraIssuePanel = new JiraIssuePanel(issuesData, issue.getKey());
+                JiraIssuesData issuesData = new JiraIssuesData(project, selectedSearcher);
+                JiraIssuesUi jqlIssuesUi = JiraIssuesUiFactory.createJQLUi(jqlAlias, issuesData);
 
-                content = ContentFactory.SERVICE.getInstance().createContent(jiraIssuePanel, issue.getKey(), false);
+                content = ContentFactory.SERVICE.getInstance().createContent(jqlIssuesUi.getMainComponent(), jqlAlias, false);
                 contentManager.addContent(content);
             }
 
             contentManager.setSelectedContent(content);
         }
-
-    }
-
-    @Override
-    public void update(AnActionEvent e) {
-        e.getPresentation().setEnabled(nonNull(e.getData(JiraDataKeys.ISSUE)));
     }
 }

@@ -1,5 +1,8 @@
 package com.intellij.jira.ui.table;
 
+import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.listener.IssueChangeListener;
+import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraIssueUiProperties;
 import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
@@ -7,22 +10,22 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.TableView;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.TableColumnModel;
-import java.util.List;
 
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 public class JiraIssueTable extends TableView<JiraIssue> {
 
-    private Project project;
+    private final JiraIssuesData myIssuesData;
 
-    public JiraIssueTable(@NotNull Project project, @NotNull List<JiraIssue> issues) {
-        super(new JiraIssueListTableModel(issues));
+    public JiraIssueTable(@NotNull JiraIssuesData issuesData) {
+        super(new JiraIssueListTableModel(issuesData));
 
-        this.project = project;
+        myIssuesData = issuesData;
 
         setBorder(JBUI.Borders.customLine(JBColor.border(),1, 0, 0, 0));
         setShowGrid(false);
@@ -36,14 +39,17 @@ public class JiraIssueTable extends TableView<JiraIssue> {
             }
         });
 
-        JiraIssueUiProperties.PropertyChangeListener myListener = new JiraIssueUiProperties.PropertyChangeListener() {
-            @Override
-            public <T> void onChanged(JiraIssueUiProperties.@NotNull JiraIssueUiProperty<T> property) {
-                updateColumns();
-            }
-        };
+        subscribeTopics();
 
-        ApplicationManager.getApplication().getService(JiraIssueApplicationSettings.class).addChangeListener(myListener);
+        ApplicationManager.getApplication().getService(JiraIssueApplicationSettings.class)
+                .addChangeListener(new MyPropertyChangeListener());
+    }
+
+    private void subscribeTopics() {
+        MessageBusConnection connection = myIssuesData.getProject().getMessageBus().connect();
+
+        connection.subscribe(RefreshIssuesListener.TOPIC, new OnRefreshIssues());
+        connection.subscribe(IssueChangeListener.TOPIC, new OnIssueChanged());
     }
 
     @Override
@@ -59,16 +65,53 @@ public class JiraIssueTable extends TableView<JiraIssue> {
         return (JiraIssueListTableModel) dataModel;
     }
 
-    public void updateModel(List<JiraIssue> issues) {
-        setModelAndUpdateColumns(new JiraIssueListTableModel(issues));
-    }
-
     public Project getProject() {
-        return project;
+        return myIssuesData.getProject();
     }
 
-    private void updateColumns() {
-        updateModel(getModel().getItems());
+    private class MyPropertyChangeListener implements JiraIssueUiProperties.PropertyChangeListener {
+
+        @Override
+        public <T> void onChanged(JiraIssueUiProperties.@NotNull JiraIssueUiProperty<T> property) {
+            setModelAndUpdateColumns(new JiraIssueListTableModel(myIssuesData));
+        }
+    }
+
+    private class OnIssueChanged implements IssueChangeListener {
+
+        @Override
+        public void onChange(String issueKey) {
+            JiraIssue issue = myIssuesData.getIssue(issueKey);
+            if (issue != null) {
+                JiraIssueListTableModel model = getModel();
+                int postItem = model.indexOf(issue);
+                if (postItem < 0) {
+                    return;
+                }
+
+                model.removeRow(postItem);
+                model.insertRow(postItem, issue);
+                addSelection(issue);
+            }
+        }
+    }
+
+    private class OnRefreshIssues implements RefreshIssuesListener {
+
+        @Override
+        public void onRefresh() {
+            JiraIssue lastSelectedIssue = getSelectedObject();
+            ApplicationManager.getApplication().invokeLater(() -> {
+                setModelAndUpdateColumns(new JiraIssueListTableModel(myIssuesData));
+                int currentPosIssue = getModel().indexOf(lastSelectedIssue);
+                // if the last selected issue exists in the new list, we select it
+                if (currentPosIssue >= 0) {
+                    JiraIssue issueToShow = getModel().getItem(currentPosIssue);
+                    addSelection(issueToShow);
+                }
+            });
+
+        }
     }
 
 }

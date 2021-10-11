@@ -30,9 +30,13 @@ public abstract class AbstractJiraToolWindowPanel extends SimpleToolWindowPanel 
     }
 
     public AbstractJiraToolWindowPanel(boolean vertical, boolean borderless, JiraIssue issue) {
+        this(vertical, borderless, issue.getKey(), issue.getProject().getKey());
+    }
+
+    public AbstractJiraToolWindowPanel(boolean vertical, boolean borderless, String issueKey, String projectKey) {
         super(vertical, borderless);
-        this.issueKey = issue.getKey();
-        this.projectKey = issue.getProject().getKey();
+        this.issueKey = issueKey;
+        this.projectKey = projectKey;
 
         initToolbar();
     }

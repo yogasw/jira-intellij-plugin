@@ -1,12 +1,7 @@
 package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.JiraDataKeys;
-import com.intellij.jira.actions.ChangelistActionGroup;
-import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
-import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
-import com.intellij.jira.actions.OpenNewJiraTabAction;
-import com.intellij.jira.actions.TransitIssueDialogAction;
+import com.intellij.jira.actions.*;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTextPane;
 import com.intellij.jira.util.JiraBorders;
@@ -23,9 +18,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.*;
+import java.awt.*;
 
 import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.WHITE;
@@ -160,7 +154,10 @@ class JiraIssuePreviewPanel extends AbstractJiraToolWindowPanel {
             issueDetails.add(issueDescriptionPanel);
         }
 
-        previewPanel.add(ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), CENTER);
+        JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getViewport().setViewPosition(new Point(0,0)); // Move to top
+
+        previewPanel.add(scrollPane, CENTER);
 
         setContent(previewPanel);
     }

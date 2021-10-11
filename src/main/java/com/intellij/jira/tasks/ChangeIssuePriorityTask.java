@@ -2,6 +2,7 @@ package com.intellij.jira.tasks;
 
 import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.exceptions.InvalidResultException;
+import com.intellij.jira.listener.IssueChangeListener;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.util.result.Result;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -37,7 +38,8 @@ public class ChangeIssuePriorityTask extends AbstractBackgroundableTask {
 
     @Override
     public void onSuccess() {
-        super.onSuccess();
+        //super.onSuccess();
+        myProject.getMessageBus().syncPublisher(IssueChangeListener.TOPIC).onChange(issueIdOrKey);
         showNotification("Jira", "Issue priority updated");
     }
 

@@ -23,9 +23,9 @@ public class EditJQLSearcherAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
         if(nonNull(project)){
-            JQLSearcher deafaultJQLSearcher = JQLSearcherManager.getInstance().getSelectedSearcher(project);
+            JQLSearcher defaultJQLSearcher = JQLSearcherManager.getInstance().getSelectedSearcher(project);
 
-            EditJQLSearcherDialog dialog = new EditJQLSearcherDialog(project, deafaultJQLSearcher);
+            EditJQLSearcherDialog dialog = new EditJQLSearcherDialog(project, defaultJQLSearcher);
             dialog.show();
         }
     }
