@@ -65,6 +65,8 @@
         <action class="com.intellij.jira.actions.GoToIssuePopupAction" id="Jira.Issue.GoTo"/>
         <action class="com.intellij.jira.actions.ConfigureJiraServersAction" id="Jira.Issue.Server.Configure"/>
 
+        <action class="com.intellij.jira.actions.OpenNewIssuesTabAction" id="Jira.Issues.New.Tab"/>
+
         <group id="Jira.Issues.Jql" class="com.intellij.jira.actions.JQLSearcherActionGroup"
                icon="AllIcons.General.Filter" popup="true">
             <reference id="Jira.Issue.Jql.Add"/>
@@ -82,13 +84,18 @@
             <reference id="Jira.Issue.ToggleColumns"/>
         </group>
 
-        <group id="Jira.Issues.Toolbar">
-            <reference id="Jira.Issues.Jql"/>
-            <separator/>
+        <group id="Jira.Issues.Base.Toolbar">
             <reference id="Jira.Issue.Refresh"/>
             <reference id="Jira.Issues.PresentationSettings"/>
             <reference id="Jira.Issue.GoTo"/>
+        </group>
+
+        <group id="Jira.Issues.Toolbar">
+            <reference id="Jira.Issues.Jql"/>
             <separator/>
+            <reference id="Jira.Issues.Base.Toolbar"/>
+            <separator/>
+            <reference id="Jira.Issues.New.Tab"/>
             <reference id="Jira.Issue.Server.Configure"/>
         </group>
 

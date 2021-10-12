@@ -1,5 +1,6 @@
 package com.intellij.jira.rest.model.jql;
 
+import com.intellij.jira.ui.editors.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.tasks.jira.jql.JqlLanguage;
@@ -13,12 +14,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JCheckBox;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
 import static com.intellij.openapi.util.text.StringUtil.isEmpty;
 import static com.intellij.openapi.util.text.StringUtil.trim;
 
-public class JQLSearcherEditor {
+public class JQLSearcherEditor implements Editor {
 
     private static final int DEFAULT_WIDTH = 300;
     private static final int DEFAULT_HEIGHT = 24;
@@ -37,19 +38,20 @@ public class JQLSearcherEditor {
     private JCheckBox myDefaultSearcherCheckBox;
     private JCheckBox mySharedSearcherCheckBox;
 
-    private JPanel myPanel;
-
-
     public JQLSearcherEditor(@NotNull Project project, @NotNull JQLSearcher searcher, boolean selected) {
         this.myProject = project;
         this.mySearcher = searcher;
         this.mySelectedSearcher = selected;
         this.mySharedSearcher = searcher.isShared();
-
-        init();
     }
 
-    private void init() {
+    public void apply(){
+        this.mySearcher.setAlias(trim(myAliasField.getText()));
+        this.mySearcher.setJql(trim(mySearchQueryField.getText()));
+    }
+
+    @Override
+    public JComponent createPanel() {
         this.myAliasLabel = new JBLabel("Alias:", 4);
         this.myAliasField = new JBTextField(mySearcher.getAlias());
         this.myAliasField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -67,24 +69,12 @@ public class JQLSearcherEditor {
         this.mySharedSearcherCheckBox.setSelected(mySharedSearcher);
 
 
-        this.myPanel = FormBuilder.createFormBuilder()
-                        .addLabeledComponent(this.myAliasLabel, this.myAliasField)
-                        .addLabeledComponent(this.mySearchLabel, this.mySearchQueryField)
-                        .addComponent(myDefaultSearcherCheckBox)
-                        .addComponent(mySharedSearcherCheckBox)
-                        .getPanel();
-
-    }
-
-
-    public void apply(){
-        this.mySearcher.setAlias(trim(myAliasField.getText()));
-        this.mySearcher.setJql(trim(mySearchQueryField.getText()));
-    }
-
-
-    public JPanel getPanel(){
-        return myPanel;
+        return FormBuilder.createFormBuilder()
+                .addLabeledComponent(this.myAliasLabel, this.myAliasField)
+                .addLabeledComponent(this.mySearchLabel, this.mySearchQueryField)
+                .addComponent(myDefaultSearcherCheckBox)
+                .addComponent(mySharedSearcherCheckBox)
+                .getPanel();
     }
 
     @Nullable

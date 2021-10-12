@@ -3,19 +3,21 @@ package com.intellij.jira.ui.panels;
 import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.ChangelistActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.listener.JiraIssueChangeListener;
-import com.intellij.jira.listener.JiraIssuesRefreshedListener;
+import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.listener.IssueChangeListener;
+import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTextPane;
+import com.intellij.jira.util.JiraBorders;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.messages.MessageBusConnection;
+import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NonNls;
@@ -25,8 +27,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
-import static com.intellij.jira.util.JiraLabelUtil.*;
-import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
+import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
+import static com.intellij.jira.util.JiraLabelUtil.WHITE;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.PAGE_START;
 import static javax.swing.BoxLayout.Y_AXIS;
@@ -35,13 +37,13 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
 
-    private final Project project;
-    private JiraIssue issue;
+    private final JiraIssuesData myIssuesData;
+    private JiraIssue myIssue;
 
-    public JiraIssueDescriptionPanel(@NotNull Project project, JiraIssue issue) {
+    public JiraIssueDescriptionPanel(@NotNull JiraIssuesData issuesData, @NotNull JiraIssue issue) {
         super(issue);
-        this.project = project;
-        this.issue = issue;
+        myIssuesData = issuesData;
+        myIssue = issue;
 
         init();
         subscribeTopic();
@@ -58,7 +60,7 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
     @Override
     public @Nullable Object getData(@NotNull @NonNls String dataId) {
         if (JiraDataKeys.ISSUE.is(dataId)) {
-            return issue;
+            return myIssue;
         }
 
         return super.getData(dataId);
@@ -66,16 +68,17 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
 
     private void init() {
         setBackground(JBColor.WHITE);
-        setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
+
+        FormBuilder formBuilder = FormBuilder.createFormBuilder();
 
         JPanel issueDetails = new JiraPanel().withBackground(JBColor.WHITE).withBorder(JBUI.Borders.empty(5, 5, 1, 5));
         issueDetails.setLayout(new BoxLayout(issueDetails, Y_AXIS));
 
         // Summary
-        if (StringUtil.isNotEmpty(issue.getSummary())) {
-            JPanel issueSummaryPanel = JiraPanelUtil.createWhitePanel(new BorderLayout()).withBorder(MARGIN_BOTTOM);
-            JBLabel summaryLabel = JiraLabelUtil.createLabel("Summary: ").withFont(BOLD);
-            JTextArea summaryArea = new JTextArea(issue.getSummary());
+        if (StringUtil.isNotEmpty(myIssue.getSummary())) {
+            JPanel issueSummaryPanel = JiraPanelUtil.createWhiteBorderPanel().withBorder(JiraBorders.emptyBottom(15));
+            JBLabel summaryLabel = JiraLabelUtil.createBoldLabel("Summary: ");
+            JTextArea summaryArea = new JTextArea(myIssue.getSummary());
             summaryArea.setLineWrap(true);
             summaryArea.setWrapStyleWord(true);
             summaryArea.setEditable(false);
@@ -84,22 +87,23 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
             issueSummaryPanel.add(summaryLabel, PAGE_START);
             issueSummaryPanel.add(summaryArea, CENTER);
 
-            issueDetails.add(issueSummaryPanel);
+            formBuilder.addComponent(issueSummaryPanel);
         }
 
         // Description
-        if (StringUtil.isNotEmpty(issue.getRenderedDescription())) {
+        if (StringUtil.isNotEmpty(myIssue.getRenderedDescription())) {
             JPanel issueDescriptionPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
-            JBLabel descriptionLabel = JiraLabelUtil.createLabel("Description: ").withFont(BOLD);
+            JBLabel descriptionLabel = JiraLabelUtil.createBoldLabel("Description: ");
             JiraTextPane descriptionTextPane = new JiraTextPane();
-            descriptionTextPane.setHTMLText(issue.getRenderedDescription());
+            descriptionTextPane.setHTMLText(myIssue.getRenderedDescription());
 
             issueDescriptionPanel.add(descriptionLabel, PAGE_START);
             issueDescriptionPanel.add(descriptionTextPane, CENTER);
 
-            issueDetails.add(issueDescriptionPanel);
+            formBuilder.addComponentFillVertically(issueDescriptionPanel, 0);
         }
 
+        issueDetails.add(formBuilder.getPanel());
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(JBUI.Borders.empty());
 
@@ -107,21 +111,20 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
     }
 
     private void subscribeTopic() {
-        MessageBusConnection connect = project.getMessageBus().connect();
+        MessageBusConnection connect = myIssuesData.getProject().getMessageBus().connect();
 
-        connect.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
-            if (issue.getKey().equals(this.issue.getKey())) {
-                this.issue = issue;
+        connect.subscribe(IssueChangeListener.TOPIC, issueKey -> {
+            if (issueKey.equals(this.myIssue.getKey())) {
+                this.myIssue = myIssuesData.getIssue(issueKey);
+
                 init();
             }
         });
 
-        connect.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
-            int issueIndex = issues.indexOf(this.issue);
-            if (issueIndex > -1) {
-                this.issue = issues.get(issueIndex);
-                init();
-            }
+        connect.subscribe(RefreshIssuesListener.TOPIC, () -> {
+            this.myIssue = myIssuesData.getIssue(issueKey);
+
+            init();
         });
     }
 }

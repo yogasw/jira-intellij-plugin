@@ -1,12 +1,10 @@
 package com.intellij.jira.tasks;
 
-import com.intellij.jira.exceptions.JiraServerConfigurationNotFoundException;
 import com.intellij.jira.components.JiraNotificationManager;
-import com.intellij.jira.listener.JiraIssueChangeListener;
-import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.exceptions.JiraServerConfigurationNotFoundException;
+import com.intellij.jira.listener.IssueChangeListener;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.server.JiraServerManager;
-import com.intellij.jira.util.result.Result;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -44,13 +42,7 @@ public abstract class AbstractBackgroundableTask extends Task.Backgroundable {
 
     @Override
     public void onSuccess() {
-        // Retrieve updated issue
-        Result issueResult = getJiraRestApi().getIssue(issueIdOrKey);
-        if(issueResult.isValid()){
-            JiraIssue issue = (JiraIssue) issueResult.get();
-            // Update views
-            myProject.getMessageBus().syncPublisher(JiraIssueChangeListener.TOPIC).issueChanged(issue);
-        }
+        myProject.getMessageBus().syncPublisher(IssueChangeListener.TOPIC).onChange(issueIdOrKey);
     }
 
     public void showNotification(String title, String content){

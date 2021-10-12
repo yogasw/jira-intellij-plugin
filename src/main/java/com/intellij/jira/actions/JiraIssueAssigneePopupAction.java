@@ -47,6 +47,7 @@ public class JiraIssueAssigneePopupAction extends JiraIssuePopupAction {
         assignableUsers.forEach(u -> group.add(JiraIssueAssignmentExecuteAction.assignUser(u.getDisplayName(), u.getAccountId(), u.getName(), issue.getKey())));
         group.add(JiraIssueAssignmentExecuteAction.assignAnyone(issue.getKey()));
 
+
         return group;
     }
 
