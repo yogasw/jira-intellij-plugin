@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 
 import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.WHITE;
@@ -92,7 +91,7 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
 
         // Description
         if (StringUtil.isNotEmpty(myIssue.getRenderedDescription())) {
-            JPanel issueDescriptionPanel = JiraPanelUtil.createWhitePanel(new BorderLayout());
+            JPanel issueDescriptionPanel = JiraPanelUtil.createWhiteBorderPanel();
             JBLabel descriptionLabel = JiraLabelUtil.createBoldLabel("Description: ");
             JiraTextPane descriptionTextPane = new JiraTextPane();
             descriptionTextPane.setHTMLText(myIssue.getRenderedDescription());

@@ -9,11 +9,11 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
-import java.awt.*;
+import java.awt.BorderLayout;
 
-public class JiraJqlIssuesPanel extends JiraIssuesPanel {
+public class JiraFilteredIssuesPanel extends JiraIssuesPanel {
 
-    public JiraJqlIssuesPanel(@NotNull JiraIssuesData issuesData) {
+    public JiraFilteredIssuesPanel(@NotNull JiraIssuesData issuesData) {
         super(issuesData);
     }
 

@@ -23,7 +23,9 @@ public class MyIssuesHighlighter implements JiraIssueHighlighter {
         JiraIssueUser currentUser = JiraUserProvider.getInstance(project).getCurrent();
         JiraIssueUser assigneeUser = issue.getAssignee();
 
-        if (assigneeUser!= null && currentUser.getEmailAddress().equals(assigneeUser.getEmailAddress())) {
+        if (currentUser != null
+                && assigneeUser != null
+                && currentUser.getEmailAddress().equals(assigneeUser.getEmailAddress())) {
             return JiraIssueStyleFactory.bold();
         }
 

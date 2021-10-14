@@ -18,8 +18,10 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.WHITE;
@@ -155,7 +157,6 @@ class JiraIssuePreviewPanel extends AbstractJiraToolWindowPanel {
         }
 
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getViewport().setViewPosition(new Point(0,0)); // Move to top
 
         previewPanel.add(scrollPane, CENTER);
 

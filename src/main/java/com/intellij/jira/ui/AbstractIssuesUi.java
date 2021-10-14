@@ -3,7 +3,7 @@ package com.intellij.jira.ui;
 import com.intellij.jira.data.JiraIssuesData;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractIssuesUi implements JiraIssuesUi {
+public abstract class AbstractIssuesUi implements IssuesUi {
 
     private final String myId;
     protected final JiraIssuesData myIssuesData;
@@ -21,6 +21,11 @@ public abstract class AbstractIssuesUi implements JiraIssuesUi {
     @Override
     public @NotNull JiraIssuesData getData() {
         return myIssuesData;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
 }

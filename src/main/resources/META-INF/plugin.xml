@@ -42,6 +42,7 @@
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherObserver"/>
         <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JiraUserProvider"/>
+        <projectService serviceImplementation="com.intellij.jira.JiraTabsManager"/>
 
         <notificationGroup id="Jira Balloon Notifications" displayType="BALLOON" />
         <notificationGroup id="Jira Sticky Balloon Notifications" displayType="STICKY_BALLOON" isLogByDefault="true" />

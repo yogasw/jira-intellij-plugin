@@ -8,19 +8,16 @@ import javax.swing.*;
 
 public class DefaultIssuesUi extends AbstractIssuesUi {
 
-    private static final String MAIN_ISSUES_ID = "MAIN_ISSUES_ID";
-
-    private final JiraIssuesPanel myIssuesPanel;
+    private static final String ISSUES_ID = "Issues";
 
     public DefaultIssuesUi(JiraIssuesData issuesData) {
-        super(MAIN_ISSUES_ID, issuesData);
-        this.myIssuesPanel = new JiraIssuesPanel(issuesData);
+        super(ISSUES_ID, issuesData);
     }
 
     @NotNull
     @Override
     public JComponent getMainComponent() {
-        return myIssuesPanel;
+        return new JiraIssuesPanel(myIssuesData);
     }
 
 }
