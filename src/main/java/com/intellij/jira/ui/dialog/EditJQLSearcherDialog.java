@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.rest.model.jql.JQLSearcherEditor;
 import com.intellij.jira.tasks.RefreshIssuesTask;

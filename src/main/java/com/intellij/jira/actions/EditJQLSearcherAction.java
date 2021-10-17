@@ -1,8 +1,8 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.jira.components.JQLSearcherManager;
-import com.intellij.jira.components.JQLSearcherProjectManager;
+import com.intellij.jira.jql.JQLSearcherManager;
+import com.intellij.jira.jql.JQLSearcherProjectManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.dialog.EditJQLSearcherDialog;

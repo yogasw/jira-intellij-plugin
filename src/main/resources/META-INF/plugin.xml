@@ -33,14 +33,13 @@
         <toolWindow id="Jira" anchor="bottom" icon="/icons/jiraIcon.svg" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory" canCloseContents="true"/>
 
         <applicationService serviceImplementation="com.intellij.jira.components.JiraNotificationManager"/>
-        <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherApplicationManager"/>
-        <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.jql.JQLSearcherApplicationManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.jql.JQLSearcherManager"/>
         <applicationService serviceImplementation="com.intellij.jira.settings.ChangelistSettings"/>
         <applicationService serviceImplementation="com.intellij.jira.ui.table.column.JiraIssueApplicationSettings"/>
 
         <projectService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
-        <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherObserver"/>
-        <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
+        <projectService serviceImplementation="com.intellij.jira.jql.JQLSearcherProjectManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JiraUserProvider"/>
         <projectService serviceImplementation="com.intellij.jira.JiraTabsManager"/>
 

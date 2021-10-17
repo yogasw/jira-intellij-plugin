@@ -1,8 +1,7 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
-import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.project.Project;
@@ -23,10 +22,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.ArrayList;
 
 import static com.intellij.jira.util.JiraLabelUtil.getBgRowColor;
 import static com.intellij.jira.util.JiraLabelUtil.getFgRowColor;
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
@@ -35,9 +34,9 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
     private SimpleSelectableList<JQLSearcher> mySearchers;
 
-    private final ColumnInfo<JQLSearcher, String> ALIAS_COLUMN = new AliasColumnInfo();
-    private final ColumnInfo<JQLSearcher, String> JQL_COLUMN = new JQLColumnInfo();
-    private final ColumnInfo<JQLSearcher, String> SHARED_COLUMN = new SharedrColumnInfo();
+    private final ColumnInfo<JQLSearcher, String> ALIAS_COLUMN = new AliasColumn();
+    private final ColumnInfo<JQLSearcher, String> JQL_COLUMN = new JQLColumn();
+    private final ColumnInfo<JQLSearcher, String> SHARED_COLUMN = new SharedColumn();
 
 
     private TableView<JQLSearcher> myTable;
@@ -56,7 +55,8 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     protected void init() {
         mySearchers = SimpleSelectableList.empty();
 
-        myModel = new ListTableModel(new ColumnInfo[]{ALIAS_COLUMN, JQL_COLUMN, SHARED_COLUMN}, new ArrayList());
+        myModel = new JQLSearcherListTableModel();
+
         for(JQLSearcher searcher : myManager.getSearchers(myProject)){
             JQLSearcher clone = searcher.clone();
             mySearchers.add(clone);
@@ -64,7 +64,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
         }
 
         mySearchers.selectItem(myManager.getSelectedSearcherIndex(myProject));
-        myTable = new TableView<>(myModel);
+        myTable = new JQLSearcherTable(myModel);
 
 
         setTitle("Configure JQL Searcher");
@@ -121,14 +121,32 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         myManager.setSearchers(myProject, mySearchers);
-        new RefreshIssuesTask(myProject).queue();
 
         super.doOKAction();
     }
 
 
+    private class JQLSearcherListTableModel extends ListTableModel<JQLSearcher> {
 
+        public JQLSearcherListTableModel() {
+            super(ALIAS_COLUMN, JQL_COLUMN, SHARED_COLUMN);
+        }
 
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false;
+        }
+    }
+
+    private class JQLSearcherTable extends TableView<JQLSearcher> {
+
+        public JQLSearcherTable(ListTableModel<JQLSearcher> model) {
+            super(model);
+            setShowGrid(false);
+            setSelectionMode(SINGLE_SELECTION);
+            setIntercellSpacing(JBUI.emptySize());
+        }
+    }
 
     private class JQLSearcherTableCellRenderer extends DefaultTableCellRenderer{
 
@@ -149,12 +167,11 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
         }
     }
 
-
-    private abstract class BaseColumnInfo extends ColumnInfo<JQLSearcher, String>{
+    private abstract class BaseColumn extends ColumnInfo<JQLSearcher, String>{
 
         private final JQLSearcherTableCellRenderer JQL_SEARCHER_RENDERER = new JQLSearcherTableCellRenderer();
 
-        public BaseColumnInfo(String name) {
+        public BaseColumn(String name) {
             super(name);
         }
 
@@ -165,10 +182,9 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
         }
     }
 
+    private class AliasColumn extends BaseColumn {
 
-    private class AliasColumnInfo extends BaseColumnInfo {
-
-        public AliasColumnInfo() {
+        public AliasColumn() {
             super("Alias");
         }
 
@@ -179,9 +195,9 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
         }
     }
 
-    private class JQLColumnInfo extends BaseColumnInfo {
+    private class JQLColumn extends BaseColumn {
 
-        public JQLColumnInfo() {
+        public JQLColumn() {
             super("JQL");
         }
 
@@ -192,9 +208,9 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
         }
     }
 
-    private class SharedrColumnInfo extends BaseColumnInfo {
+    private class SharedColumn extends BaseColumn {
 
-        public SharedrColumnInfo() {
+        public SharedColumn() {
             super("Shared");
         }
 

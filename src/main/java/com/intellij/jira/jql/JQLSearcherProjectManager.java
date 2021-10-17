@@ -1,4 +1,4 @@
-package com.intellij.jira.components;
+package com.intellij.jira.jql;
 
 import com.intellij.configurationStore.XmlSerializer;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
@@ -93,6 +93,12 @@ public class JQLSearcherProjectManager implements PersistentStateComponent<JQLSe
         return mySelectedSearcher > -1;
     }
 
+    public void setSelectedSearcher(int selectedSearcher) {
+        if (selectedSearcher >= 0) {
+            this.mySelectedSearcher = selectedSearcher;
+        }
+    }
+
     public void setSearchers(List<JQLSearcher> searcherList, int selected) {
         this.projectSearchers.clear();
         for (JQLSearcher searcher : searcherList){
@@ -106,15 +112,6 @@ public class JQLSearcherProjectManager implements PersistentStateComponent<JQLSe
             projectSearchers.add(searcher);
         }
     }
-
-    public void notifyObservers(List<JQLSearcher> searchers){
-        getJqlSearcherObserver().update(searchers);
-    }
-
-    private JQLSearcherObserver getJqlSearcherObserver(){
-        return JQLSearcherObserver.getInstance(myProject);
-    }
-
 
     public static class Config{
         @Tag("selected")

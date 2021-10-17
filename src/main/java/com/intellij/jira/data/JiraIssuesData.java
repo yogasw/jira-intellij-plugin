@@ -2,7 +2,7 @@ package com.intellij.jira.data;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.server.JiraRestApi;

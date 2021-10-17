@@ -1,4 +1,4 @@
-package com.intellij.jira.components;
+package com.intellij.jira.jql;
 
 import com.intellij.configurationStore.XmlSerializer;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
