@@ -1,7 +1,9 @@
 package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
+import com.intellij.jira.ui.table.JiraIssueTable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -13,8 +15,8 @@ import java.awt.BorderLayout;
 
 public class JiraFilteredIssuesPanel extends JiraIssuesPanel {
 
-    public JiraFilteredIssuesPanel(@NotNull JiraIssuesData issuesData) {
-        super(issuesData);
+    public JiraFilteredIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
+        super(issuesData, searcher);
     }
 
     @Override
@@ -38,4 +40,23 @@ public class JiraFilteredIssuesPanel extends JiraIssuesPanel {
     protected void setToolbarHeightReference() {
 
     }
+
+    @Override
+    protected @NotNull JiraIssueTable getIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
+        return new MyJiraIssueTable(issuesData, searcher);
+    }
+
+
+    private class MyJiraIssueTable extends JiraIssueTable {
+
+        public MyJiraIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
+            super(issuesData, searcher);
+        }
+
+        @Override
+        public void updateSelectedSearcher() {
+            // Do not update
+        }
+    }
+
 }

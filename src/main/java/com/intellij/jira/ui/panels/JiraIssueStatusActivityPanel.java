@@ -7,17 +7,21 @@ import org.jetbrains.annotations.NotNull;
 
 public class JiraIssueStatusActivityPanel extends OnePixelSplitter {
 
-    private final JiraIssueStatusPanel jiraIssueStatusPanel;
-    private final JiraIssueActivityPanel jiraIssueActivityPanel;
+    private final JiraIssueStatusPanel myStatusPanel;
+    private final JiraIssueActivityPanel myActivityPanel;
 
     public JiraIssueStatusActivityPanel(@NotNull JiraIssuesData issuesData, JiraIssue issue) {
         super(0.35f);
 
-        this.jiraIssueStatusPanel = new JiraIssueStatusPanel(issuesData, issue);
-        this.jiraIssueActivityPanel = new JiraIssueActivityPanel(issuesData, issue);
+        myStatusPanel = new JiraIssueStatusPanel(issuesData, issue);
+        myActivityPanel = new JiraIssueActivityPanel(issuesData, issue);
 
-        setFirstComponent(this.jiraIssueStatusPanel);
-        setSecondComponent(this.jiraIssueActivityPanel);
+        setFirstComponent(myStatusPanel);
+        setSecondComponent(myActivityPanel);
     }
 
+    public void update(@NotNull JiraIssue issue) {
+        myStatusPanel.update(issue);
+        myActivityPanel.update(issue);
+    }
 }

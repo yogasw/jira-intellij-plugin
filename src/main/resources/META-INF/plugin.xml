@@ -37,8 +37,10 @@
         <applicationService serviceImplementation="com.intellij.jira.jql.JQLSearcherManager"/>
         <applicationService serviceImplementation="com.intellij.jira.settings.ChangelistSettings"/>
         <applicationService serviceImplementation="com.intellij.jira.ui.table.column.JiraIssueApplicationSettings"/>
+        <applicationService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.server.JiraServerApplicationManager"/>
 
-        <projectService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
+        <projectService serviceImplementation="com.intellij.jira.server.JiraServerProjectManager"/>
         <projectService serviceImplementation="com.intellij.jira.jql.JQLSearcherProjectManager"/>
         <projectService serviceImplementation="com.intellij.jira.components.JiraUserProvider"/>
         <projectService serviceImplementation="com.intellij.jira.JiraTabsManager"/>

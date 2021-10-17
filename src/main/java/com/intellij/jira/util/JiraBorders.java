@@ -12,6 +12,10 @@ public final class JiraBorders {
         return empty(0, 0);
     }
 
+    public static Border empty(int offsets) {
+        return empty(offsets, offsets);
+    }
+
     public static Border emptyTop(int offset) {
         return empty(offset, 0, 0, 0);
     }

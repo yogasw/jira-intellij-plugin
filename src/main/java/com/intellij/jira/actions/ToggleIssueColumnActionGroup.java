@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +15,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.intellij.jira.ui.table.column.JiraIssueColumnUtils.*;
+import static com.intellij.jira.ui.table.column.JiraIssueColumnUtils.addColumn;
+import static com.intellij.jira.ui.table.column.JiraIssueColumnUtils.getHideableColumns;
+import static com.intellij.jira.ui.table.column.JiraIssueColumnUtils.isVisible;
+import static com.intellij.jira.ui.table.column.JiraIssueColumnUtils.removeColumn;
 import static java.util.Objects.isNull;
 
 
@@ -44,8 +48,8 @@ public class ToggleIssueColumnActionGroup extends DefaultActionGroup {
         if (isNull(project)|| !project.isInitialized() || project.isDisposed()) {
             e.getPresentation().setVisible(false);
         } else {
-            JiraServerManager manager = JiraServerManager.getInstance(project);
-            e.getPresentation().setVisible(manager.hasJiraServerConfigured());
+            JiraServerManager manager = ApplicationManager.getApplication().getService(JiraServerManager.class);
+            e.getPresentation().setVisible(manager.hasJiraServerConfigured(project));
         }
     }
 

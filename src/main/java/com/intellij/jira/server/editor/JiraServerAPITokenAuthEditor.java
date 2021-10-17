@@ -1,17 +1,18 @@
 package com.intellij.jira.server.editor;
 
 import com.intellij.jira.server.JiraServer;
-import com.intellij.jira.server.auth.AuthType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UI;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -33,7 +34,7 @@ public class JiraServerAPITokenAuthEditor extends JiraServerAuthEditor {
     }
 
     @Override
-    public JPanel getPanel() {
+    public JComponent createPanel() {
         this.myEmailLabel = new JBLabel("Email:", 4);
         this.myEmailField = new JBTextField();
         this.myEmailField.setText(myServer.hasUserAndPassAuth() ? "" : myServer.getUsername());
@@ -52,6 +53,7 @@ public class JiraServerAPITokenAuthEditor extends JiraServerAuthEditor {
                 .addLabeledComponent(this.myEmailLabel, this.myEmailField)
                 .addLabeledComponent(this.myApiTokenLabel, this.myApiTokenField)
                 .addComponent(this.myDefaultServerCheckbox)
+                .addComponent(this.mySharedCheckbox)
                 .addComponentToRightColumn(this.myTestPanel)
                 .getPanel();
     }
@@ -69,7 +71,7 @@ public class JiraServerAPITokenAuthEditor extends JiraServerAuthEditor {
         String useremail = trim(myEmailField.getText());
         String apiToken = trim(valueOf(myApiTokenField.getPassword()));
 
-        this.myServer.withApiToken(url, useremail, apiToken);
+        this.myServer.withApiToken(url, useremail, apiToken, isSharedServer());
 
         super.apply();
     }

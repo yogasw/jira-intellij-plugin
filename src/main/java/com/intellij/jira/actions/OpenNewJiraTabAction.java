@@ -2,21 +2,14 @@ package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.jira.JiraDataKeys;
-import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.JiraTabsManager;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.ui.panels.JiraIssuePanel;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 import static java.util.Objects.nonNull;
 
 public class OpenNewJiraTabAction extends JiraIssueAction {
@@ -31,22 +24,8 @@ public class OpenNewJiraTabAction extends JiraIssueAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (Objects.nonNull(project)) {
-
-            ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-            ToolWindow jiraToolWindow = toolWindowManager.getToolWindow(TOOL_WINDOW_ID);
-            ContentManager contentManager = jiraToolWindow.getContentManager();
-
             JiraIssue issue = e.getRequiredData(JiraDataKeys.ISSUE);
-            Content content = contentManager.findContent(issue.getKey()); // Avoid creates same content
-            if (Objects.isNull(content)) {
-                JiraIssuesData issuesData = new JiraIssuesData(project);
-                JiraIssuePanel jiraIssuePanel = new JiraIssuePanel(issuesData, issue.getKey());
-
-                content = ContentFactory.SERVICE.getInstance().createContent(jiraIssuePanel, issue.getKey(), false);
-                contentManager.addContent(content);
-            }
-
-            contentManager.setSelectedContent(content);
+            JiraTabsManager.getInstance(project).openDetailsIssueTab(issue.getKey());
         }
 
     }

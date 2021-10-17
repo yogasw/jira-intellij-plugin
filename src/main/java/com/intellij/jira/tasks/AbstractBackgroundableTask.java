@@ -3,9 +3,12 @@ package com.intellij.jira.tasks;
 import com.intellij.jira.components.JiraNotificationManager;
 import com.intellij.jira.exceptions.JiraServerConfigurationNotFoundException;
 import com.intellij.jira.listener.IssueChangeListener;
+import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.server.JiraServerManager;
+import com.intellij.jira.util.result.Result;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -21,12 +24,12 @@ public abstract class AbstractBackgroundableTask extends Task.Backgroundable {
     public AbstractBackgroundableTask(@NotNull Project project, @NotNull String title, String issueIdOrKey) {
         super(project, title, false, ALWAYS_BACKGROUND);
         this.issueIdOrKey = issueIdOrKey;
-        this.jiraServerManager = JiraServerManager.getInstance(project);
+        this.jiraServerManager = ApplicationManager.getApplication().getService(JiraServerManager.class);
     }
 
     @NotNull
     public JiraRestApi getJiraRestApi() throws JiraServerConfigurationNotFoundException{
-        JiraRestApi jiraRestApi = jiraServerManager.getJiraRestApi();
+        JiraRestApi jiraRestApi = jiraServerManager.getJiraRestApi(myProject);
         if(isNull(jiraRestApi)) {
             throw new JiraServerConfigurationNotFoundException();
         }
@@ -42,7 +45,12 @@ public abstract class AbstractBackgroundableTask extends Task.Backgroundable {
 
     @Override
     public void onSuccess() {
-        myProject.getMessageBus().syncPublisher(IssueChangeListener.TOPIC).onChange(issueIdOrKey);
+        Result issueResult = getJiraRestApi().getIssue(issueIdOrKey);
+        JiraIssue issue = (JiraIssue) issueResult.get();
+
+        if (issue != null) {
+            myProject.getMessageBus().syncPublisher(IssueChangeListener.TOPIC).onChange(issue);
+        }
     }
 
     public void showNotification(String title, String content){

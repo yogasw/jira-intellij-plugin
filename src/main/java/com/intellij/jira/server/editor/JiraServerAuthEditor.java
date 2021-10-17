@@ -2,6 +2,7 @@ package com.intellij.jira.server.editor;
 
 import com.intellij.jira.server.JiraServer;
 import com.intellij.jira.tasks.TestJiraServerConnectionTask;
+import com.intellij.jira.ui.editors.Editor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressManager;
@@ -29,7 +30,7 @@ import java.util.function.Consumer;
 
 import static com.intellij.jira.util.JiraPanelUtil.MARGIN_BOTTOM;
 
-public abstract class JiraServerAuthEditor {
+public abstract class JiraServerAuthEditor implements Editor {
 
     protected static final int DEFAULT_WIDTH = 450;
     protected static final int DEFAULT_HEIGHT = 24;
@@ -46,6 +47,7 @@ public abstract class JiraServerAuthEditor {
     protected JTextField myUrlField;
 
     protected JCheckBox myDefaultServerCheckbox;
+    protected JCheckBox mySharedCheckbox;
 
     protected JPanel myTestPanel;
     protected JButton myTestButton;
@@ -59,12 +61,15 @@ public abstract class JiraServerAuthEditor {
         init();
     }
 
-    public abstract JPanel getPanel();
-
     public void installListeners() {
         installListener(myUrlField);
         installListener(myDefaultServerCheckbox);
         installListener(myTestButton);
+
+        mySharedCheckbox.addActionListener(e -> {
+            myServer.setShared(mySharedCheckbox.isSelected());
+        });
+
     }
 
     private void init() {
@@ -76,6 +81,10 @@ public abstract class JiraServerAuthEditor {
         this.myDefaultServerCheckbox = new JCheckBox("Set Default");
         this.myDefaultServerCheckbox.setBorder(JBUI.Borders.emptyRight(4));
         this.myDefaultServerCheckbox.setSelected(mySelectedServer);
+
+        this.mySharedCheckbox = new JCheckBox("Shared");
+        this.mySharedCheckbox.setBorder(JBUI.Borders.emptyRight(4));
+        this.mySharedCheckbox.setSelected(myServer.isShared());
 
         this.myTestPanel = new JPanel(new BorderLayout());
         myTestPanel.setBorder(MARGIN_BOTTOM);
@@ -100,7 +109,7 @@ public abstract class JiraServerAuthEditor {
     }
 
     private void installListener(JButton button){
-        button.addActionListener((event) -> {
+        button.addActionListener(event -> {
             ApplicationManager.getApplication().invokeLater(() -> {
                 TestJiraServerConnectionTask task = new TestJiraServerConnectionTask(myProject, myServer);
                 ProgressManager.getInstance().run(task);
@@ -125,6 +134,10 @@ public abstract class JiraServerAuthEditor {
 
     protected void apply(){
         this.myChangeUrlListener.accept(myServer);
+    }
+
+    protected boolean isSharedServer() {
+        return mySharedCheckbox.isSelected();
     }
 
     private void defaultServerChanged(){

@@ -3,10 +3,13 @@ package com.intellij.jira.ui.panels;
 import com.google.common.util.concurrent.SettableFuture;
 import com.intellij.jira.JiraUiDataKeys;
 import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
 import com.intellij.jira.ui.table.JiraIssueTable;
 import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DataProvider;
@@ -17,6 +20,8 @@ import com.intellij.openapi.ui.Splitter;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.panels.Wrapper;
+import com.intellij.util.messages.MessageBusConnection;
+import com.intellij.vcs.log.ui.frame.ProgressStripe;
 import net.miginfocom.swing.MigLayout;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
@@ -31,31 +37,42 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
-public class JiraIssuesPanel extends JiraPanel implements DataProvider {
+public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposable {
 
     private final JComponent myToolbar;
+    private final JQLSearcher mySearcher;
+    private final JiraIssuesData myIssuesData;
     private final JiraIssueTable myJiraIssueTable;
     private final JiraIssueDetailsPanel myJiraIssueDetailsPanel;
+    private final ProgressStripe myProgressStripe;
 
     private Splitter myIssuesBrowserSplitter;
 
-    public JiraIssuesPanel(@NotNull JiraIssuesData issuesData) {
+    public JiraIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
         super(new BorderLayout());
 
+        myIssuesData = issuesData;
+        mySearcher = searcher;
         myToolbar = getToolbar(issuesData.getProject());
 
-        myJiraIssueTable = new JiraIssueTable(issuesData);
+        myJiraIssueTable = getIssueTable(issuesData, searcher);
         myJiraIssueDetailsPanel = new JiraIssueDetailsPanel(issuesData);
 
         myJiraIssueTable.getSelectionModel().addListSelectionListener(new MyListSelectionListener());
 
         JComponent toolbarAndTable = new JPanel(new BorderLayout());
         toolbarAndTable.add(myToolbar, getToolbarOrientation());
-        toolbarAndTable.add(ScrollPaneFactory.createScrollPane(myJiraIssueTable, true), BorderLayout.CENTER);
+        JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(myJiraIssueTable, true);
+        myProgressStripe = new ProgressStripe(scrollPane, this, 1);
+
+        toolbarAndTable.add(myProgressStripe, BorderLayout.CENTER);
 
         myIssuesBrowserSplitter = new OnePixelSplitter(0.6f);
         myIssuesBrowserSplitter.setFirstComponent(toolbarAndTable);
         myIssuesBrowserSplitter.setSecondComponent(myJiraIssueDetailsPanel);
+
+        MessageBusConnection connection = issuesData.getProject().getMessageBus().connect();
+        connection.subscribe(RefreshIssuesListener.TOPIC, new MyRefreshIssuesListener());
 
         add(myIssuesBrowserSplitter);
     }
@@ -67,6 +84,11 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider {
 
     protected void setToolbarHeightReference() {
         myJiraIssueDetailsPanel.setToolbarHeightReferent(myToolbar);
+    }
+
+    @NotNull
+    protected JiraIssueTable getIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
+        return new JiraIssueTable(issuesData, searcher);
     }
 
     @Override
@@ -116,12 +138,39 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider {
         return future;
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
     private class MyListSelectionListener implements ListSelectionListener {
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
             myJiraIssueDetailsPanel.showIssue(myJiraIssueTable.getSelectedObject());
             setToolbarHeightReference();
+        }
+    }
+
+    private class MyRefreshIssuesListener implements RefreshIssuesListener {
+
+        @Override
+        public void onRefresh() {
+            myProgressStripe.startLoading();
+            ApplicationManager.getApplication().invokeLater(() -> {
+                JiraIssue lastSelectedIssue = myJiraIssueTable.getSelectedObject();
+                myJiraIssueTable.updateSelectedSearcher();
+                myJiraIssueTable.updateModelAndColumns();
+                int currentPosIssue = myJiraIssueTable.getModel().indexOf(lastSelectedIssue);
+                // if the last selected issue exists in the new list, we select it
+                if (currentPosIssue >= 0) {
+                    JiraIssue issueToShow = myJiraIssueTable.getModel().getItem(currentPosIssue);
+                    myJiraIssueTable.addSelection(issueToShow);
+                }
+
+            });
+            myProgressStripe.stopLoading();
+
         }
     }
 

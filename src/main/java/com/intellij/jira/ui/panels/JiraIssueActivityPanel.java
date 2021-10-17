@@ -2,21 +2,20 @@ package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.listener.IssueChangeListener;
-import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTabbedPane;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.JTabbedPane;
 
 public class JiraIssueActivityPanel extends JiraTabbedPane {
 
     private final JiraIssuesData myIssuesData;
     private JiraIssue myIssue;
 
-    private Integer mySelectedTab = 0;
+    private int mySelectedTab = 0;
 
     JiraIssueActivityPanel(@NotNull JiraIssuesData issuesData, JiraIssue issue) {
         super(JTabbedPane.BOTTOM);
@@ -27,6 +26,11 @@ public class JiraIssueActivityPanel extends JiraTabbedPane {
         setSelectedIndex(mySelectedTab);
         addChangeListener(e -> mySelectedTab = getSelectedIndex());
         subscribeTopic();
+    }
+
+    public void update(@NotNull JiraIssue issue) {
+        myIssue = issue;
+        updatePanel();
     }
 
     private String appendTotal(int total) {
@@ -43,29 +47,27 @@ public class JiraIssueActivityPanel extends JiraTabbedPane {
 
     private void subscribeTopic() {
         MessageBusConnection connect = myIssuesData.getProject().getMessageBus().connect();
-        connect.subscribe(IssueChangeListener.TOPIC, issueKey -> {
-            if (issueKey.equals(this.myIssue.getKey())) {
-                this.myIssue = myIssuesData.getIssue(issueKey);
+        connect.subscribe(IssueChangeListener.TOPIC, issue -> {
+            if (issue.getKey().equals(myIssue.getKey())) {
+                myIssue = issue;
                 updatePanel();
             }
         });
 
-        connect.subscribe(RefreshIssuesListener.TOPIC, () -> {
-            this.myIssue = myIssuesData.getIssue(myIssue.getKey());
-            updatePanel();
-        });
     }
 
     private void updatePanel() {
         ApplicationManager.getApplication().invokeLater(() -> {
-            Integer oldSelectedTab = Integer.valueOf(mySelectedTab.intValue());
+            int oldSelectedTab = mySelectedTab;
             while (getTabCount() > 0) {
                 remove(0);
             }
 
-            addTabs();
-            setSelectedIndex(oldSelectedTab);
-            mySelectedTab = getSelectedIndex();
+            if (myIssue != null) {
+                addTabs();
+                setSelectedIndex(oldSelectedTab);
+                mySelectedTab = getSelectedIndex();
+            }
         });
     }
 

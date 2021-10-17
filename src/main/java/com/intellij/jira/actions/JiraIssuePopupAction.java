@@ -5,13 +5,14 @@ import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-public abstract class JiraIssuePopupAction extends JiraIssueAction{
+public abstract class JiraIssuePopupAction extends JiraIssueAction {
 
     public JiraIssuePopupAction(@NotNull ActionProperties actionProperties) {
         super(actionProperties);
@@ -25,8 +26,8 @@ public abstract class JiraIssuePopupAction extends JiraIssueAction{
                 return;
             }
 
-            JiraServerManager manager = JiraServerManager.getInstance(project);
-            JiraRestApi jiraRestApi = manager.getJiraRestApi();
+            JiraServerManager manager = ApplicationManager.getApplication().getService(JiraServerManager.class);
+            JiraRestApi jiraRestApi = manager.getJiraRestApi(project);
             if(isNull(jiraRestApi)) {
                 return;
             }

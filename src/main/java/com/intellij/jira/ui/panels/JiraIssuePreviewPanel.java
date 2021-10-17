@@ -1,10 +1,14 @@
 package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.JiraDataKeys;
-import com.intellij.jira.actions.*;
+import com.intellij.jira.actions.ChangelistActionGroup;
+import com.intellij.jira.actions.JiraIssueActionGroup;
+import com.intellij.jira.actions.JiraIssueAssigneePopupAction;
+import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
+import com.intellij.jira.actions.OpenNewJiraTabAction;
+import com.intellij.jira.actions.TransitIssueDialogAction;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTextPane;
-import com.intellij.jira.util.JiraBorders;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -18,7 +22,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -27,7 +30,6 @@ import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.WHITE;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.PAGE_START;
-import static javax.swing.BoxLayout.Y_AXIS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
@@ -68,14 +70,10 @@ class JiraIssuePreviewPanel extends AbstractJiraToolWindowPanel {
     }
 
     private void initContent() {
-        JPanel previewPanel = JiraPanelUtil.createWhiteBorderPanel()
-                .withBorder(JiraBorders.emptyLeft(5));
 
-        JPanel issueDetails = JiraPanelUtil.createWhiteBorderPanel();
-        issueDetails.setLayout(new BoxLayout(issueDetails, Y_AXIS));
+        JPanel issueDetails = new JiraScrollablePanel();
 
         // Key and status
-
         JBLabel projectKeyLabel = JiraLabelUtil.createLinkLabel(issue.getProject().getName(), issue.getProject().getUrl());
         JBLabel separatorLabel = JiraLabelUtil.createLabel(" / ");
         JBLabel issueKeyLabel = JiraLabelUtil.createLinkLabel(issue.getKey(), issue.getUrl());
@@ -158,9 +156,7 @@ class JiraIssuePreviewPanel extends AbstractJiraToolWindowPanel {
 
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
 
-        previewPanel.add(scrollPane, CENTER);
-
-        setContent(previewPanel);
+        setContent(scrollPane);
     }
 
 }

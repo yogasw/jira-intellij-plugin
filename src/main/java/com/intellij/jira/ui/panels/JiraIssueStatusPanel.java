@@ -7,20 +7,16 @@ import com.intellij.jira.actions.JiraIssuePrioritiesPopupAction;
 import com.intellij.jira.actions.TransitIssueDialogAction;
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.listener.IssueChangeListener;
-import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.ui.JBColor;
 import com.intellij.util.messages.MessageBusConnection;
-import com.intellij.util.ui.FormBuilder;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-
-import static javax.swing.BoxLayout.Y_AXIS;
+import javax.swing.JPanel;
 
 public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
 
@@ -56,54 +52,50 @@ public class JiraIssueStatusPanel extends AbstractJiraToolWindowPanel {
     }
 
     private void init() {
-        JPanel mainPanel = JiraPanelUtil.createWhiteBorderPanel().withBorder(JBUI.Borders.empty(5));
-        mainPanel.setLayout(new BoxLayout(mainPanel, Y_AXIS));
+        setBackground(JBColor.WHITE);
 
-        FormBuilder formBuilder = FormBuilder.createFormBuilder();
+        JPanel mainPanel = new JiraScrollablePanel();
 
         // Status
         JPanel statusPanel = JiraPanelUtil.createStatusPanel(myIssue);
-        formBuilder.addComponent(statusPanel);
+        mainPanel.add(statusPanel);
 
         // Priority
         JPanel priorityPanel = JiraPanelUtil.createPriorityPanel(myIssue);
-        formBuilder.addComponent(priorityPanel,0);
+        mainPanel.add(priorityPanel);
 
         // Reporter
         JPanel reporterPanel = JiraPanelUtil.createReporterPanel(myIssue);
-        formBuilder.addComponent(reporterPanel,0);
+        mainPanel.add(reporterPanel);
 
         // Assignee
         JPanel assigneePanel = JiraPanelUtil.createAssigneePanel(myIssue);
-        formBuilder.addComponent(assigneePanel,0);
+        mainPanel.add(assigneePanel);
 
         // Watches
         JPanel watchesPanel = JiraPanelUtil.createWatchesPanel(myIssue, myIssuesData.getProject());
-        formBuilder.addComponent(watchesPanel,0);
+        mainPanel.add(watchesPanel);
 
         // Versions
         JPanel versionsPanel = JiraPanelUtil.createVersionsPanel(myIssue);
-        formBuilder.addComponentFillVertically(versionsPanel, 0);
+        mainPanel.add(versionsPanel);
 
-        mainPanel.add(formBuilder.getPanel());
         setContent(mainPanel);
+    }
+
+    public void update(@NotNull JiraIssue issue) {
+        myIssue = issue;
+        init();
     }
 
     private void subscribeTopic() {
         MessageBusConnection connect = myIssuesData.getProject().getMessageBus().connect();
 
-        connect.subscribe(IssueChangeListener.TOPIC, issueKey -> {
-            if (issueKey.equals(this.myIssue.getKey())) {
-                this.myIssue = myIssuesData.getIssue(issueKey);
-
+        connect.subscribe(IssueChangeListener.TOPIC, issue -> {
+            if (issue.getKey().equals(myIssue.getKey())) {
+                myIssue = issue;
                 init();
             }
-        });
-
-        connect.subscribe(RefreshIssuesListener.TOPIC, () -> {
-            this.myIssue = myIssuesData.getIssue(issueKey);
-
-            init();
         });
 
     }

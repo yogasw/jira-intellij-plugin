@@ -9,6 +9,7 @@ import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.popup.JiraIssuePrioritiesPopup;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 
 import java.util.List;
@@ -30,8 +31,8 @@ public class JiraIssuePrioritiesPopupAction extends JiraIssueAction {
             return;
         }
 
-        JiraServerManager manager = JiraServerManager.getInstance(project);
-        JiraRestApi jiraRestApi = manager.getJiraRestApi();
+        JiraServerManager manager = ApplicationManager.getApplication().getService(JiraServerManager.class);
+        JiraRestApi jiraRestApi = manager.getJiraRestApi(project);
         if(isNull(jiraRestApi)){
            return;
         }

@@ -5,7 +5,6 @@ import com.intellij.jira.actions.ChangelistActionGroup;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.listener.IssueChangeListener;
-import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTextPane;
 import com.intellij.jira.util.JiraBorders;
@@ -16,21 +15,20 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.util.messages.MessageBusConnection;
-import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import static com.intellij.jira.util.JiraLabelUtil.DACULA_DEFAULT_COLOR;
 import static com.intellij.jira.util.JiraLabelUtil.WHITE;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.PAGE_START;
-import static javax.swing.BoxLayout.Y_AXIS;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
@@ -68,10 +66,7 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
     private void init() {
         setBackground(JBColor.WHITE);
 
-        FormBuilder formBuilder = FormBuilder.createFormBuilder();
-
-        JPanel issueDetails = new JiraPanel().withBackground(JBColor.WHITE).withBorder(JBUI.Borders.empty(5, 5, 1, 5));
-        issueDetails.setLayout(new BoxLayout(issueDetails, Y_AXIS));
+        JPanel issueDetails = new JiraScrollablePanel();
 
         // Summary
         if (StringUtil.isNotEmpty(myIssue.getSummary())) {
@@ -86,7 +81,7 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
             issueSummaryPanel.add(summaryLabel, PAGE_START);
             issueSummaryPanel.add(summaryArea, CENTER);
 
-            formBuilder.addComponent(issueSummaryPanel);
+            issueDetails.add(issueSummaryPanel);
         }
 
         // Description
@@ -99,31 +94,27 @@ public class JiraIssueDescriptionPanel extends AbstractJiraToolWindowPanel {
             issueDescriptionPanel.add(descriptionLabel, PAGE_START);
             issueDescriptionPanel.add(descriptionTextPane, CENTER);
 
-            formBuilder.addComponentFillVertically(issueDescriptionPanel, 0);
+            issueDetails.add(issueDescriptionPanel);
         }
 
-        issueDetails.add(formBuilder.getPanel());
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(issueDetails, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(JBUI.Borders.empty());
 
         setContent(scrollPane);
     }
 
+    public void update(@NotNull JiraIssue issue) {
+        myIssue = issue;
+        init();
+    }
+
     private void subscribeTopic() {
-        MessageBusConnection connect = myIssuesData.getProject().getMessageBus().connect();
-
-        connect.subscribe(IssueChangeListener.TOPIC, issueKey -> {
-            if (issueKey.equals(this.myIssue.getKey())) {
-                this.myIssue = myIssuesData.getIssue(issueKey);
-
+        myIssuesData.getProject().getMessageBus().connect().subscribe(IssueChangeListener.TOPIC, issue -> {
+            if (issue.getKey().equals(myIssue.getKey())) {
+                myIssue = issue;
                 init();
             }
         });
 
-        connect.subscribe(RefreshIssuesListener.TOPIC, () -> {
-            this.myIssue = myIssuesData.getIssue(issueKey);
-
-            init();
-        });
     }
 }

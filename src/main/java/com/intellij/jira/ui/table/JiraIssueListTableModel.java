@@ -2,6 +2,7 @@ package com.intellij.jira.ui.table;
 
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.table.column.JiraIssueColumn;
 import com.intellij.jira.ui.table.column.JiraIssueColumnManager;
 import com.intellij.jira.ui.table.column.JiraIssueColumnUtils;
@@ -15,12 +16,15 @@ import java.util.List;
 public class JiraIssueListTableModel extends ListTableModel<JiraIssue> {
 
     private final JiraIssuesData myIssuesData;
+    private final JQLSearcher mySearcher;
 
-    public JiraIssueListTableModel(@NotNull JiraIssuesData issuesData) {
+    public JiraIssueListTableModel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
         super();
 
         myIssuesData = issuesData;
-        List<JiraIssue> issues = issuesData.getIssues();
+        mySearcher = searcher;
+
+        List<JiraIssue> issues = issuesData.getIssues(searcher.getJql());
 
         initializeColumnsWidth(issues);
         setColumnInfos(getIssueColumns());

@@ -7,6 +7,7 @@ import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.jira.util.SimpleSelectableList;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
@@ -64,7 +65,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
     public ConfigureJiraServersDialog(@NotNull Project project) {
         super(project, false);
         this.myProject = project;
-        this.myManager = JiraServerManager.getInstance(project);
+        this.myManager = ApplicationManager.getApplication().getService(JiraServerManager.class);
         init();
     }
 
@@ -74,23 +75,20 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         myJiraServerEditor = new JPanel(new CardLayout());
         myJiraServerEditor.add(EMPTY_PANEL, EMPTY_PANEL_NAME);
 
-        myServers = new SimpleSelectableList<>();
+        myServers = myManager.getAllServers(myProject);
 
-        CollectionListModel listModel = new CollectionListModel<>(new ArrayList());
-        for(JiraServer server : myManager.getJiraServers()){
+        CollectionListModel<JiraServer> listModel = new CollectionListModel(new ArrayList<>());
+        for(JiraServer server : myServers.getItems()){
             JiraServer clone = server.clone();
             listModel.add(clone);
-            myServers.add(clone);
         }
-
-        myServers.selectItem(myManager.getSelectedJiraServerIndex());
 
         this.myChangeListener = (server, selected) -> myServers.updateSelectedItem(server, selected);
         this.myChangeUrlListener = server -> ((CollectionListModel)myServersList.getModel()).contentsChanged(server);
 
 
         for(int i = 0; i < myServers.getItems().size(); i++){
-            addJiraServerEditor(myServers.getItems().get(i), i == myManager.getSelectedJiraServerIndex());
+            addJiraServerEditor(myServers.getItems().get(i), i == myManager.getSelectedServerIndex(myProject));
         }
 
 
@@ -145,8 +143,8 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
-        myManager.setJiraServers(myServers);
-        updateIssues();
+        myManager.setServers(myProject, myServers);
+        //updateIssues();
 
         super.doOKAction();
     }
@@ -186,7 +184,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         JiraServerEditor editor = new JiraServerEditor(myProject, server, selected, myChangeListener, myChangeUrlListener);
         myEditors.add(editor);
         String name = myServerNames.get(server);
-        myJiraServerEditor.add(editor.getPanel(), name);
+        myJiraServerEditor.add(editor.createPanel(), name);
         myJiraServerEditor.doLayout();
     }
 

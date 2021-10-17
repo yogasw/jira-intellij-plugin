@@ -7,6 +7,7 @@ import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -86,7 +87,7 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
             Project project = e.getProject();
             if(nonNull(project)){
                 myProject = project;
-                myJiraRestApi = JiraServerManager.getInstance(project).getJiraRestApi();
+                myJiraRestApi = ApplicationManager.getApplication().getService(JiraServerManager.class).getJiraRestApi(project);
             }
         }
     }
