@@ -23,11 +23,11 @@ public class DetailsIssueUi implements IssueUi {
 
     @Override
     public @NotNull JComponent getMainComponent() {
-        return new JiraIssuePanel(myIssuesData, myIssueKey);
+        return new JiraIssuePanel(myIssuesData, myIssueKey, this);
     }
 
     @Override
     public void dispose() {
-
+        System.out.println("Disposing DetailsIssueUi...");
     }
 }

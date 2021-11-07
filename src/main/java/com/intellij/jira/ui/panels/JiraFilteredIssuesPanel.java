@@ -4,6 +4,7 @@ import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
 import com.intellij.jira.ui.table.JiraIssueTable;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -15,8 +16,8 @@ import java.awt.BorderLayout;
 
 public class JiraFilteredIssuesPanel extends JiraIssuesPanel {
 
-    public JiraFilteredIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
-        super(issuesData, searcher);
+    public JiraFilteredIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
+        super(issuesData, searcher, parent);
     }
 
     @Override
@@ -42,15 +43,15 @@ public class JiraFilteredIssuesPanel extends JiraIssuesPanel {
     }
 
     @Override
-    protected @NotNull JiraIssueTable getIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
-        return new MyJiraIssueTable(issuesData, searcher);
+    protected @NotNull JiraIssueTable getIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
+        return new MyJiraIssueTable(issuesData, searcher, parent);
     }
 
 
     private class MyJiraIssueTable extends JiraIssueTable {
 
-        public MyJiraIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
-            super(issuesData, searcher);
+        public MyJiraIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
+            super(issuesData, searcher, parent);
         }
 
         @Override

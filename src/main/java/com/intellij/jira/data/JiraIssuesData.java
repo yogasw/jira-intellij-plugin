@@ -1,20 +1,24 @@
 package com.intellij.jira.data;
 
 import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class JiraIssuesData {
+public class JiraIssuesData implements Disposable {
 
     private final Project myProject;
     private final IssuesGetter myIssuesGetter;
 
-    public JiraIssuesData(@NotNull Project project) {
+    public JiraIssuesData(@NotNull Project project, @NotNull Disposable parent) {
         myProject = project;
         myIssuesGetter = new IssuesGetter(project);
+
+        Disposer.register(parent, this);
     }
 
     public Project getProject() {
@@ -30,4 +34,8 @@ public class JiraIssuesData {
         return myIssuesGetter.getIssue(issueKey);
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }

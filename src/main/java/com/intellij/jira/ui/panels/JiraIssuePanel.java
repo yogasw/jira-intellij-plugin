@@ -4,6 +4,8 @@ import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.listener.RefreshIssuesListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.util.JiraPanelUtil;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.OnePixelSplitter;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-public class JiraIssuePanel extends JiraPanel {
+public class JiraIssuePanel extends JiraPanel implements Disposable {
 
     private static final JPanel ISSUE_NOT_FOUND_PANEL = JiraPanelUtil.createPlaceHolderPanel("Issue Not Found");
 
@@ -21,8 +23,10 @@ public class JiraIssuePanel extends JiraPanel {
     private JiraIssueDescriptionPanel myDescriptionPanel;
     private JiraIssueStatusActivityPanel myStatusActivityPanel;
 
-    public JiraIssuePanel(@NotNull JiraIssuesData issuesData, String issueKey) {
+    public JiraIssuePanel(@NotNull JiraIssuesData issuesData, String issueKey, @NotNull Disposable parent) {
         super(new BorderLayout());
+
+        Disposer.register(parent, this);
 
         myIssuesData = issuesData;
         myIssueKey = issueKey;
@@ -45,6 +49,11 @@ public class JiraIssuePanel extends JiraPanel {
 
         issuesData.getProject().getMessageBus().connect()
                 .subscribe(RefreshIssuesListener.TOPIC, new MyRefreshIssuesListener());
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
 

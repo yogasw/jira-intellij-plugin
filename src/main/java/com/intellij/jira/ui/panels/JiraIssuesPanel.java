@@ -17,6 +17,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.panels.Wrapper;
@@ -48,15 +49,17 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
 
     private Splitter myIssuesBrowserSplitter;
 
-    public JiraIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
+    public JiraIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
         super(new BorderLayout());
+
+        Disposer.register(parent, this);
 
         myIssuesData = issuesData;
         mySearcher = searcher;
         myToolbar = getToolbar(issuesData.getProject());
 
-        myJiraIssueTable = getIssueTable(issuesData, searcher);
-        myJiraIssueDetailsPanel = new JiraIssueDetailsPanel(issuesData);
+        myJiraIssueTable = getIssueTable(issuesData, searcher, parent);
+        myJiraIssueDetailsPanel = new JiraIssueDetailsPanel(issuesData, parent);
 
         myJiraIssueTable.getSelectionModel().addListSelectionListener(new MyListSelectionListener());
 
@@ -87,8 +90,8 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     }
 
     @NotNull
-    protected JiraIssueTable getIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher) {
-        return new JiraIssueTable(issuesData, searcher);
+    protected JiraIssueTable getIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
+        return new JiraIssueTable(issuesData, searcher, parent);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.table.column;
 
+import com.intellij.jira.ui.renders.JiraIssueStringCellRenderer;
 import com.intellij.jira.ui.renders.JiraIssueTableCellRenderer;
 import com.intellij.util.ui.UIUtil;
 
@@ -8,6 +9,7 @@ import javax.swing.table.TableCellRenderer;
 public abstract class StringColumn<T> extends JiraIssueColumn<T, String> {
 
     public final TableCellRenderer DEFAULT_JIRA_ISSUE_TABLE_CELL_RENDERER = new JiraIssueTableCellRenderer();
+    public final TableCellRenderer DEFAULT_JIRA_ISSUE_STRING_CELL_RENDERER = new JiraIssueStringCellRenderer();
 
     protected StringColumn(String id, String name) {
         super(id, name);

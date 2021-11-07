@@ -8,6 +8,7 @@ import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.ui.JiraUi;
 import com.intellij.jira.ui.JiraUiFactory;
 import com.intellij.jira.ui.panels.JiraServerNotConfiguredPanel;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -28,7 +29,7 @@ import static com.intellij.jira.server.JiraServerManager.JIRA_SERVER_CHANGED;
 import static com.intellij.jira.server.JiraServerManager.JIRA_SERVER_REMOVED_ALL;
 import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
 
-public class JiraTabsManager {
+public class JiraTabsManager implements Disposable {
 
     public static final String TAB_ISSUES = "Issues";
 
@@ -38,7 +39,7 @@ public class JiraTabsManager {
 
     public JiraTabsManager(@NotNull Project project) {
         myProject = project;
-        myIssueData = new JiraIssuesData(project);
+        myIssueData = new JiraIssuesData(project, this);
 
         project.getMessageBus().connect().subscribe(JIRA_SERVER_REMOVED_ALL, this::openNotConfiguredServerTab);
         project.getMessageBus().connect().subscribe(JIRA_SERVER_CHANGED, () -> {
@@ -147,4 +148,8 @@ public class JiraTabsManager {
         return null;
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }

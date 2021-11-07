@@ -4,8 +4,10 @@ import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTabbedPane;
 import com.intellij.jira.util.JiraPanelUtil;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +17,7 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
-public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
+public class JiraIssueDetailsPanel extends SimpleToolWindowPanel implements Disposable {
 
     public static final String TAB_KEY = "selectedTab";
     private static final String TAB_PREVIEW = " Preview ";
@@ -35,8 +37,11 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
     private JiraIssueCommentsPanel myJiraIssueCommentsPanel;
     private JiraIssueWorkLogsPanel myJiraIssueWorkLogsPanel;
 
-    public JiraIssueDetailsPanel(@NotNull JiraIssuesData issuesData){
+    public JiraIssueDetailsPanel(@NotNull JiraIssuesData issuesData, @NotNull Disposable parent){
         super(true);
+
+        Disposer.register(parent, this);
+
         this.myProject = issuesData.getProject();
         setEmptyContent();
     }
@@ -85,4 +90,8 @@ public class JiraIssueDetailsPanel extends SimpleToolWindowPanel {
         myJiraIssueWorkLogsPanel.setToolbarHeightReferent(referent);
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }
