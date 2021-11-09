@@ -43,22 +43,22 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
     protected JTextField myTextField;
     protected JButton myButton;
     protected PickerDialogAction myButtonAction;
-    protected boolean isMultiSelect;
+    protected boolean myIsMultiSelect;
 
     public SelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
         super(issueKey, fieldName, fieldValue, required);
-        this.isMultiSelect = isMultiSelect;
+        myIsMultiSelect = isMultiSelect;
     }
 
     @Override
     public JComponent createPanel() {
-        this.myButton.addActionListener(e -> {
+        myButton.addActionListener(e -> {
             InputEvent inputEvent = e.getSource() instanceof InputEvent ? (InputEvent)e.getSource() : null;
-            myButtonAction.actionPerformed(AnActionEvent.createFromAnAction(myButtonAction, inputEvent, ActionPlaces.UNKNOWN, DataManager.getInstance().getDataContext(myTextField)));
+            myButtonAction.actionPerformed(AnActionEvent.createFromAnAction(myButtonAction, inputEvent, ActionPlaces.POPUP, DataManager.getInstance().getDataContext(myTextField)));
         });
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, myPanel)
+                .addLabeledComponent(myLabel, myPanel)
                 .getPanel();
     }
 
@@ -100,9 +100,9 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
         public PickerDialog(@Nullable Project project, @NotNull String title, List<E> items, List<E> selectedItems) {
             super(project, false);
             setTitle(title);
-            this.myList = new JBList(items);
-            this.myList.setPreferredSize(getPreferredSizeList());
-            this.myList.setSelectionMode(isMultiSelect ? MULTIPLE_INTERVAL_SELECTION: SINGLE_SELECTION);
+            myList = new JBList(items);
+            myList.setPreferredSize(getPreferredSizeList());
+            myList.setSelectionMode(myIsMultiSelect ? MULTIPLE_INTERVAL_SELECTION: SINGLE_SELECTION);
             if (Objects.nonNull(selectedItems)) {
                 IntArrayList selectedIndices = new IntArrayList();
                 for (E selectedItem : selectedItems) {
@@ -112,8 +112,8 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
                     }
                 }
 
-                if (selectedIndices.size() > 0) {
-                    this.myList.setSelectedIndices(selectedIndices.toIntArray());
+                if (!selectedIndices.isEmpty()) {
+                    myList.setSelectedIndices(selectedIndices.toIntArray());
                 }
             }
 

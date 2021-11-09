@@ -5,12 +5,14 @@ import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.tasks.RefreshIssuesTask;
+import com.intellij.jira.ui.AbstractIssuesUi;
 import com.intellij.jira.ui.JiraUi;
 import com.intellij.jira.ui.JiraUiFactory;
 import com.intellij.jira.ui.panels.JiraServerNotConfiguredPanel;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
@@ -56,13 +58,15 @@ public class JiraTabsManager implements Disposable {
         // check if server is configured
         if (JiraServerManager.getInstance().hasJiraServerConfigured(myProject)) {
             ContentManager contentManager = getContentManager();
-            JiraUi issuesUi = createIssuesUi();
+            AbstractIssuesUi issuesUi = createIssuesUi();
+            Disposer.register(this, issuesUi);
 
             Content content = ContentFactory.SERVICE.getInstance().createContent(issuesUi.getMainComponent(), TAB_ISSUES, false);
             content.setCloseable(false);
 
             ContentsUtil.addContent(contentManager, content, true);
             myServerConfigured = true;
+            issuesUi.refresh();
         } else {
             openNotConfiguredServerTab();
             myServerConfigured = false;
@@ -70,8 +74,9 @@ public class JiraTabsManager implements Disposable {
     }
 
     public void openFilteredIssuesTab() {
-        JiraUi filteredIssuesUi = createFilteredIssuesUi();
+        AbstractIssuesUi filteredIssuesUi = createFilteredIssuesUi();
         openTab(filteredIssuesUi, new TabGroupId("FilteredIssuesGroup", () -> "Filter", false));
+        filteredIssuesUi.refresh();
     }
 
     public void openDetailsIssueTab(String issueKey) {
@@ -92,6 +97,7 @@ public class JiraTabsManager implements Disposable {
     }
 
     private void openTab(@NotNull JiraUi jiraUi, @NotNull TabGroupId tabGroupId) {
+        Disposer.register(this, jiraUi);
         ContentManager contentManager = getContentManager();
 
         TabDescriptor tabDescriptor = new TabDescriptor(jiraUi.getMainComponent(), jiraUi::getId, jiraUi);
@@ -109,11 +115,11 @@ public class JiraTabsManager implements Disposable {
         contentManager.setSelectedContent(content);
     }
 
-    private JiraUi createIssuesUi() {
-        return JiraUiFactory.createIssuesUi(myIssueData, getSelectedJQLSearcher());
+    private AbstractIssuesUi createIssuesUi() {
+        return JiraUiFactory.createIssuesUi(myIssueData);
     }
 
-    private JiraUi createFilteredIssuesUi() {
+    private AbstractIssuesUi createFilteredIssuesUi() {
         return JiraUiFactory.createFilteredIssuesUi(myIssueData, getSelectedJQLSearcher());
     }
 

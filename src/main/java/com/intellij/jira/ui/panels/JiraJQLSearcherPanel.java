@@ -2,7 +2,6 @@ package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
-import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -19,14 +18,16 @@ public class JiraJQLSearcherPanel extends JiraPanel {
 
     private final Project myProject;
     private final JQLSearcherManager myManager;
+    private final Runnable myRefresher;
 
     private ComboBox<JQLSearcher> myComboBox;
     private CollectionComboBoxModel<JQLSearcher> myComboBoxItems;
 
-    public JiraJQLSearcherPanel(@NotNull Project project) {
+    public JiraJQLSearcherPanel(@NotNull Project project, @NotNull Runnable refresher) {
         super(new BorderLayout());
-        this.myProject = project;
-        this.myManager = JQLSearcherManager.getInstance();
+        myProject = project;
+        myManager = JQLSearcherManager.getInstance();
+        myRefresher = refresher;
 
         init();
         installListeners();
@@ -52,7 +53,7 @@ public class JiraJQLSearcherPanel extends JiraPanel {
             int selectedSearcherIndex =  this.myComboBox.getSelectedIndex();
             if(selectedSearcherIndex >= 0){
                 myManager.setSelectedSearcher(myProject, selectedSearcherIndex);
-                ApplicationManager.getApplication().invokeLater(() -> new RefreshIssuesTask(myProject).queue());
+                ApplicationManager.getApplication().invokeLater(myRefresher);
             }
         });
 

@@ -9,12 +9,12 @@ public final class JiraUiFactory {
     private JiraUiFactory() { }
 
     @NotNull
-    public static JiraUi createIssuesUi(JiraIssuesData issuesData, JQLSearcher searcher) {
-        return new DefaultIssuesUi(issuesData, searcher);
+    public static AbstractIssuesUi createIssuesUi(JiraIssuesData issuesData) {
+        return new DefaultIssuesUi(issuesData);
     }
 
     @NotNull
-    public static JiraUi createFilteredIssuesUi(JiraIssuesData issuesData, JQLSearcher searcher) {
+    public static AbstractIssuesUi createFilteredIssuesUi(JiraIssuesData issuesData, JQLSearcher searcher) {
         return new FilteredIssuesUi(issuesData, searcher);
     }
 

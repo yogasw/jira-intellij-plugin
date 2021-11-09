@@ -1,19 +1,15 @@
 package com.intellij.jira.ui.table;
 
 import com.intellij.jira.data.JiraIssuesData;
-import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.listener.IssueChangeListener;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.JiraIssueStyleFactory;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighter;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.table.TableView;
-import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,22 +28,17 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 public class JiraIssueTable extends TableView<JiraIssue> implements Disposable {
 
-    private final JiraIssuesData myIssuesData;
-    private JQLSearcher mySearcher;
     private final Collection<JiraIssueHighlighter> myHighlighters = new LinkedHashSet<>();
     private final BaseStyleProvider myBaseStyleProvider;
 
-    public JiraIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
-        super(new JiraIssueListTableModel(issuesData, searcher));
+    public JiraIssueTable(@NotNull JiraIssuesData issuesData, @NotNull Disposable parent) {
+        super(new JiraIssueListTableModel(issuesData));
 
         Disposer.register(parent, this);
 
-        myIssuesData = issuesData;
-        mySearcher = searcher;
-
         myBaseStyleProvider = new BaseStyleProvider(this);
 
-        setBorder(JBUI.Borders.customLine(JBColor.border(),1, 0, 0, 0));
+        setBorder(JBUI.Borders.customLineTop(JBColor.border()));
         setShowGrid(false);
         setSelectionMode(SINGLE_SELECTION);
         setIntercellSpacing(JBUI.emptySize());
@@ -59,7 +50,8 @@ public class JiraIssueTable extends TableView<JiraIssue> implements Disposable {
             }
         });
 
-        subscribeTopics();
+        issuesData.getProject().getMessageBus().connect()
+                .subscribe(IssueChangeListener.TOPIC, new OnIssueChanged());
 
     }
 
@@ -74,18 +66,6 @@ public class JiraIssueTable extends TableView<JiraIssue> implements Disposable {
     @Override
     public JiraIssueListTableModel getModel() {
         return (JiraIssueListTableModel) dataModel;
-    }
-
-    public Project getProject() {
-        return myIssuesData.getProject();
-    }
-
-    public void updateSelectedSearcher() {
-        mySearcher = JQLSearcherManager.getInstance().getSelectedSearcher(getProject());
-    }
-
-    public void updateModelAndColumns() {
-        setModelAndUpdateColumns(new JiraIssueListTableModel(myIssuesData, mySearcher));
     }
 
     public void addHighlighter(JiraIssueHighlighter highlighter) {
@@ -126,18 +106,12 @@ public class JiraIssueTable extends TableView<JiraIssue> implements Disposable {
         return SimpleTextAttributes.REGULAR_ATTRIBUTES;
     }
 
-    private void subscribeTopics() {
-        MessageBusConnection connection = myIssuesData.getProject().getMessageBus().connect();
-
-        connection.subscribe(IssueChangeListener.TOPIC, new OnIssueChanged());
-    }
-
-    private class BaseStyleProvider {
-        private JTable myTable;
+    private static class BaseStyleProvider {
+        private final JTable myTable;
         private final TableCellRenderer myDefaultCellRenderer = new DefaultTableCellRenderer();
 
-        private BaseStyleProvider(JTable myTable) {
-            this.myTable = myTable;
+        private BaseStyleProvider(JTable table) {
+            myTable = table;
         }
 
 

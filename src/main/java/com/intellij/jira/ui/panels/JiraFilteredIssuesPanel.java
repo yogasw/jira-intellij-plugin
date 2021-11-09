@@ -1,14 +1,15 @@
 package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.data.JiraIssuesData;
-import com.intellij.jira.rest.model.jql.JQLSearcher;
+import com.intellij.jira.ui.AbstractIssuesUi;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
-import com.intellij.jira.ui.table.JiraIssueTable;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
@@ -16,8 +17,9 @@ import java.awt.BorderLayout;
 
 public class JiraFilteredIssuesPanel extends JiraIssuesPanel {
 
-    public JiraFilteredIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
-        super(issuesData, searcher, parent);
+    public JiraFilteredIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull AbstractIssuesUi issuesUi, @NotNull Disposable parent) {
+        super(issuesData, issuesUi, parent);
+        getJiraIssueTable().setBorder(JBUI.Borders.customLineLeft(JBColor.border()));
     }
 
     @Override
@@ -42,22 +44,5 @@ public class JiraFilteredIssuesPanel extends JiraIssuesPanel {
 
     }
 
-    @Override
-    protected @NotNull JiraIssueTable getIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
-        return new MyJiraIssueTable(issuesData, searcher, parent);
-    }
-
-
-    private class MyJiraIssueTable extends JiraIssueTable {
-
-        public MyJiraIssueTable(@NotNull JiraIssuesData issuesData, @NotNull JQLSearcher searcher, @NotNull Disposable parent) {
-            super(issuesData, searcher, parent);
-        }
-
-        @Override
-        public void updateSelectedSearcher() {
-            // Do not update
-        }
-    }
 
 }

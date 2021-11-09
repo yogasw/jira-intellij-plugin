@@ -33,7 +33,7 @@ public class GroupSelectFieldEditor extends SelectFieldEditor<String> {
             return JsonNull.INSTANCE;
         }
 
-        if(isMultiSelect){
+        if(myIsMultiSelect){
             return createArrayNameObjects(selectedGroups);
         }
 

@@ -1,7 +1,8 @@
 package com.intellij.jira.actions;
 
+import com.intellij.jira.JiraUiDataKeys;
 import com.intellij.jira.server.JiraServerManager;
-import com.intellij.jira.tasks.RefreshIssuesTask;
+import com.intellij.jira.ui.AbstractIssuesUi;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -28,7 +29,8 @@ public class JiraIssuesRefreshAction extends AnAction {
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getProject();
         if(nonNull(project)){
-            new RefreshIssuesTask(project).queue();
+            AbstractIssuesUi ui = event.getRequiredData(JiraUiDataKeys.ISSUES_UI);
+            ui.refresh();
         }
     }
 

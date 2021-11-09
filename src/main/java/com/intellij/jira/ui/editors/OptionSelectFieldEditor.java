@@ -8,8 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.Arrays;
+import javax.swing.JComponent;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -35,9 +34,9 @@ public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFie
     protected void initSelectedItems() {
         JsonElement element = GSON.toJsonTree(fieldValue);
         if (element.isJsonArray()) {
-            selectedItems = JiraGsonUtil.getAsList(element, JiraCustomFieldOption[].class);
+            mySelectedItems = JiraGsonUtil.getAsList(element, JiraCustomFieldOption[].class);
         } else if (element.isJsonObject()) {
-            selectedItems = Collections.singletonList(GSON.fromJson(element, JiraCustomFieldOption.class));
+            mySelectedItems = Collections.singletonList(GSON.fromJson(element, JiraCustomFieldOption.class));
         }
     }
 
@@ -47,8 +46,8 @@ public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFie
             return JsonNull.INSTANCE;
         }
 
-        List<String> values = selectedItems.stream().map(JiraCustomFieldOption::getValue).collect(toList());
-        if(isMultiSelect){
+        List<String> values = mySelectedItems.stream().map(JiraCustomFieldOption::getValue).collect(toList());
+        if(myIsMultiSelect){
             return createArrayObject("value", values);
         }
 
@@ -57,8 +56,8 @@ public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFie
 
     @Override
     public JComponent createPanel() {
-        if (Objects.nonNull(selectedItems)) {
-            myTextField.setText(selectedItems.stream().map(JiraCustomFieldOption::getValue).collect(joining(", ")));
+        if (Objects.nonNull(mySelectedItems)) {
+            myTextField.setText(mySelectedItems.stream().map(JiraCustomFieldOption::getValue).collect(joining(", ")));
         }
 
         return super.createPanel();
@@ -87,13 +86,13 @@ public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFie
     class OptionPickerDialog extends PickerDialog<JiraCustomFieldOption>{
 
         OptionPickerDialog(@Nullable Project project) {
-            super(project, "Options", myItems, selectedItems);
+            super(project, "Options", myItems, mySelectedItems);
         }
 
         @Override
         protected void doOKAction() {
-            selectedItems = myList.getSelectedValuesList();
-            myTextField.setText(selectedItems.isEmpty() ? "" :  selectedItems.stream().map(JiraCustomFieldOption::getValue).collect(joining(", ")));
+            mySelectedItems = myList.getSelectedValuesList();
+            myTextField.setText(mySelectedItems.isEmpty() ? "" :  mySelectedItems.stream().map(JiraCustomFieldOption::getValue).collect(joining(", ")));
 
 
             super.doOKAction();

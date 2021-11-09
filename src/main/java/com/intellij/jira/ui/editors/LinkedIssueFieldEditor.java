@@ -38,11 +38,11 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
 
     private JiraIssueLinkTypeInfo mySelectedLinkType;
     private String mySelectedIssue;
-    private String projectKey;
+    private String myProjectKey;
 
     public LinkedIssueFieldEditor(String issueKey, String fieldName, boolean required, String projectKey) {
         super(issueKey, fieldName, null, required);
-        this.projectKey = projectKey;
+        myProjectKey = projectKey;
     }
 
     @Override
@@ -52,11 +52,11 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
 
     @Override
     public JComponent createPanel() {
-        this.myButton.setIcon(AllIcons.Ide.UpDown);
-        this.myButton.addActionListener(e -> {
+        myButton.setIcon(AllIcons.Ide.UpDown);
+        myButton.addActionListener(e -> {
             InputEvent inputEvent = e.getSource() instanceof InputEvent ? (InputEvent)e.getSource() : null;
-            MyAddIssueLinkDialogAction myAction = new MyAddIssueLinkDialogAction();
-            myAction.actionPerformed(AnActionEvent.createFromAnAction(myAction, inputEvent, ActionPlaces.UNKNOWN, DataManager.getInstance().getDataContext(myTextField)));
+            MyAddIssueLinkDialogAction action = new MyAddIssueLinkDialogAction();
+            action.actionPerformed(AnActionEvent.createFromAnAction(action, inputEvent, ActionPlaces.TOOLBAR, DataManager.getInstance().getDataContext(myTextField)));
         });
 
         return FormBuilder.createFormBuilder()
@@ -95,7 +95,7 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
     @Override
     public @Nullable Object getData(@NotNull String dataId) {
         if (JiraDataKeys.PROJECT_KEY.is(dataId)) {
-            return projectKey;
+            return myProjectKey;
         }
 
         return super.getData(dataId);

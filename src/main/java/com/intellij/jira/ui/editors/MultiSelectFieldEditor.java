@@ -56,7 +56,7 @@ public class MultiSelectFieldEditor<T> extends SelectFieldEditor<T> {
             return JsonNull.INSTANCE;
         }
 
-        if (isMultiSelect) {
+        if (myIsMultiSelect) {
             return createArrayNameObjects(selectedItems);
         }
 
