@@ -4,8 +4,6 @@ import com.intellij.jira.ui.JiraUi;
 import com.intellij.jira.ui.panels.JiraTabPanel;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
-import com.intellij.ui.content.TabDescriptor;
-import com.intellij.ui.content.TabGroupId;
 import com.intellij.ui.content.TabbedContent;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
@@ -52,26 +50,6 @@ public final class JiraContentUtil {
 
     }
 
-
-    public static void updateTabName(@NotNull ContentManager manager, String previousName, String newName) {
-        for (Content content : manager.getContents()) {
-            if (content instanceof TabbedContent) {
-                var tab2 = ((TabbedContent) content).getTabs().stream()
-                        .filter(pair -> pair.getFirst().equals(previousName))
-                        .findFirst();
-
-                tab2.ifPresent(pair -> {
-                    TabGroupId groupId = content.getUserData(Content.TAB_GROUP_ID_KEY);
-                    TabDescriptor tab = content.getUserData(Content.TAB_DESCRIPTOR_KEY);
-                    if (groupId != null && tab != null) {
-                        content.setDisplayName(newName);
-                    }
-                });
-
-            }
-        }
-    }
-
     @Nullable
     public static JiraUi getIssuesUi(@NotNull JComponent c) {
         return ContainerUtil.getFirstItem(getIssuesUis(c));
@@ -82,6 +60,19 @@ public final class JiraContentUtil {
         collectIssuesPanelInstances(c, panels);
 
         return ContainerUtil.map(panels, JiraTabPanel::getUi);
+    }
+
+    public static Set<JiraUi> getAllJiraUis(@NotNull ContentManager manager) {
+        Set<JiraUi> uis = new HashSet<>();
+        for (Content content : manager.getContents()) {
+            if (content instanceof TabbedContent) {
+                ((TabbedContent) content).getTabs().forEach(pair -> uis.addAll(getIssuesUis(pair.second)));
+            } else {
+                uis.addAll(getIssuesUis(content.getComponent()));
+            }
+        }
+
+        return uis;
     }
 
     private static void collectIssuesPanelInstances(@NotNull JComponent component, @NotNull Set<JiraTabPanel> result) {

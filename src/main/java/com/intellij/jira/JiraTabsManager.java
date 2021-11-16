@@ -4,7 +4,6 @@ import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.server.JiraServerManager;
-import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.ui.AbstractIssuesUi;
 import com.intellij.jira.ui.JiraUi;
 import com.intellij.jira.ui.JiraUiFactory;
@@ -48,7 +47,14 @@ public class JiraTabsManager implements Disposable {
         project.getMessageBus().connect().subscribe(JIRA_SERVER_REMOVED_ALL, this::openNotConfiguredServerTab);
         project.getMessageBus().connect().subscribe(JIRA_SERVER_CHANGED, () -> {
             if (myServerConfigured && JiraServerManager.getInstance().hasJiraServerConfigured(myProject)) {
-                ApplicationManager.getApplication().invokeLater(() -> new RefreshIssuesTask(myProject).queue());
+                ApplicationManager.getApplication().invokeLater(() -> {
+                        ContentManager manager = getContentManager();
+                        JiraContentUtil.getAllJiraUis(manager).forEach(ui -> {
+                            if (ui instanceof AbstractIssuesUi) {
+                                ((AbstractIssuesUi) ui).refresh();
+                            }
+                        });
+                });
             } else {
                 openIssuesTab();
             }

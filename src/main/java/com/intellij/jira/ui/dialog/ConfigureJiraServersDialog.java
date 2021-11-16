@@ -3,7 +3,6 @@ package com.intellij.jira.ui.dialog;
 import com.intellij.jira.server.JiraServer;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.server.editor.JiraServerEditor;
-import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.jira.util.SimpleSelectableList;
@@ -144,7 +143,6 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         myManager.setServers(myProject, myServers);
-        //updateIssues();
 
         super.doOKAction();
     }
@@ -188,7 +186,6 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         myJiraServerEditor.doLayout();
     }
 
-
     private void removeJiraServer(){
         int selectedServer = myServersList.getSelectedIndex();
         if(selectedServer > -1){
@@ -201,7 +198,6 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
             updateEditorPanel(EMPTY_PANEL_NAME);
         }
 
-
     }
 
     private void updateEditorPanel(String name){
@@ -209,11 +205,6 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         mySplitter.doLayout();
         mySplitter.repaint();
     }
-
-    private void updateIssues(){
-        new RefreshIssuesTask(myProject).queue();
-    }
-
 
     private JComponent createDetailsServerPanel() {
         return myJiraServerEditor;
