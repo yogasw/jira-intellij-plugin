@@ -9,6 +9,8 @@ import com.intellij.jira.ui.AbstractIssuesUi;
 import com.intellij.jira.ui.JiraUi;
 import com.intellij.jira.ui.JiraUiFactory;
 import com.intellij.jira.ui.panels.JiraServerNotConfiguredPanel;
+import com.intellij.jira.ui.panels.JiraTabPanel;
+import com.intellij.jira.util.JiraContentUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -20,7 +22,6 @@ import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.content.TabDescriptor;
 import com.intellij.ui.content.TabGroupId;
-import com.intellij.ui.content.TabbedContent;
 import com.intellij.util.ContentUtilEx;
 import com.intellij.util.ContentsUtil;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,7 @@ import javax.swing.JComponent;
 import static com.intellij.jira.server.JiraServerManager.JIRA_SERVER_CHANGED;
 import static com.intellij.jira.server.JiraServerManager.JIRA_SERVER_REMOVED_ALL;
 import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
+import static com.intellij.jira.util.JiraContentUtil.getIssuesUi;
 
 public class JiraTabsManager implements Disposable {
 
@@ -61,7 +63,7 @@ public class JiraTabsManager implements Disposable {
             AbstractIssuesUi issuesUi = createIssuesUi();
             Disposer.register(this, issuesUi);
 
-            Content content = ContentFactory.SERVICE.getInstance().createContent(issuesUi.getMainComponent(), TAB_ISSUES, false);
+            Content content = ContentFactory.SERVICE.getInstance().createContent(new JiraTabPanel(issuesUi), TAB_ISSUES, false);
             content.setCloseable(false);
 
             ContentsUtil.addContent(contentManager, content, true);
@@ -96,15 +98,27 @@ public class JiraTabsManager implements Disposable {
         ContentsUtil.addContent(contentManager, content, true);
     }
 
+    public void closeTab(@NotNull String name) {
+        JiraContentUtil.closeTab(getContentManager(), name);
+    }
+
+    public void updateTabName(JiraUi ui) {
+        ContentManager manager = getContentManager();
+        JComponent component = ContentUtilEx.findContentComponent(manager, c -> ui == getIssuesUi(c));
+        if (component == null) return;
+
+        ContentUtilEx.updateTabbedContentDisplayName(manager, component);
+    }
+
     private void openTab(@NotNull JiraUi jiraUi, @NotNull TabGroupId tabGroupId) {
         Disposer.register(this, jiraUi);
         ContentManager contentManager = getContentManager();
 
-        TabDescriptor tabDescriptor = new TabDescriptor(jiraUi.getMainComponent(), jiraUi::getId, jiraUi);
+        TabDescriptor tabDescriptor = new TabDescriptor(new JiraTabPanel(jiraUi), jiraUi::getId, jiraUi);
         String tabName = tabGroupId.getDisplayName(tabDescriptor);
         Content content = contentManager.findContent(tabName);
         if (content == null) {
-            content = findTabbedContent(contentManager, jiraUi.getId());
+            content = JiraContentUtil.findTabbedContent(contentManager, jiraUi.getId());
         }
 
         if (content == null) {
@@ -138,20 +152,6 @@ public class JiraTabsManager implements Disposable {
 
     public static JiraTabsManager getInstance(@NotNull Project project) {
         return project.getService(JiraTabsManager.class);
-    }
-
-    private Content findTabbedContent(@NotNull ContentManager manager, @NotNull String name) {
-        for (Content content : manager.getContents()) {
-            if (content instanceof TabbedContent) {
-                var tab = ((TabbedContent) content).getTabs().stream()
-                        .filter(pair -> pair.getFirst().equals(name))
-                        .findFirst();
-
-                return tab.isPresent() ? content : null;
-            }
-        }
-
-        return null;
     }
 
     @Override

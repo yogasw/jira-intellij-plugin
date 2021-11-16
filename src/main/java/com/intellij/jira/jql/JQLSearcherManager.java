@@ -2,12 +2,14 @@ package com.intellij.jira.jql;
 
 import com.intellij.jira.listener.JQLSearcherListener;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
+import com.intellij.jira.util.ListComparator;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,10 +42,19 @@ public class JQLSearcherManager {
         return getSimpleSelectableList(project).hasSelectedItem();
     }
 
-    public void setSearchers(Project project, SimpleSelectableList<JQLSearcher> searcherList) {
-        updateApplicationSearchers(searcherList);
-        updateProjectSearchers(project, searcherList);
-        ApplicationManager.getApplication().getMessageBus().syncPublisher(JQL_SEARCHERS_CHANGE).onChange();
+    public void setSearchers(Project project, ListComparator.Result<JQLSearcher> result) {
+        // TODO: update apps and project searchers and notify changed and removed
+        SimpleSelectableList<JQLSearcher> list = SimpleSelectableList.of(result.getEdited());
+        list.addAll(result.getNotEdited());
+        list.addAll(result.getAdded());
+
+        updateApplicationSearchers(list);
+        updateProjectSearchers(project, list);
+
+
+        ApplicationManager.getApplication().getMessageBus().syncPublisher(JQL_SEARCHERS_CHANGE).onChange(result.getEdited());
+        ApplicationManager.getApplication().getMessageBus().syncPublisher(JQL_SEARCHERS_CHANGE).onRemoved(result.getRemoved());
+
     }
 
     public void add(Project project, JQLSearcher searcher, boolean selected){
@@ -52,10 +63,13 @@ public class JQLSearcherManager {
 
         updateApplicationSearchers(simpleSelectableList);
         updateProjectSearchers(project, simpleSelectableList);
+
+        ApplicationManager.getApplication().getMessageBus().syncPublisher(JQL_SEARCHERS_CHANGE).onChange(Collections.singletonList(searcher));
+
     }
 
     public void update(Project project, String oldAliasSearcher, JQLSearcher updatedSearcher, boolean selected){
-        JQLSearcher oldSearcher = findByAlias(project, oldAliasSearcher);
+        JQLSearcher oldSearcher = findById(project, oldAliasSearcher);
         if(isNull(oldSearcher)){
             return;
         }
@@ -65,6 +79,8 @@ public class JQLSearcherManager {
 
         updateApplicationSearchers(simpleSelectableList);
         updateProjectSearchers(project, simpleSelectableList);
+
+        ApplicationManager.getApplication().getMessageBus().syncPublisher(JQL_SEARCHERS_CHANGE).onChange(Collections.singletonList(updatedSearcher));
     }
 
     public void setSelectedSearcher(Project project, int selectedSearcherIndex) {
@@ -72,9 +88,9 @@ public class JQLSearcherManager {
     }
 
     @Nullable
-    private JQLSearcher findByAlias(Project project, String alias){
+    private JQLSearcher findById(Project project, String id){
         return getSimpleSelectableList(project).getItems().stream()
-                .filter(searcher -> searcher.getAlias().equals(alias))
+                .filter(searcher -> searcher.getId().equals(id))
                 .findFirst().orElse(null);
     }
 

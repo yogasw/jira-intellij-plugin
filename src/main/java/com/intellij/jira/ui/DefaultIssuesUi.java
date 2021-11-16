@@ -2,6 +2,7 @@ package com.intellij.jira.ui;
 
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.jql.JQLSearcherManager;
+import com.intellij.jira.listener.JQLSearcherListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.panels.JiraIssuesPanel;
@@ -22,6 +23,9 @@ public class DefaultIssuesUi extends AbstractIssuesUi {
 
         myIssuesPanel = new JiraIssuesPanel(issuesData, this, this);
         updateHighlighters();
+
+        issuesData.getProject().getMessageBus().connect()
+                .subscribe(JQLSearcherManager.JQL_SEARCHERS_CHANGE, new MyJQLSearcherListener());
     }
 
     @NotNull
@@ -46,4 +50,18 @@ public class DefaultIssuesUi extends AbstractIssuesUi {
     void setIssues(List<JiraIssue> issues) {
         myIssuesPanel.setIssues(issues);
     }
+
+    private class MyJQLSearcherListener implements JQLSearcherListener {
+
+        @Override
+        public void onChange(List<JQLSearcher> editedSearchers) {
+            myIssuesPanel.updateSearcherPanel();
+        }
+
+        @Override
+        public void onRemoved(List<JQLSearcher> removedSearchers) {
+            myIssuesPanel.updateSearcherPanel();
+        }
+    }
+
 }

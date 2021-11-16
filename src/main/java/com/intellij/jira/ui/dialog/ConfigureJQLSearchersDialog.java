@@ -3,6 +3,8 @@ package com.intellij.jira.ui.dialog;
 import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.panels.JiraPanel;
+import com.intellij.jira.util.IssueSearcherListComparator;
+import com.intellij.jira.util.ListComparator;
 import com.intellij.jira.util.SimpleSelectableList;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -22,6 +24,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.intellij.jira.util.JiraLabelUtil.getBgRowColor;
 import static com.intellij.jira.util.JiraLabelUtil.getFgRowColor;
@@ -32,6 +36,7 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
     private final Project myProject;
     private final JQLSearcherManager myManager;
 
+    private List<JQLSearcher> myOldSearchers = new ArrayList<>();
     private SimpleSelectableList<JQLSearcher> mySearchers;
 
     private final ColumnInfo<JQLSearcher, String> ALIAS_COLUMN = new AliasColumn();
@@ -57,7 +62,10 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
         myModel = new JQLSearcherListTableModel();
 
-        for(JQLSearcher searcher : myManager.getSearchers(myProject)){
+        List<JQLSearcher> searchers = myManager.getSearchers(myProject);
+        myOldSearchers.addAll(new ArrayList<>(searchers));
+
+        for(JQLSearcher searcher : searchers){
             JQLSearcher clone = searcher.clone();
             mySearchers.add(clone);
             myModel.addRow(clone);
@@ -120,7 +128,10 @@ public class ConfigureJQLSearchersDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
-        myManager.setSearchers(myProject, mySearchers);
+
+        ListComparator.Result<JQLSearcher> result = new IssueSearcherListComparator().compare(myOldSearchers, new ArrayList<>(mySearchers.getItems()));
+
+        myManager.setSearchers(myProject, result);
 
         super.doOKAction();
     }

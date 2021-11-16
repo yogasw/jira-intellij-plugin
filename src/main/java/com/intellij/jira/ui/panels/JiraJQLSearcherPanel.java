@@ -12,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 
-import static com.intellij.jira.jql.JQLSearcherManager.JQL_SEARCHERS_CHANGE;
-
 public class JiraJQLSearcherPanel extends JiraPanel {
 
     private final Project myProject;
@@ -56,24 +54,24 @@ public class JiraJQLSearcherPanel extends JiraPanel {
                 ApplicationManager.getApplication().invokeLater(myRefresher);
             }
         });
+    }
 
-        myProject.getMessageBus().connect().subscribe(JQL_SEARCHERS_CHANGE, () -> {
-            myComboBoxItems.removeAll();
+    public void updateCombo() {
+        myComboBoxItems.removeAll();
 
-            SimpleSelectableList<JQLSearcher> searchers = myManager.getSimpleSelectableList(myProject);
+        SimpleSelectableList<JQLSearcher> searchers = myManager.getSimpleSelectableList(myProject);
 
-            if(!searchers.isEmpty()){
-                myComboBoxItems.add(searchers.getItems());
-                int selectedSearcherIndex = searchers.getSelectedItemIndex();
-                if(myComboBox.getSelectedIndex() != selectedSearcherIndex){
-                    myComboBox.setSelectedIndex(selectedSearcherIndex);
-                }
-            } else {
-                myComboBoxItems.setSelectedItem(null);
+        if(!searchers.isEmpty()){
+            myComboBoxItems.add(searchers.getItems());
+            int selectedSearcherIndex = searchers.getSelectedItemIndex();
+            if(myComboBox.getSelectedIndex() != selectedSearcherIndex){
+                myComboBox.setSelectedIndex(selectedSearcherIndex);
             }
+        } else {
+            myComboBoxItems.setSelectedItem(null);
+        }
 
-            myComboBoxItems.update();
-        });
+        myComboBoxItems.update();
 
     }
 
