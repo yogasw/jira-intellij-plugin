@@ -1,4 +1,4 @@
-package com.intellij.jira.ui;
+package com.intellij.jira.ui.model;
 
 import javax.swing.AbstractListModel;
 import java.util.List;

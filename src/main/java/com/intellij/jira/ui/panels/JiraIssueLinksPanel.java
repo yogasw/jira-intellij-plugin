@@ -6,7 +6,7 @@ import com.intellij.jira.actions.DeleteIssueLinkDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueLink;
-import com.intellij.jira.ui.JiraIssueLinkListModel;
+import com.intellij.jira.ui.model.JiraIssueLinkListModel;
 import com.intellij.jira.ui.renders.JiraIssueLinkListCellRenderer;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;

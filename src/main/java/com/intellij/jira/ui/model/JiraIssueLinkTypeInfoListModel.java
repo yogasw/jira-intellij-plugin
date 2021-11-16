@@ -1,4 +1,4 @@
-package com.intellij.jira.ui;
+package com.intellij.jira.ui.model;
 
 import com.intellij.jira.rest.model.JiraIssueLinkType;
 import com.intellij.jira.rest.model.JiraIssueLinkTypeInfo;

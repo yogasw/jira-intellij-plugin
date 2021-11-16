@@ -8,7 +8,7 @@ import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.JiraIssueCommentsWrapper;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComment;
-import com.intellij.jira.ui.JiraIssueCommentListModel;
+import com.intellij.jira.ui.model.JiraIssueCommentListModel;
 import com.intellij.jira.ui.renders.JiraIssueCommentListCellRenderer;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;

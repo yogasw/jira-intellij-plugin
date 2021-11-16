@@ -7,7 +7,7 @@ import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.actions.OpenAttachmentInBrowserAction;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueAttachment;
-import com.intellij.jira.ui.JiraIssueAttachmentListModel;
+import com.intellij.jira.ui.model.JiraIssueAttachmentListModel;
 import com.intellij.jira.ui.renders.JiraIssueAttachmentListCellRenderer;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;

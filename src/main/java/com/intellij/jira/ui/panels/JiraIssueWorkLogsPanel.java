@@ -8,7 +8,7 @@ import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
-import com.intellij.jira.ui.JiraIssueWorklogListModel;
+import com.intellij.jira.ui.model.JiraIssueWorklogListModel;
 import com.intellij.jira.ui.renders.JiraIssueWorklogListCellRender;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
