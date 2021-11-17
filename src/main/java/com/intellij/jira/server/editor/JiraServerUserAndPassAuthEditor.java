@@ -9,8 +9,8 @@ import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import java.util.Objects;
@@ -34,7 +34,7 @@ public class JiraServerUserAndPassAuthEditor extends JiraServerAuthEditor {
     }
 
     @Override
-    public JPanel getPanel() {
+    public JComponent createPanel() {
 
         this.myUsernameLabel = new JBLabel("Username:", 4);
         this.myUsernameField = new JBTextField();
@@ -54,6 +54,7 @@ public class JiraServerUserAndPassAuthEditor extends JiraServerAuthEditor {
                 .addLabeledComponent(this.myUsernameLabel, this.myUsernameField)
                 .addLabeledComponent(this.myPasswordLabel, this.myPasswordField)
                 .addComponent(this.myDefaultServerCheckbox)
+                .addComponent(this.mySharedCheckbox)
                 .addComponentToRightColumn(this.myTestPanel)
                 .getPanel();
     }
@@ -71,7 +72,7 @@ public class JiraServerUserAndPassAuthEditor extends JiraServerAuthEditor {
         String username = trim(myUsernameField.getText());
         String password = trim(valueOf(myPasswordField.getPassword()));
 
-        this.myServer.withUserAndPass(url, username, password);
+        this.myServer.withUserAndPass(url, username, password, isSharedServer());
 
         super.apply();
     }

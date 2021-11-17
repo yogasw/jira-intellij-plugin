@@ -39,7 +39,7 @@ public class JiraPanelUtil {
 
     private JiraPanelUtil() { }
 
-    public static final Border MARGIN_BOTTOM = JBUI.Borders.emptyBottom(10);
+    public static final Border MARGIN_BOTTOM = JiraBorders.emptyBottom(10);
 
     public static JiraPanel createWhiteGridPanel(int rows, int cols){
         return createWhitePanel(new GridLayout(rows, cols));
@@ -80,10 +80,9 @@ public class JiraPanelUtil {
     }
 
     public static JPanel createStatusPanel(@NotNull JiraIssue issue) {
-        JBLabel statusLabel = JiraLabelUtil.createBoldLabel("Status: ");
         JLabel statusValueLabel = JiraLabelUtil.createStatusLabel(issue.getStatus());
 
-        return createWhiteLeftFlowPanel(statusLabel, statusValueLabel);
+        return createWhiteLeftFlowPanel(statusValueLabel);
     }
 
     public static JPanel createPriorityPanel(@NotNull JiraIssue issue) {
@@ -91,6 +90,13 @@ public class JiraPanelUtil {
         JBLabel priorityValueLabel = JiraLabelUtil.createPriorityLabel(issue.getPriority());
 
         return createWhiteBorderPanel(priorityLabel, priorityValueLabel);
+    }
+
+    public static JPanel createReporterPanel(@NotNull JiraIssue issue) {
+        JBLabel reporterLabel = JiraLabelUtil.createBoldLabel("Reporter: ");
+        JBLabel reporterValueLabel = JiraLabelUtil.createLabel(issue.getReporter() != null ? issue.getReporter().getDisplayName() : EMPTY_TEXT);
+
+        return createWhiteBorderPanel(reporterLabel, reporterValueLabel);
     }
 
     public static JPanel createAssigneePanel(@NotNull JiraIssue issue) {
@@ -168,7 +174,7 @@ public class JiraPanelUtil {
         return panel;
     }
 
-    private static JPanel createWhiteLeftFlowPanel(JLabel... labels) {
+    public static JPanel createWhiteLeftFlowPanel(JLabel... labels) {
         JPanel panel = createWhitePanel(new FlowLayout(FlowLayout.LEFT, 0, 1)).withBorder(MARGIN_BOTTOM);
 
         for (JLabel label : labels) {

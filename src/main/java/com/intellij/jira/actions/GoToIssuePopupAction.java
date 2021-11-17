@@ -1,10 +1,13 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.JiraUiDataKeys;
+import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.panels.JiraIssuesPanel;
 import com.intellij.jira.ui.popup.GoToIssuePopup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 
 import java.util.List;
@@ -26,15 +29,11 @@ public class GoToIssuePopupAction extends JiraIssueAction {
             return;
         }
 
-        JiraIssuesPanel issuesPanel = (JiraIssuesPanel) getComponent();
-        if(isNull(issuesPanel)){
-            return;
-        }
+        JiraIssuesPanel issuesPanel = e.getRequiredData(JiraUiDataKeys.ISSUES_PANEL);
 
-        List<String> issueKeys = issuesPanel.getTableListModel().getItems().stream().map(issue -> issue.getKey()).collect(toList());
+        List<String> issueKeys = issuesPanel.getJiraIssueTable().getModel().getItems().stream().map(JiraIssue::getKey).collect(toList());
         GoToIssuePopup popup = new GoToIssuePopup(project, issueKeys, key -> issuesPanel.goToIssue(key));
-        popup.show(issuesPanel.getIssueTable());
-
+        popup.show(issuesPanel.getJiraIssueTable());
     }
 
     @Override
@@ -43,8 +42,8 @@ public class GoToIssuePopupAction extends JiraIssueAction {
         if (isNull(project)|| !project.isInitialized() || project.isDisposed()) {
             event.getPresentation().setEnabled(false);
         } else {
-            JiraServerManager manager = JiraServerManager.getInstance(project);
-            event.getPresentation().setEnabled(manager.hasJiraServerConfigured());
+            JiraServerManager manager = ApplicationManager.getApplication().getService(JiraServerManager.class);
+            event.getPresentation().setEnabled(manager.hasJiraServerConfigured(project));
         }
     }
 

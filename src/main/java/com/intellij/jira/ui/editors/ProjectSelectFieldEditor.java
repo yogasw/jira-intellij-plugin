@@ -4,13 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.jira.rest.model.JiraProject;
 import com.intellij.jira.util.JiraGsonUtil;
-import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,16 +35,16 @@ public class ProjectSelectFieldEditor extends DataSelectFieldEditor<JiraProject>
     protected void initSelectedItems() {
         JsonElement element = GSON.toJsonTree(fieldValue);
         if (element.isJsonArray()) {
-            selectedItems = JiraGsonUtil.getAsList(element, JiraProject[].class);
+            mySelectedItems = JiraGsonUtil.getAsList(element, JiraProject[].class);
         } else if (element.isJsonObject()) {
-            selectedItems = Collections.singletonList(GSON.fromJson(element, JiraProject.class));
+            mySelectedItems = Collections.singletonList(GSON.fromJson(element, JiraProject.class));
         }
     }
 
     @Override
     public JComponent createPanel() {
-        if (Objects.nonNull(selectedItems)) {
-            myTextField.setText(selectedItems.stream().map(JiraProject::getKey).collect(joining(", ")));
+        if (Objects.nonNull(mySelectedItems)) {
+            myTextField.setText(mySelectedItems.stream().map(JiraProject::getKey).collect(joining(", ")));
         }
 
         return super.createPanel();
@@ -58,8 +56,8 @@ public class ProjectSelectFieldEditor extends DataSelectFieldEditor<JiraProject>
             return JsonNull.INSTANCE;
         }
 
-        List<String> values = selectedItems.stream().map(JiraProject::getKey).collect(toList());
-        if(isMultiSelect){
+        List<String> values = mySelectedItems.stream().map(JiraProject::getKey).collect(toList());
+        if(myIsMultiSelect){
             return createArrayObject(KEY, values);
         }
 
@@ -90,13 +88,13 @@ public class ProjectSelectFieldEditor extends DataSelectFieldEditor<JiraProject>
     class ProjectPickerDialog extends PickerDialog<JiraProject>{
 
         ProjectPickerDialog(@Nullable Project project) {
-            super(project, "Projects", myItems, selectedItems);
+            super(project, "Projects", myItems, mySelectedItems);
         }
 
         @Override
         protected void doOKAction() {
-            selectedItems = myList.getSelectedValuesList();
-            myTextField.setText(selectedItems.isEmpty() ? "" :  selectedItems.stream().map(JiraProject::getKey).collect(joining(", ")));
+            mySelectedItems = myList.getSelectedValuesList();
+            myTextField.setText(mySelectedItems.isEmpty() ? "" :  mySelectedItems.stream().map(JiraProject::getKey).collect(joining(", ")));
 
 
             super.doOKAction();

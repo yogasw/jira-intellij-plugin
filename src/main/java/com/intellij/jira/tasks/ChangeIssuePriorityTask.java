@@ -12,11 +12,11 @@ import static com.intellij.jira.rest.model.JiraPermissionType.EDIT_ISSUES;
 
 public class ChangeIssuePriorityTask extends AbstractBackgroundableTask {
 
-    private String priorityName;
+    private final String myPriorityName;
 
     public ChangeIssuePriorityTask(@NotNull Project project, String priorityName, String issueIdOrKey) {
         super(project, "Updating Issue Priority...", issueIdOrKey);
-        this.priorityName = priorityName;
+        this.myPriorityName = priorityName;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class ChangeIssuePriorityTask extends AbstractBackgroundableTask {
             throw new InvalidPermissionException("Edit Issue Failed", "You don't have permission to change priority");
         }
 
-        Result result = jiraRestApi.changeIssuePriority(priorityName, issueIdOrKey);
+        Result result = jiraRestApi.changeIssuePriority(myPriorityName, issueIdOrKey);
         if(!result.isValid()){
             throw new InvalidResultException("Error", "Issue priority has not been updated");
         }

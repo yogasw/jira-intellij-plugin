@@ -1,6 +1,7 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.AddIssueAttachmentDialog;
@@ -14,15 +15,13 @@ public class AddIssueAttachmentDialogAction extends JiraIssueDialogAction {
 
     private static final ActionProperties properties = ActionProperties.of("Add Attachment",  AllIcons.General.Add);
 
-    private final String issueKey;
-
-    public AddIssueAttachmentDialogAction(String issueKey) {
+    public AddIssueAttachmentDialogAction() {
         super(properties);
-        this.issueKey = issueKey;
     }
 
     @Override
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
+        String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
         boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, CREATE_ATTACHMENTS);
         if(!hasPermission){
             throw new InvalidPermissionException("Jira", "You don't have permission to attach files");

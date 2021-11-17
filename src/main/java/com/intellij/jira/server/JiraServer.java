@@ -1,9 +1,10 @@
 package com.intellij.jira.server;
 
 import com.intellij.jira.server.auth.AuthType;
-import com.intellij.openapi.util.PasswordUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.xmlb.annotations.*;
+import com.intellij.util.xmlb.annotations.Attribute;
+import com.intellij.util.xmlb.annotations.Tag;
+import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -21,32 +22,36 @@ public class JiraServer {
     private String password;
 
     private AuthType type;
+    private boolean shared;
 
     public JiraServer() { }
 
-    private JiraServer(String url, String username, String password, AuthType type) {
+    private JiraServer(String url, String username, String password, AuthType type, boolean shared) {
         this.url = url;
         this.username = username;
         this.password = password;
         this.type = type;
+        this.shared = shared;
     }
 
     private JiraServer(JiraServer other){
-        this(other.getUrl(), other.getUsername(), other.getPassword(), other.getType());
+        this(other.getUrl(), other.getUsername(), other.getPassword(), other.getType(), other.isShared());
     }
 
-    public void withUserAndPass(String url, String username, String password) {
+    public void withUserAndPass(String url, String username, String password, boolean shared) {
         setUrl(url);
         setUsername(username);
         setPassword(password);
         setType(AuthType.USER_PASS);
+        setShared(shared);
     }
 
-    public void withApiToken(String url, String useremail, String apiToken) {
+    public void withApiToken(String url, String useremail, String apiToken, boolean shared) {
         setUrl(url);
         setUsername(useremail);
         setPassword(apiToken);
         setType(AuthType.API_TOKEN);
+        setShared(shared);
     }
 
     @Attribute("url")
@@ -85,6 +90,15 @@ public class JiraServer {
         this.type = type == null ? DEFAULT_AUTH_TYPE : type;
     }
 
+    @Attribute("shared")
+    public boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(boolean shared) {
+        this.shared = shared;
+    }
+
     @Transient
     public boolean hasUserAndPassAuth() {
         return AuthType.USER_PASS == getType();
@@ -105,13 +119,13 @@ public class JiraServer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        JiraServer server = (JiraServer) o;
-        return Objects.equals(url, server.url);
+        JiraServer that = (JiraServer) o;
+        return Objects.equals(url, that.url) && Objects.equals(username, that.username) && Objects.equals(password, that.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url);
+        return Objects.hash(url, username, password);
     }
 
 

@@ -17,31 +17,89 @@
         ]]>
     </description>
 
+    <!-- Compatible with Idea platform 2021.1 - 2021.3 -->
+    <idea-version since-build="210" until-build="213.*"/>
+
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+
     <depends>com.intellij.tasks</depends>
 
+    <extensionPoints>
+        <extensionPoint name="issueHighlighterFactory" interface="com.intellij.jira.ui.highlighters.JiraIssueHighlighterFactory" dynamic="true"/>
+    </extensionPoints>
+
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="JIRA" anchor="bottom" icon="/icons/ico-jira-16.png" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory" canCloseContents="true"/>
+        <toolWindow id="Jira" anchor="bottom" icon="/icons/jiraIcon.svg" factoryClass="com.intellij.jira.ui.JiraToolWindowFactory" canCloseContents="true"/>
 
         <applicationService serviceImplementation="com.intellij.jira.components.JiraNotificationManager"/>
-        <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherApplicationManager"/>
-        <applicationService serviceImplementation="com.intellij.jira.components.JQLSearcherManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.jql.JQLSearcherApplicationManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.jql.JQLSearcherManager"/>
         <applicationService serviceImplementation="com.intellij.jira.settings.ChangelistSettings"/>
+        <applicationService serviceImplementation="com.intellij.jira.ui.table.column.JiraIssueApplicationSettings"/>
+        <applicationService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.server.JiraServerApplicationManager"/>
 
-        <projectService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
-        <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherObserver"/>
-        <projectService serviceImplementation="com.intellij.jira.components.JQLSearcherProjectManager"/>
+        <projectService serviceImplementation="com.intellij.jira.server.JiraServerProjectManager"/>
+        <projectService serviceImplementation="com.intellij.jira.jql.JQLSearcherProjectManager"/>
+        <projectService serviceImplementation="com.intellij.jira.components.JiraUserProvider"/>
+        <projectService serviceImplementation="com.intellij.jira.JiraTabsManager"/>
 
         <notificationGroup id="Jira Balloon Notifications" displayType="BALLOON" />
         <notificationGroup id="Jira Sticky Balloon Notifications" displayType="STICKY_BALLOON" isLogByDefault="true" />
+
+        <jira.issueHighlighterFactory implementation="com.intellij.jira.ui.highlighters.MyIssuesHighlighter$Factory"/>
+        <jira.issueHighlighterFactory implementation="com.intellij.jira.ui.highlighters.ResolvedIssuesHighlighter$Factory"/>
+
     </extensions>
 
     <actions>
-        <action id="Jira.toolwindow.Refresh"
+        <action id="Jira.Issue.Refresh"
                 class="com.intellij.jira.actions.JiraIssuesRefreshAction"
                 text="Refresh Issues"
                 description="Updates the project issues"
                 icon="AllIcons.Actions.Refresh">
         </action>
+
+        <action class="com.intellij.jira.actions.AddJQLSearcherAction" id="Jira.Issue.Jql.Add"/>
+        <action class="com.intellij.jira.actions.EditJQLSearcherAction" id="Jira.Issue.Jql.Edit"/>
+        <action class="com.intellij.jira.actions.ConfigureJQLSearchersAction" id="Jira.Issue.Jql.Configure"/>
+        <action class="com.intellij.jira.actions.GoToIssuePopupAction" id="Jira.Issue.GoTo"/>
+        <action class="com.intellij.jira.actions.ConfigureJiraServersAction" id="Jira.Issue.Server.Configure"/>
+
+        <action class="com.intellij.jira.actions.OpenNewIssuesTabAction" id="Jira.Issues.New.Tab"/>
+
+        <group id="Jira.Issues.Jql" class="com.intellij.jira.actions.JQLSearcherActionGroup"
+               icon="AllIcons.General.Filter" popup="true">
+            <reference id="Jira.Issue.Jql.Add"/>
+            <reference id="Jira.Issue.Jql.Edit"/>
+            <separator/>
+            <reference id="Jira.Issue.Jql.Configure"/>
+        </group>
+
+        <group class="com.intellij.jira.actions.HighlightersActionGroup" id="Jira.Issue.HighlightersActionGroup"/>
+        <action class="com.intellij.jira.actions.ToggleIssueColumnActionGroup" id="Jira.Issue.ToggleColumns"/>
+
+        <group id="Jira.Issues.PresentationSettings" class="com.intellij.jira.actions.JiraIssueToolbarPopupActionGroup"
+               icon="AllIcons.Actions.Show" popup="true">
+            <reference id="Jira.Issue.HighlightersActionGroup"/>
+            <reference id="Jira.Issue.ToggleColumns"/>
+        </group>
+
+        <group id="Jira.Issues.Base.Toolbar">
+            <reference id="Jira.Issue.Refresh"/>
+            <reference id="Jira.Issues.PresentationSettings"/>
+            <reference id="Jira.Issue.GoTo"/>
+        </group>
+
+        <group id="Jira.Issues.Toolbar">
+            <reference id="Jira.Issues.Jql"/>
+            <separator/>
+            <reference id="Jira.Issues.Base.Toolbar"/>
+            <separator/>
+            <reference id="Jira.Issues.New.Tab"/>
+            <reference id="Jira.Issue.Server.Configure"/>
+        </group>
+
     </actions>
 </idea-plugin>

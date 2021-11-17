@@ -4,13 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.jira.rest.model.JiraProjectVersion;
 import com.intellij.jira.util.JiraGsonUtil;
-import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,16 +35,16 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
     protected void initSelectedItems() {
         JsonElement element = GSON.toJsonTree(fieldValue);
         if (element.isJsonArray()) {
-            selectedItems = JiraGsonUtil.getAsList(element, JiraProjectVersion[].class);
+            mySelectedItems = JiraGsonUtil.getAsList(element, JiraProjectVersion[].class);
         } else if (element.isJsonObject()) {
-            selectedItems = Collections.singletonList(GSON.fromJson(element, JiraProjectVersion.class));
+            mySelectedItems = Collections.singletonList(GSON.fromJson(element, JiraProjectVersion.class));
         }
     }
 
     @Override
     public JComponent createPanel() {
-        if (Objects.nonNull(selectedItems)) {
-            myTextField.setText(selectedItems.stream().map(JiraProjectVersion::getName).collect(joining(", ")));
+        if (Objects.nonNull(mySelectedItems)) {
+            myTextField.setText(mySelectedItems.stream().map(JiraProjectVersion::getName).collect(joining(", ")));
         }
 
         return super.createPanel();
@@ -58,8 +56,8 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
             return JsonNull.INSTANCE;
         }
 
-        List<String> values = selectedItems.stream().map(JiraProjectVersion::getName).collect(toList());
-        if(isMultiSelect){
+        List<String> values = mySelectedItems.stream().map(JiraProjectVersion::getName).collect(toList());
+        if(myIsMultiSelect){
             return createArrayObject(KEY, values);
         }
 
@@ -88,13 +86,13 @@ public class VersionSelectFieldEditor extends DataSelectFieldEditor<JiraProjectV
     class VersionPickerDialog extends PickerDialog<JiraProjectVersion>{
 
         VersionPickerDialog(@Nullable Project project) {
-            super(project, "Versions", myItems, selectedItems);
+            super(project, "Versions", myItems, mySelectedItems);
         }
 
         @Override
         protected void doOKAction() {
-            selectedItems = myList.getSelectedValuesList();
-            myTextField.setText(selectedItems.isEmpty() ? "" :  selectedItems.stream().map(JiraProjectVersion::getName).collect(joining(", ")));
+            mySelectedItems = myList.getSelectedValuesList();
+            myTextField.setText(mySelectedItems.isEmpty() ? "" :  mySelectedItems.stream().map(JiraProjectVersion::getName).collect(joining(", ")));
 
             super.doOKAction();
         }

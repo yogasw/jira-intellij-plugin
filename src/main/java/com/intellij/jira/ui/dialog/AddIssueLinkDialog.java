@@ -3,7 +3,7 @@ package com.intellij.jira.ui.dialog;
 import com.intellij.jira.rest.model.JiraIssueLinkType;
 import com.intellij.jira.rest.model.JiraIssueLinkTypeInfo;
 import com.intellij.jira.tasks.AddIssueLinkTask;
-import com.intellij.jira.ui.JiraIssueLinkTypeInfoListModel;
+import com.intellij.jira.ui.model.JiraIssueLinkTypeInfoListModel;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;

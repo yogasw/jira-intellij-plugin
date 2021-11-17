@@ -31,7 +31,7 @@ public class ChangelistSettingsDialog extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
         this.defaultChangelistSettingsEditor = new DefaultChangelistSettingsEditor(settings);
-        this.defaultChangelistSettingsEditor.installListener((actionEvent) -> {
+        this.defaultChangelistSettingsEditor.installListener(actionEvent -> {
             if (this.defaultChangelistSettingsEditor.isSelected()) {
                 this.defaultChangelistSettingsEditor.enableComponents();
                 this.customChangelistSettingsEditor.disableComponents();
@@ -42,7 +42,7 @@ public class ChangelistSettingsDialog extends DialogWrapper {
         });
 
         this.customChangelistSettingsEditor = new CustomChangelistSettingsEditor(settings);
-        this.customChangelistSettingsEditor.installListener((actionEvent) -> {
+        this.customChangelistSettingsEditor.installListener(actionEvent -> {
             if (this.customChangelistSettingsEditor.isSelected()) {
                 this.customChangelistSettingsEditor.enableComponents();
                 this.defaultChangelistSettingsEditor.disableComponents();

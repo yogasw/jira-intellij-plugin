@@ -1,7 +1,7 @@
 package com.intellij.jira.ui.panels;
 
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.ui.JiraIssueSubtaskListModel;
+import com.intellij.jira.ui.model.JiraIssueSubtaskListModel;
 import com.intellij.jira.ui.renders.JiraIssueSubtaskListCellRender;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.ScrollPaneFactory;

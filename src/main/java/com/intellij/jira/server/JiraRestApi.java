@@ -196,12 +196,8 @@ public class JiraRestApi {
         return worklog;
     }
 
-    public String getDefaultSearchQuery(){
-        return jiraRestClient.getDefaultSearchQuery();
-    }
-
-    public boolean testConnection() throws Exception {
-        return jiraRestClient.testConnection();
+    public void testConnection() throws Exception {
+        findCurrentUser();
     }
 
     public List<String> getProjectRoles(String projectKey) {
@@ -289,7 +285,7 @@ public class JiraRestApi {
 
     public Result getCurrentUser() {
         try {
-            return BodyResult.ok(jiraRestClient.getCurrentUser());
+            return BodyResult.ok(findCurrentUser());
         } catch (Exception e) {
             log.error("Error getting current user");
             return BodyResult.error();
@@ -314,4 +310,9 @@ public class JiraRestApi {
             return BodyResult.error();
         }
     }
+
+    private JiraIssueUser findCurrentUser() throws Exception {
+        return jiraRestClient.getCurrentUser();
+    }
+
 }

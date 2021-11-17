@@ -235,12 +235,6 @@ public class JiraRestClient {
         return jiraRepository.getSearchQuery();
     }
 
-    public boolean testConnection() throws Exception {
-        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("myself"));
-        jiraRepository.executeMethod(method);
-        return method.getStatusCode() == 200;
-    }
-
     public List<String> getProjectRoles(String projectKey) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("project", projectKey, "role"));
         String response = jiraRepository.executeMethod(method);

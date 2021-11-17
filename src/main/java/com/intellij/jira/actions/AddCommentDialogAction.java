@@ -1,6 +1,7 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
@@ -14,22 +15,19 @@ import java.util.List;
 public class AddCommentDialogAction extends JiraIssueDialogAction{
     private static final ActionProperties properties = ActionProperties.of("Add a comment",  AllIcons.General.Add);
 
-    private String projectKey;
-    private String issueKey;
-
-    public AddCommentDialogAction(String projectKey, String issueKey) {
+    public AddCommentDialogAction() {
         super(properties);
-        this.projectKey = projectKey;
-        this.issueKey = issueKey;
     }
 
     @Override
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
+        String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.ADD_COMMENTS);
         if(!userHasPermission){
             throw new InvalidPermissionException("Add Comment Failed", "You don't have permission to add comments");
         }
 
+        String projectKey = e.getRequiredData(JiraDataKeys.PROJECT_KEY);
         List<String> projectRoles = jiraRestApi.getProjectRoles(projectKey);
 
         AddCommentDialog commentDialog = new AddCommentDialog(project, issueKey, projectRoles);

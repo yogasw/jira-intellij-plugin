@@ -3,15 +3,15 @@ package com.intellij.jira.ui.renders;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueLink;
 import com.intellij.jira.rest.model.JiraIssueStatus;
-import com.intellij.jira.ui.panels.JiraPanel;
+import com.intellij.jira.util.JiraBorders;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 
 import javax.swing.JList;
-import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -26,7 +26,7 @@ import static com.intellij.jira.util.JiraLabelUtil.getFgRowColor;
 import static com.intellij.openapi.util.text.StringUtil.toUpperCase;
 import static java.util.Objects.nonNull;
 
-public class JiraIssueLinkListCellRenderer extends DefaultJiraListCellRender {
+public class JiraIssueLinkListCellRenderer extends DefaultJiraListCellRender  {
 
     private JBLabel typeLabel;
     private JBLabel issueKeyAndSummaryLabel;
@@ -38,15 +38,15 @@ public class JiraIssueLinkListCellRenderer extends DefaultJiraListCellRender {
     }
 
     private void init() {
-        JPanel issueLinkpanel = new JiraPanel(new BorderLayout())
-                .withBorder(JBUI.Borders.empty(4, 5)).andTransparent();
+        BorderLayoutPanel issueLinkPanel = new BorderLayoutPanel()
+                .withBorder(JiraBorders.empty(4, 5)).andTransparent();
         typeLabel =  JiraLabelUtil.createEmptyLabel().withFont(BOLD);
         issueStatusLabel = JiraLabelUtil.createEmptyStatusLabel();
         issueKeyAndSummaryLabel = JiraLabelUtil.createEmptyLabel().withBorder(JBUI.Borders.emptyLeft(10));
-        issueLinkpanel.add(typeLabel, BorderLayout.LINE_START);
-        issueLinkpanel.add(issueKeyAndSummaryLabel, BorderLayout.CENTER);
-        issueLinkpanel.add(issueStatusLabel, BorderLayout.LINE_END);
-        add(issueLinkpanel);
+        issueLinkPanel.add(typeLabel, BorderLayout.LINE_START);
+        issueLinkPanel.addToCenter(issueKeyAndSummaryLabel);
+        issueLinkPanel.add(issueStatusLabel, BorderLayout.LINE_END);
+        add(issueLinkPanel);
     }
 
     @Override
@@ -54,11 +54,11 @@ public class JiraIssueLinkListCellRenderer extends DefaultJiraListCellRender {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         JiraIssueLink issueLink = (JiraIssueLink) value;
 
-        setBorder(JBUI.Borders.emptyBottom(2));
+        setBorder(JiraBorders.emptyBottom(2));
 
-        if(isSelected){
+        if (isSelected) {
             setBackground(UIUtil.isUnderDarcula() ? DARK_DARCULA_ISSUE_LINK_COLOR : DARK_ISSUE_LINK_COLOR);
-        }else{
+        } else {
             setBackground(UIUtil.isUnderDarcula() ? DARCULA_ISSUE_LINK_COLOR : ISSUE_LINK_COLOR);
         }
 
@@ -78,14 +78,11 @@ public class JiraIssueLinkListCellRenderer extends DefaultJiraListCellRender {
         issueStatusLabel.setBackground(status.getCategoryColor());
         issueStatusLabel.setForeground(status.isInProgressCategory() ?  IN_PROGRESS_TEXT_COLOR : Color.WHITE);
 
-
         return this;
     }
-
 
     private String getIssueKeyAndSummary(JiraIssue issue){
         return issue.getKey() + " " + issue.getSummary();
     }
-
 
 }

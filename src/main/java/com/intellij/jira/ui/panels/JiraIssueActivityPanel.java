@@ -1,28 +1,26 @@
 package com.intellij.jira.ui.panels;
 
-import com.intellij.jira.listener.JiraIssueChangeListener;
-import com.intellij.jira.listener.JiraIssuesRefreshedListener;
+import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.listener.IssueChangeListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.JiraTabbedPane;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
 public class JiraIssueActivityPanel extends JiraTabbedPane {
 
-    private final Project project;
-    private JiraIssue issue;
+    private final JiraIssuesData myIssuesData;
+    private JiraIssue myIssue;
 
-    private Integer mySelectedTab = 0;
+    private int mySelectedTab = 0;
 
-    JiraIssueActivityPanel(@NotNull Project project, JiraIssue issue) {
+    JiraIssueActivityPanel(@NotNull JiraIssuesData issuesData, JiraIssue issue) {
         super(JTabbedPane.BOTTOM);
-        this.project = project;
-        this.issue = issue;
+        myIssuesData = issuesData;
+        myIssue = issue;
 
         addTabs();
         setSelectedIndex(mySelectedTab);
@@ -30,46 +28,46 @@ public class JiraIssueActivityPanel extends JiraTabbedPane {
         subscribeTopic();
     }
 
+    public void update(@NotNull JiraIssue issue) {
+        myIssue = issue;
+        updatePanel();
+    }
+
     private String appendTotal(int total) {
         return total > 0 ? " (" + total + ") " : " ";
     }
 
     private void addTabs() {
-        addTab(JiraIssueDetailsPanel.TAB_ATTACHMENTS + appendTotal(issue.getAttachments().size()), new JiraIssueAttachmentsPanel(issue));
-        addTab(JiraIssueDetailsPanel.TAB_LINKS + appendTotal(issue.getIssueLinks().size()), new JiraIssueLinksPanel(issue));
-        addTab(JiraIssueDetailsPanel.TAB_SUB_TASKS + appendTotal(issue.getSubtasks().size()), new JiraIssueSubtasksPanel(issue));
-        addTab(JiraIssueDetailsPanel.TAB_COMMENTS + appendTotal(issue.getRenderedComments().getTotal()), new JiraIssueCommentsPanel(issue));
-        addTab(JiraIssueDetailsPanel.TAB_WORK_LOG + appendTotal(issue.getWorklogs().size()), new JiraIssueWorkLogsPanel(issue));
+        addTab(JiraIssueDetailsPanel.TAB_ATTACHMENTS + appendTotal(myIssue.getAttachments().size()), new JiraIssueAttachmentsPanel(myIssue));
+        addTab(JiraIssueDetailsPanel.TAB_LINKS + appendTotal(myIssue.getIssueLinks().size()), new JiraIssueLinksPanel(myIssue));
+        addTab(JiraIssueDetailsPanel.TAB_SUB_TASKS + appendTotal(myIssue.getSubtasks().size()), new JiraIssueSubtasksPanel(myIssue));
+        addTab(JiraIssueDetailsPanel.TAB_COMMENTS + appendTotal(myIssue.getRenderedComments().getTotal()), new JiraIssueCommentsPanel(myIssue));
+        addTab(JiraIssueDetailsPanel.TAB_WORK_LOG + appendTotal(myIssue.getWorklogs().size()), new JiraIssueWorkLogsPanel(myIssue));
     }
 
     private void subscribeTopic() {
-        MessageBusConnection connect = project.getMessageBus().connect();
-        connect.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
-            if (issue.getKey().equals(this.issue.getKey())) {
-                this.issue = issue;
+        MessageBusConnection connect = myIssuesData.getProject().getMessageBus().connect();
+        connect.subscribe(IssueChangeListener.TOPIC, issue -> {
+            if (issue.getKey().equals(myIssue.getKey())) {
+                myIssue = issue;
                 updatePanel();
             }
         });
 
-        connect.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
-            int issueIndex = issues.indexOf(this.issue);
-            if (issueIndex > -1) {
-                this.issue = issues.get(issueIndex);
-                updatePanel();
-            }
-        });
     }
 
     private void updatePanel() {
         ApplicationManager.getApplication().invokeLater(() -> {
-            Integer oldSelectedTab = Integer.valueOf(mySelectedTab.intValue());
+            int oldSelectedTab = mySelectedTab;
             while (getTabCount() > 0) {
                 remove(0);
             }
 
-            addTabs();
-            setSelectedIndex(oldSelectedTab);
-            mySelectedTab = getSelectedIndex();
+            if (myIssue != null) {
+                addTabs();
+                setSelectedIndex(oldSelectedTab);
+                mySelectedTab = getSelectedIndex();
+            }
         });
     }
 

@@ -3,10 +3,10 @@ package com.intellij.jira.ui.dialog;
 import com.intellij.jira.server.JiraServer;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.server.editor.JiraServerEditor;
-import com.intellij.jira.tasks.RefreshIssuesTask;
 import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.jira.util.SimpleSelectableList;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
@@ -64,7 +64,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
     public ConfigureJiraServersDialog(@NotNull Project project) {
         super(project, false);
         this.myProject = project;
-        this.myManager = JiraServerManager.getInstance(project);
+        this.myManager = ApplicationManager.getApplication().getService(JiraServerManager.class);
         init();
     }
 
@@ -74,27 +74,24 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         myJiraServerEditor = new JPanel(new CardLayout());
         myJiraServerEditor.add(EMPTY_PANEL, EMPTY_PANEL_NAME);
 
-        myServers = new SimpleSelectableList<>();
+        myServers = myManager.getAllServers(myProject);
 
-        CollectionListModel listModel = new CollectionListModel(new ArrayList());
-        for(JiraServer server : myManager.getJiraServers()){
+        CollectionListModel<JiraServer> listModel = new CollectionListModel(new ArrayList<>());
+        for(JiraServer server : myServers.getItems()){
             JiraServer clone = server.clone();
             listModel.add(clone);
-            myServers.add(clone);
         }
 
-        myServers.selectItem(myManager.getSelectedJiraServerIndex());
-
         this.myChangeListener = (server, selected) -> myServers.updateSelectedItem(server, selected);
-        this.myChangeUrlListener = (server) -> ((CollectionListModel)myServersList.getModel()).contentsChanged(server);
+        this.myChangeUrlListener = server -> ((CollectionListModel)myServersList.getModel()).contentsChanged(server);
 
 
         for(int i = 0; i < myServers.getItems().size(); i++){
-            addJiraServerEditor(myServers.getItems().get(i), i == myManager.getSelectedJiraServerIndex());
+            addJiraServerEditor(myServers.getItems().get(i), i == myManager.getSelectedServerIndex(myProject));
         }
 
 
-        myServersList = new JBList();
+        myServersList = new JBList<>();
         myServersList.setEmptyText("No servers");
         myServersList.setModel(listModel);
         myServersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -107,16 +104,15 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
             }
         });
 
-        myServersList.setCellRenderer(new ColoredListCellRenderer() {
+        myServersList.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
-            protected void customizeCellRenderer(@NotNull JList list, Object value, int index, boolean selected, boolean hasFocus) {
-                JiraServer server = (JiraServer)value;
+            protected void customizeCellRenderer(@NotNull JList<? extends JiraServer> list, JiraServer value, int index, boolean selected, boolean hasFocus) {
                 setIcon(TasksCoreIcons.Jira);
-                append(server.getPresentableName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                append(value.getPresentableName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
             }
         });
 
-                setTitle("Configure Servers");
+        setTitle("Configure Servers");
         super.init();
     }
 
@@ -146,8 +142,7 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
-        myManager.setJiraServers(myServers);
-        updateIssues();
+        myManager.setServers(myProject, myServers);
 
         super.doOKAction();
     }
@@ -187,10 +182,9 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         JiraServerEditor editor = new JiraServerEditor(myProject, server, selected, myChangeListener, myChangeUrlListener);
         myEditors.add(editor);
         String name = myServerNames.get(server);
-        myJiraServerEditor.add(editor.getPanel(), name);
+        myJiraServerEditor.add(editor.createPanel(), name);
         myJiraServerEditor.doLayout();
     }
-
 
     private void removeJiraServer(){
         int selectedServer = myServersList.getSelectedIndex();
@@ -204,7 +198,6 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
             updateEditorPanel(EMPTY_PANEL_NAME);
         }
 
-
     }
 
     private void updateEditorPanel(String name){
@@ -212,11 +205,6 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         mySplitter.doLayout();
         mySplitter.repaint();
     }
-
-    private void updateIssues(){
-        new RefreshIssuesTask(myProject).queue();
-    }
-
 
     private JComponent createDetailsServerPanel() {
         return myJiraServerEditor;

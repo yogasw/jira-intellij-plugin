@@ -1,182 +1,190 @@
 package com.intellij.jira.ui.panels;
 
 import com.google.common.util.concurrent.SettableFuture;
-import com.intellij.jira.actions.ConfigureJiraServersAction;
-import com.intellij.jira.actions.GoToIssuePopupAction;
-import com.intellij.jira.actions.JQLSearcherActionGroup;
-import com.intellij.jira.actions.JiraIssueActionGroup;
-import com.intellij.jira.components.JQLSearcherManager;
-import com.intellij.jira.listener.JiraIssueChangeListener;
-import com.intellij.jira.listener.JiraIssuesRefreshedListener;
+import com.intellij.jira.JiraUiDataKeys;
+import com.intellij.jira.data.JiraIssuesData;
+import com.intellij.jira.data.JiraProgress;
 import com.intellij.jira.rest.model.JiraIssue;
-import com.intellij.jira.server.JiraRestApi;
+import com.intellij.jira.ui.AbstractIssuesUi;
+import com.intellij.jira.ui.JiraIssueActionPlaces;
 import com.intellij.jira.ui.table.JiraIssueListTableModel;
-import com.intellij.jira.ui.table.JiraIssueTableView;
-import com.intellij.jira.util.JiraPanelUtil;
-import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.jira.ui.table.JiraIssueTable;
+import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.actionSystem.DataProvider;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.JBSplitter;
+import com.intellij.openapi.ui.Splitter;
+import com.intellij.openapi.util.Disposer;
+import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.util.messages.MessageBusConnection;
-import com.intellij.util.ui.JBUI;
+import com.intellij.ui.components.panels.Wrapper;
+import com.intellij.vcs.log.ui.frame.ProgressStripe;
+import net.miginfocom.swing.MigLayout;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
-import static com.intellij.jira.ui.JiraToolWindowFactory.TOOL_WINDOW_ID;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposable {
 
-public class JiraIssuesPanel extends SimpleToolWindowPanel {
+    private final JComponent myToolbar;
+    private final JiraIssueTable myJiraIssueTable;
+    private final JiraIssueDetailsPanel myJiraIssueDetailsPanel;
+    private final ProgressStripe myProgressStripe;
+    private final AbstractIssuesUi myUi;
+    private final JiraJQLSearcherPanel mySearcherPanel;
 
-    private final JiraRestApi myJiraRestApi;
-    private final Project myProject;
-    private final JQLSearcherManager myManager;
+    private final Splitter myIssuesBrowserSplitter;
 
-    private JiraIssueTableView issueTable;
-    private JiraIssueDetailsPanel issueDetailsPanel;
+    public JiraIssuesPanel(@NotNull JiraIssuesData issuesData, @NotNull AbstractIssuesUi issuesUi, @NotNull Disposable parent) {
+        super(new BorderLayout());
 
-    public JiraIssuesPanel(JiraRestApi server, Project project) {
-        super(false, true);
-        this.myJiraRestApi = server;
-        this.myProject = project;
-        this.myManager = JQLSearcherManager.getInstance();
+        Disposer.register(parent, this);
 
-        init();
-        subscribeTopic();
+        myUi = issuesUi;
+        mySearcherPanel = new JiraJQLSearcherPanel(issuesData.getProject(), myUi::refresh);
+        myToolbar = getToolbar(issuesData.getProject());
+
+        myJiraIssueTable = new JiraIssueTable(issuesData, parent);
+        myJiraIssueDetailsPanel = new JiraIssueDetailsPanel(issuesData, parent);
+
+        myJiraIssueTable.getSelectionModel().addListSelectionListener(new MyListSelectionListener());
+
+        JComponent toolbarAndTable = new JPanel(new BorderLayout());
+        toolbarAndTable.add(myToolbar, getToolbarOrientation());
+        JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(myJiraIssueTable, true);
+        myProgressStripe = new ProgressStripe(scrollPane, this, 1);
+
+        toolbarAndTable.add(myProgressStripe, BorderLayout.CENTER);
+
+        myIssuesBrowserSplitter = new OnePixelSplitter(0.6f);
+        myIssuesBrowserSplitter.setFirstComponent(toolbarAndTable);
+        myIssuesBrowserSplitter.setSecondComponent(myJiraIssueDetailsPanel);
+
+        myUi.getRefresher().getProgress().addProgressListener(new MyProgressListener(), this);
+
+        add(myIssuesBrowserSplitter);
     }
 
-    private void subscribeTopic() {
-        MessageBusConnection connection = myProject.getMessageBus().connect();
-
-        connection.subscribe(JiraIssueChangeListener.TOPIC, issue -> {
-            if(nonNull(issueTable)){
-                JiraIssueListTableModel model = issueTable.getModel();
-                int postItem = model.indexOf(issue);
-                if(postItem < 0){
-                    return;
-                }
-
-                model.removeRow(postItem);
-                model.insertRow(postItem, issue);
-                issueTable.addSelection(issue);
-            }
-        });
-
-        connection.subscribe(JiraIssuesRefreshedListener.TOPIC, issues -> {
-            if(nonNull(issueTable)){
-                JiraIssue lastSelectedIssue = issueTable.getSelectedObject();
-                ApplicationManager.getApplication().invokeLater(() -> {
-
-                    issueTable.updateModel(issues);
-                    int currentPosIssue = issueTable.getModel().indexOf(lastSelectedIssue);
-                    // if the last selected issue exists in the new list, we select it
-                    if(currentPosIssue >= 0) {
-                        JiraIssue issueToShow = issueTable.getModel().getItem(currentPosIssue);
-                        issueTable.addSelection(issueToShow);
-                    } else {
-                        issueDetailsPanel.setEmptyContent();
-                    }
-                });
-            }
-        });
-
+    @NotNull
+    protected String getToolbarOrientation() {
+        return BorderLayout.NORTH;
     }
 
-    private void init() {
-        setToolbar();
-        setContent();
+    protected void setToolbarHeightReference() {
+        myJiraIssueDetailsPanel.setToolbarHeightReferent(myToolbar);
     }
 
-    private void setContent() {
-        JComponent content;
-        if(isNull(myJiraRestApi)) {
-            content = JiraPanelUtil.createPlaceHolderPanel("No Jira server found");
-        } else {
-            List<JiraIssue> issues = myJiraRestApi.getIssues(getDefaultJQLSearcher());
-            issueDetailsPanel = new JiraIssueDetailsPanel(myProject);
-
-            issueTable = new JiraIssueTableView(issues);
-            issueTable.getSelectionModel().addListSelectionListener(event ->  this.issueDetailsPanel.showIssue(issueTable.getSelectedObject()));
-
-            JPanel issuesPanel = new JPanel(new BorderLayout());
-            issuesPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 0, 1));
-
-            JPanel jqlPanel = new JiraPanel(new BorderLayout());
-            jqlPanel.setBorder(JBUI.Borders.customLine(JBColor.border(),0, 0, 1, 0));
-            jqlPanel.add(new JiraJQLSearcherPanel(myProject), BorderLayout.WEST);
-
-            issuesPanel.add(jqlPanel, BorderLayout.PAGE_START);
-            issuesPanel.add(ScrollPaneFactory.createScrollPane(issueTable), BorderLayout.CENTER);
-
-
-            JBSplitter splitter = new JBSplitter();
-            splitter.setProportion(0.6f);
-            splitter.setFirstComponent(issuesPanel);
-            splitter.setSecondComponent(issueDetailsPanel);
-            splitter.setShowDividerIcon(false);
-            splitter.setDividerWidth(1);
-
-            content = splitter;
+    @Override
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
+        if (JiraUiDataKeys.ISSUES_PANEL.is(dataId)) {
+            return this;
+        } else if (JiraUiDataKeys.JIRA_UI_PROPERTIES.is(dataId)) {
+            return ApplicationManager.getApplication().getService(JiraIssueApplicationSettings.class);
+        } else if (JiraUiDataKeys.ISSUES_UI.is(dataId)) {
+            return myUi;
         }
 
-        super.setContent(content);
+        return null;
     }
 
-    private void setToolbar(){
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(TOOL_WINDOW_ID, createActionGroup(), false);
-        actionToolbar.setTargetComponent(this);
-        Box toolBarBox = Box.createHorizontalBox();
-        toolBarBox.add(actionToolbar.getComponent());
-        super.setToolbar(toolBarBox);
+    @NotNull
+    protected JComponent getToolbar(@NotNull Project project) {
+        DefaultActionGroup toolbarGroup = new DefaultActionGroup();
+        toolbarGroup.copyFromGroup((DefaultActionGroup) ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR));
+
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR, toolbarGroup, true);
+        toolbar.setTargetComponent(this);
+
+        Wrapper jqlFilter = new Wrapper(mySearcherPanel);
+        jqlFilter.setVerticalSizeReferent(toolbar.getComponent());
+
+        JPanel panel = new JPanel(new MigLayout("ins 0, fill", "[left]0[left, fill]push[pref:pref, right]", "center"));
+        panel.add(jqlFilter);
+        panel.add(toolbar.getComponent());
+
+        return panel;
     }
 
-    private ActionGroup createActionGroup(){
-        JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(ActionManager.getInstance().getAction("Jira.toolwindow.Refresh"));
-        group.add(new JQLSearcherActionGroup());
-        group.add(new GoToIssuePopupAction());
-        group.add(Separator.getInstance());
-        group.add(new ConfigureJiraServersAction());
-        return group;
+    public JiraIssueTable getJiraIssueTable() {
+        return myJiraIssueTable;
     }
 
-    public JiraIssueListTableModel getTableListModel(){
-        return issueTable.getModel();
-    }
-
-    public JiraIssueTableView getIssueTable(){
-        return issueTable;
-    }
-
-    public Future<Boolean> goToIssue(String issueKey){
+    public Future<Boolean> goToIssue(String issueKey) {
         SettableFuture<Boolean> future = SettableFuture.create();
         future.set(false);
-        Optional<JiraIssue> targetIssue = issueTable.getItems().stream().filter(issue -> Objects.equals(issue.getKey(), issueKey)).findFirst();
+        Optional<JiraIssue> targetIssue = myJiraIssueTable.getItems().stream().filter(issue -> Objects.equals(issue.getKey(), issueKey)).findFirst();
         if(targetIssue.isPresent()){
             future.set(true);
-            issueTable.addSelection(targetIssue.get());
-            issueTable.scrollRectToVisible(issueTable.getCellRect(issueTable.getSelectedRow(),issueTable.getSelectedColumn(), true));
-            issueDetailsPanel.showIssue(targetIssue.get());
+            myJiraIssueTable.addSelection(targetIssue.get());
+            myJiraIssueTable.scrollRectToVisible(myJiraIssueTable.getCellRect(myJiraIssueTable.getSelectedRow(), myJiraIssueTable.getSelectedColumn(), true));
+            myJiraIssueDetailsPanel.showIssue(targetIssue.get());
         }
 
         return future;
     }
 
-    private String getDefaultJQLSearcher(){
-        return myManager.getSelectedSearcher(myProject).getJql();
+    @Override
+    public void dispose() {
+
+    }
+
+    public void setIssues(List<JiraIssue> issues) {
+        if (issues.isEmpty()) {
+            myJiraIssueTable.getEmptyText().setText("No issues to display");
+        }
+
+        JiraIssue lastSelectedIssue = myJiraIssueTable.getSelectedObject();
+        myJiraIssueTable.setModelAndUpdateColumns(new JiraIssueListTableModel());
+        myJiraIssueTable.getModel().setIssues(issues);
+
+        int currentPosIssue = myJiraIssueTable.getModel().indexOf(lastSelectedIssue);
+        // if the last selected issue exists in the new list, we select it
+        if (currentPosIssue >= 0) {
+            JiraIssue issueToShow = myJiraIssueTable.getModel().getItem(currentPosIssue);
+            myJiraIssueTable.addSelection(issueToShow);
+        }
+    }
+
+    public void updateSearcherPanel() {
+        mySearcherPanel.updateCombo();
+    }
+
+    private class MyListSelectionListener implements ListSelectionListener {
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            myJiraIssueDetailsPanel.showIssue(myJiraIssueTable.getSelectedObject());
+            setToolbarHeightReference();
+        }
+    }
+
+    private class MyProgressListener implements JiraProgress.JiraProgressListener {
+
+        @Override
+        public void start() {
+            myProgressStripe.startLoading();
+            myJiraIssueTable.getEmptyText().setText("Loading issues...");
+        }
+
+        @Override
+        public void finish() {
+            myProgressStripe.stopLoading();
+        }
     }
 
 }

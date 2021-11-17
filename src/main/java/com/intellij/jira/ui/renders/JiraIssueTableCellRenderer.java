@@ -1,8 +1,8 @@
 package com.intellij.jira.ui.renders;
 
-import javax.swing.*;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
+import java.awt.Component;
 
 import static com.intellij.jira.util.JiraLabelUtil.getBgRowColor;
 import static com.intellij.jira.util.JiraLabelUtil.getFgRowColor;

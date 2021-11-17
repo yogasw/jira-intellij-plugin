@@ -1,20 +1,11 @@
 package com.intellij.jira.ui.editors;
 
 import com.google.gson.JsonElement;
-import com.intellij.openapi.ui.ValidationInfo;
-import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-
-public interface FieldEditor {
-
-     JComponent createPanel();
+public interface FieldEditor extends Editor {
 
      JsonElement getJsonValue();
 
      boolean isRequired();
-
-     @Nullable
-     ValidationInfo validate();
 
 }

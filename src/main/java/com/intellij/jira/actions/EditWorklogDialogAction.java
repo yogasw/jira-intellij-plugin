@@ -1,13 +1,13 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.exceptions.InvalidPermissionException;
+import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.EditWorklogDialog;
-import com.intellij.jira.util.factory.JiraIssuTimeTrackingFactory;
-import com.intellij.jira.util.factory.JiraIssueWorklogFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -20,22 +20,15 @@ import static java.util.Objects.nonNull;
 public class EditWorklogDialogAction extends JiraIssueDialogAction {
     private static final ActionProperties properties = ActionProperties.of("Edit Work Log", AllIcons.Actions.Edit);
 
-    private String issueKey;
-    private String projectKey;
-    private JiraIssueWorklogFactory worklogFactory;
-    private JiraIssuTimeTrackingFactory timetrackingFactory;
-
-    public EditWorklogDialogAction(String issueKey, String projectKey, JiraIssueWorklogFactory factory, JiraIssuTimeTrackingFactory timetrackingFactory) {
+    public EditWorklogDialogAction() {
         super(properties);
-        this.issueKey = issueKey;
-        this.projectKey = projectKey;
-        this.worklogFactory = factory;
-        this.timetrackingFactory = timetrackingFactory;
     }
 
     @Override
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
-        JiraIssueWorklog worklogToEdit = jiraRestApi.getWorklog(issueKey, worklogFactory.create().getId());
+        String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
+        JiraIssueWorklog issueWorklog = e.getRequiredData(JiraDataKeys.ISSUE_WORKLOG);
+        JiraIssueWorklog worklogToEdit = jiraRestApi.getWorklog(issueKey, issueWorklog.getId());
         // Check permissions
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_ALL_WORKLOGS);
         if (!userHasPermission) {
@@ -52,16 +45,18 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
         }
 
         if (Objects.nonNull(worklogToEdit)) {
+            String projectKey = e.getRequiredData(JiraDataKeys.PROJECT_KEY);
             List<String> projectRoles = jiraRestApi.getProjectRoles(projectKey);
 
-            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, projectRoles, worklogToEdit, timetrackingFactory.create(), false);
+            JiraIssueTimeTracking issueTimeTracking = e.getRequiredData(JiraDataKeys.ISSUE_TIME_TRACKING);
+            EditWorklogDialog dialog = new EditWorklogDialog(project, issueKey, projectRoles, worklogToEdit, issueTimeTracking, false);
             dialog.show();
         }
     }
 
     @Override
     public void update(AnActionEvent e) {
-        e.getPresentation().setEnabled(nonNull(worklogFactory.create()));
+        e.getPresentation().setEnabled(nonNull(e.getData(JiraDataKeys.ISSUE_WORKLOG)));
     }
 
 }
