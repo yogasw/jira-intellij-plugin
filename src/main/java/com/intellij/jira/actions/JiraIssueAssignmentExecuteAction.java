@@ -12,6 +12,7 @@ public class JiraIssueAssignmentExecuteAction extends JiraIssueAction {
     private String username;
     private String issueKey;
 
+
     public static JiraIssueAssignmentExecuteAction assignAnyone(String issueKey){
         return new JiraIssueAssignmentExecuteAction("Unassign", null, "-1", issueKey);
     }

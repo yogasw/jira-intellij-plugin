@@ -11,6 +11,7 @@ public class JiraIssueChangePriorityAction extends JiraIssueAction {
     private String priorityName;
     private String issueIdOrKey;
 
+
     public JiraIssueChangePriorityAction(String priorityName, String issueIdOrKey) {
         super(ActionProperties.of(priorityName));
         this.priorityName = priorityName;

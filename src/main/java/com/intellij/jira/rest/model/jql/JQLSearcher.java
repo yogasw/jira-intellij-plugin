@@ -3,14 +3,18 @@ package com.intellij.jira.rest.model.jql;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.intellij.openapi.util.text.StringUtil.trim;
 
 @Tag("JQLSearcher")
 public class JQLSearcher {
+
+    private String myId;
 
     private String alias;
     private String jql;
@@ -18,20 +22,23 @@ public class JQLSearcher {
     private boolean shared;
 
     public JQLSearcher() {
-        this.alias = "";
-        this.jql = "";
+        this("", "", false);
     }
 
     public JQLSearcher(@Nullable String alias, String jql, boolean shared) {
+        this(UUID.randomUUID().toString(), alias, jql, shared);
+    }
+
+    private JQLSearcher(JQLSearcher other){
+        this(other.getId(), other.getAlias(), other.getJql(), other.isShared());
+    }
+
+    private JQLSearcher(@NotNull String id, @Nullable String alias, String jql, boolean shared) {
+        myId = id;
         setAlias(alias);
         setJql(jql);
         setShared(shared);
     }
-
-    public JQLSearcher(JQLSearcher other){
-        this(other.getAlias(), other.getJql(), other.isShared());
-    }
-
 
     @Attribute("alias")
     public String getAlias() {
@@ -57,6 +64,10 @@ public class JQLSearcher {
 
     public void setShared(boolean shared) {
         this.shared = shared;
+    }
+
+    public String getId() {
+        return myId;
     }
 
     @Override

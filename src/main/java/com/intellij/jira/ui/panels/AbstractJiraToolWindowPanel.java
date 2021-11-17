@@ -1,10 +1,15 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.ui.components.panels.Wrapper;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -14,6 +19,7 @@ public abstract class AbstractJiraToolWindowPanel extends SimpleToolWindowPanel 
 
     protected final String issueKey;
     protected final String projectKey;
+    private Wrapper myToolbarWrapper;
 
     AbstractJiraToolWindowPanel(JiraIssue issue) {
         this(false, issue);
@@ -24,11 +30,26 @@ public abstract class AbstractJiraToolWindowPanel extends SimpleToolWindowPanel 
     }
 
     public AbstractJiraToolWindowPanel(boolean vertical, boolean borderless, JiraIssue issue) {
+        this(vertical, borderless, issue.getKey(), issue.getProject().getKey());
+    }
+
+    public AbstractJiraToolWindowPanel(boolean vertical, boolean borderless, String issueKey, String projectKey) {
         super(vertical, borderless);
-        this.issueKey = issue.getKey();
-        this.projectKey = issue.getProject().getKey();
+        this.issueKey = issueKey;
+        this.projectKey = projectKey;
 
         initToolbar();
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
+        if (JiraDataKeys.ISSUE_KEY.is(dataId)) {
+            return issueKey;
+        } else if (JiraDataKeys.PROJECT_KEY.is(dataId)) {
+            return projectKey;
+        }
+
+        return super.getData(dataId);
     }
 
     public void initToolbar(){
@@ -37,7 +58,13 @@ public abstract class AbstractJiraToolWindowPanel extends SimpleToolWindowPanel 
 
         Box toolBarBox = getToolBarBox();
         toolBarBox.add(actionToolbar.getComponent());
-        setToolbar(toolBarBox);
+        myToolbarWrapper = new Wrapper(actionToolbar.getComponent());
+        setToolbar(myToolbarWrapper);
+        //GuiUtils.installVisibilityReferent(myToolbarWrapper, actionToolbar.getComponent());
+    }
+
+    public void setToolbarHeightReferent(@NotNull JComponent referent) {
+        myToolbarWrapper.setVerticalSizeReferent(referent);
     }
 
     public ActionToolbar getActionToolbar(){

@@ -6,6 +6,7 @@ import com.intellij.jira.server.JiraServerManager;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +27,8 @@ public abstract class JiraIssueDialogAction extends AnAction {
                 return;
             }
 
-            JiraServerManager manager = JiraServerManager.getInstance(project);
-            JiraRestApi jiraRestApi = manager.getJiraRestApi();
+            JiraServerManager manager = ApplicationManager.getApplication().getService(JiraServerManager.class);
+            JiraRestApi jiraRestApi = manager.getJiraRestApi(project);
             if(isNull(jiraRestApi)) {
                 return;
             }

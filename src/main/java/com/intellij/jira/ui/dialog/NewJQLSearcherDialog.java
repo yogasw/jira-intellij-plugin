@@ -1,6 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
-import com.intellij.jira.components.JQLSearcherManager;
+import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

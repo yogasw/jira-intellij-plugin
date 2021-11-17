@@ -1,13 +1,13 @@
 package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.exceptions.InvalidPermissionException;
+import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
 import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.DeleteWorklogDialog;
-import com.intellij.jira.util.factory.JiraIssuTimeTrackingFactory;
-import com.intellij.jira.util.factory.JiraIssueWorklogFactory;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -18,20 +18,14 @@ public class DeleteWorklogDialogAction extends JiraIssueDialogAction {
 
     private static final ActionProperties properties = ActionProperties.of("Delete Work Log",  AllIcons.General.Remove);
 
-    private String issueKey;
-    private JiraIssueWorklogFactory worklogFactory;
-    private JiraIssuTimeTrackingFactory timeTrackingFactory;
-
-    public DeleteWorklogDialogAction(String issueKey, JiraIssueWorklogFactory factory, JiraIssuTimeTrackingFactory timeTrackingFactory) {
+    public DeleteWorklogDialogAction() {
         super(properties);
-        this.issueKey = issueKey;
-        this.worklogFactory = factory;
-        this.timeTrackingFactory = timeTrackingFactory;
     }
 
     @Override
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
-        JiraIssueWorklog worklogToDelete = worklogFactory.create();
+        String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
+        JiraIssueWorklog worklogToDelete = e.getRequiredData(JiraDataKeys.ISSUE_WORKLOG);
 
         boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.DELETE_ALL_WORKLOGS);
         if(!userHasPermission){
@@ -40,18 +34,19 @@ public class DeleteWorklogDialogAction extends JiraIssueDialogAction {
                 throw new InvalidPermissionException("Delete Work Log Failed", "You don't have permission to delete Work Logs");
             }
 
-            if(nonNull(worklogToDelete) && !worklogToDelete.getAuthor().getName().equals(jiraRestApi.getUsername())){
+            if(!worklogToDelete.getAuthor().getName().equals(jiraRestApi.getUsername())){
                 throw new InvalidPermissionException("Delete Work Log Failed", "This comment not yours. You cannot delete it");
             }
         }
 
-        DeleteWorklogDialog dialog = new DeleteWorklogDialog(project, issueKey, worklogToDelete.getId(), timeTrackingFactory.create());
+        JiraIssueTimeTracking issueTimeTracking = e.getRequiredData(JiraDataKeys.ISSUE_TIME_TRACKING);
+        DeleteWorklogDialog dialog = new DeleteWorklogDialog(project, issueKey, worklogToDelete.getId(), issueTimeTracking);
         dialog.show();
     }
 
     @Override
     public void update(AnActionEvent e) {
-        e.getPresentation().setEnabled(nonNull(worklogFactory.create()));
+        e.getPresentation().setEnabled(nonNull(e.getData(JiraDataKeys.ISSUE_WORKLOG)));
     }
 
 }

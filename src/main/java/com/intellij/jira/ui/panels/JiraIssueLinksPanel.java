@@ -1,17 +1,19 @@
 package com.intellij.jira.ui.panels;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.AddIssueLinkDialogAction;
 import com.intellij.jira.actions.DeleteIssueLinkDialogAction;
 import com.intellij.jira.actions.JiraIssueActionGroup;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueLink;
-import com.intellij.jira.ui.JiraIssueLinkListModel;
+import com.intellij.jira.ui.model.JiraIssueLinkListModel;
 import com.intellij.jira.ui.renders.JiraIssueLinkListCellRenderer;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -36,10 +38,20 @@ class JiraIssueLinksPanel extends AbstractJiraToolWindowPanel {
     @Override
     public ActionGroup getActionGroup() {
         JiraIssueActionGroup group = new JiraIssueActionGroup(this);
-        group.add(new AddIssueLinkDialogAction(projectKey, issueKey));
-        group.add(new DeleteIssueLinkDialogAction(issueKey, () -> issueLink));
+        group.add(new AddIssueLinkDialogAction());
+        group.add(new DeleteIssueLinkDialogAction());
 
         return group;
+    }
+
+    @Override
+    public @Nullable Object getData(@NotNull String dataId) {
+        if (JiraDataKeys.ISSUE_LINK.is(dataId)
+            && Objects.nonNull(issueLinkList.getSelectedValue())) {
+            return issueLink;
+        }
+
+        return super.getData(dataId);
     }
 
     private void initContent(List<JiraIssueLink> issueLinks) {
@@ -63,7 +75,6 @@ class JiraIssueLinksPanel extends AbstractJiraToolWindowPanel {
         JiraIssueLink selectedLink = issueLinkList.getSelectedValue();
         if(!Objects.equals(issueLink, selectedLink)){
             issueLink = selectedLink;
-            initToolbar();
         }
     }
 

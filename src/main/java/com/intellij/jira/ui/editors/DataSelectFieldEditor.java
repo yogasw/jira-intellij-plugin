@@ -6,7 +6,7 @@ import java.util.List;
 public abstract class DataSelectFieldEditor<T> extends SelectFieldEditor<T> {
 
     protected List<T> myItems;
-    protected List<T> selectedItems;
+    protected List<T> mySelectedItems;
 
     public DataSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect, List<T> items) {
         super(issueKey, fieldName, fieldValue, required, isMultiSelect);

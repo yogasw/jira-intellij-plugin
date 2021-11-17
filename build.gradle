@@ -40,6 +40,13 @@ patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>New feature: posibility to create changelist on transit dialog</li>
+        <li>New features:
+            <ul>
+                <li>Open filtered issues tabs</li>
+                <li>Global jira servers</li>
+            </ul>
+        </li>
+        <li>UI improvements</li>
+        <li>Bug fixes</li>
       </ul>"""
 }

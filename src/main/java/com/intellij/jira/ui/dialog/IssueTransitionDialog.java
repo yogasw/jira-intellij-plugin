@@ -6,7 +6,7 @@ import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueFieldProperties;
 import com.intellij.jira.rest.model.JiraIssueTransition;
 import com.intellij.jira.tasks.TransitIssueTask;
-import com.intellij.jira.ui.JiraIssueTransitionListModel;
+import com.intellij.jira.ui.model.JiraIssueTransitionListModel;
 import com.intellij.jira.ui.panels.JiraPanel;
 import com.intellij.jira.ui.panels.JiraTransitionTaskEditor;
 import com.intellij.jira.ui.renders.JiraIssueTransitionListCellRenderer;

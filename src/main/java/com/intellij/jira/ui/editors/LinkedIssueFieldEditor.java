@@ -6,17 +6,18 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.AddIssueLinkDialogAction;
 import com.intellij.jira.rest.model.JiraIssueLinkType;
 import com.intellij.jira.rest.model.JiraIssueLinkTypeInfo;
 import com.intellij.jira.ui.dialog.AddIssueLinkDialog;
-import com.intellij.jira.util.JiraIssueField;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.FormBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -37,11 +38,11 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
 
     private JiraIssueLinkTypeInfo mySelectedLinkType;
     private String mySelectedIssue;
-    private String projectKey;
+    private String myProjectKey;
 
     public LinkedIssueFieldEditor(String issueKey, String fieldName, boolean required, String projectKey) {
         super(issueKey, fieldName, null, required);
-        this.projectKey = projectKey;
+        myProjectKey = projectKey;
     }
 
     @Override
@@ -51,11 +52,11 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
 
     @Override
     public JComponent createPanel() {
-        this.myButton.setIcon(AllIcons.Ide.UpDown);
-        this.myButton.addActionListener(e -> {
+        myButton.setIcon(AllIcons.Ide.UpDown);
+        myButton.addActionListener(e -> {
             InputEvent inputEvent = e.getSource() instanceof InputEvent ? (InputEvent)e.getSource() : null;
-            MyAddIssueLinkDialogAction myAction = new MyAddIssueLinkDialogAction();
-            myAction.actionPerformed(AnActionEvent.createFromAnAction(myAction, inputEvent, ActionPlaces.UNKNOWN, DataManager.getInstance().getDataContext(myTextField)));
+            MyAddIssueLinkDialogAction action = new MyAddIssueLinkDialogAction();
+            action.actionPerformed(AnActionEvent.createFromAnAction(action, inputEvent, ActionPlaces.TOOLBAR, DataManager.getInstance().getDataContext(myTextField)));
         });
 
         return FormBuilder.createFormBuilder()
@@ -91,14 +92,19 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
         return null;
     }
 
-    private class MyAddIssueLinkDialogAction extends AddIssueLinkDialogAction {
-
-        public MyAddIssueLinkDialogAction() {
-            super(projectKey, issueKey);
+    @Override
+    public @Nullable Object getData(@NotNull String dataId) {
+        if (JiraDataKeys.PROJECT_KEY.is(dataId)) {
+            return myProjectKey;
         }
 
+        return super.getData(dataId);
+    }
+
+    private class MyAddIssueLinkDialogAction extends AddIssueLinkDialogAction {
+
         @Override
-        public void openIssueLinkDialog(Project project, List<JiraIssueLinkType> issueLinkTypes, List<String> issues) {
+        public void openIssueLinkDialog(Project project, List<JiraIssueLinkType> issueLinkTypes, List<String> issues, String issueKey) {
             MyAddIssueLinkDialog dialog = new MyAddIssueLinkDialog(project, issueLinkTypes, issues, issueKey);
             dialog.show();
         }

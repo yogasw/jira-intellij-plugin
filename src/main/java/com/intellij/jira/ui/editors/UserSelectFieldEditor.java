@@ -5,7 +5,6 @@ import com.google.gson.JsonNull;
 import com.intellij.jira.rest.model.JiraIssueUser;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import static java.util.stream.Collectors.toList;
 
 public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
 
-    private List<JiraIssueUser> selectedUsers = new ArrayList<>();
+    private List<JiraIssueUser> mySelectedUsers = new ArrayList<>();
 
     public UserSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
         this(issueKey, fieldName, fieldValue, required, false);
@@ -36,7 +35,7 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
         JiraIssueUser user = getFieldValue();
         if(Objects.nonNull(user)) {
             myTextField.setText(user.getDisplayName());
-            selectedUsers.add(user);
+            mySelectedUsers.add(user);
         }
     }
 
@@ -47,7 +46,7 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
         }
 
         List<String> selectedUserNames = getSelectedUserNames();
-        if(isMultiSelect){
+        if(myIsMultiSelect){
             return createArrayNameObjects(selectedUserNames);
         }
 
@@ -64,7 +63,7 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
     }
 
     private List<String> getSelectedUserNames() {
-        return selectedUsers.stream().map(JiraIssueUser::getName).collect(toList());
+        return mySelectedUsers.stream().map(JiraIssueUser::getName).collect(toList());
     }
 
     private class UserPickerDialogAction extends PickerDialogAction {
@@ -93,8 +92,8 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
 
         @Override
         protected void doOKAction() {
-            selectedUsers = myList.getSelectedValuesList();
-            myTextField.setText(selectedUsers.isEmpty() ? "" : selectedUsers.stream().map(JiraIssueUser::getDisplayName).collect(Collectors.joining(", ")));
+            mySelectedUsers = myList.getSelectedValuesList();
+            myTextField.setText(mySelectedUsers.isEmpty() ? "" : mySelectedUsers.stream().map(JiraIssueUser::getDisplayName).collect(Collectors.joining(", ")));
 
             super.doOKAction();
         }
