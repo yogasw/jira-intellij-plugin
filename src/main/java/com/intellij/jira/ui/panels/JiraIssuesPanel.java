@@ -7,6 +7,7 @@ import com.intellij.jira.data.JiraProgress;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.ui.AbstractIssuesUi;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
+import com.intellij.jira.ui.table.JiraIssueListTableModel;
 import com.intellij.jira.ui.table.JiraIssueTable;
 import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
 import com.intellij.openapi.Disposable;
@@ -148,6 +149,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         }
 
         JiraIssue lastSelectedIssue = myJiraIssueTable.getSelectedObject();
+        myJiraIssueTable.setModelAndUpdateColumns(new JiraIssueListTableModel());
         myJiraIssueTable.getModel().setIssues(issues);
 
         int currentPosIssue = myJiraIssueTable.getModel().indexOf(lastSelectedIssue);

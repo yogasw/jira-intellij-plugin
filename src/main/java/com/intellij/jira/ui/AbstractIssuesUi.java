@@ -10,6 +10,7 @@ import com.intellij.jira.ui.highlighters.JiraIssueHighlighter;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighterFactory;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighterProperty;
 import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
+import com.intellij.jira.ui.table.column.JiraIssueColumnProperties;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
@@ -95,7 +96,13 @@ public abstract class AbstractIssuesUi implements IssuesUi {
 
         @Override
         public <T> void onChanged(JiraIssueUiProperties.@NotNull JiraIssueUiProperty<T> property) {
-            updateHighlighters();
+            if (property instanceof JiraIssueHighlighterProperty) {
+                updateHighlighters();
+            } else if (property instanceof JiraIssueColumnProperties.TableColumnVisibilityProperty) {
+                getTable().getModel().update();
+                getTable().createDefaultColumnsFromModel();
+                getTable().updateColumnSizes();
+            }
         }
     }
 

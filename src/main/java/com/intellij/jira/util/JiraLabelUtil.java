@@ -3,7 +3,7 @@ package com.intellij.jira.util;
 import com.intellij.jira.rest.model.JiraIssuePriority;
 import com.intellij.jira.rest.model.JiraIssueStatus;
 import com.intellij.jira.ui.labels.JiraLinkLabel;
-import com.intellij.jira.ui.labels.JiraStatusLightLabel;
+import com.intellij.jira.ui.labels.JiraStatusDarkLabel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBFont;
@@ -99,7 +99,7 @@ public class JiraLabelUtil {
     }
 
     public static JBLabel createStatusLabel(JiraIssueStatus status){
-        return new JiraStatusLightLabel(status);
+        return new JiraStatusDarkLabel(status);
     }
 
     public static JBLabel createEmptyStatusLabel(){

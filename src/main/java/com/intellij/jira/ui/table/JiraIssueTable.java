@@ -32,7 +32,7 @@ public class JiraIssueTable extends TableView<JiraIssue> implements Disposable {
     private final BaseStyleProvider myBaseStyleProvider;
 
     public JiraIssueTable(@NotNull JiraIssuesData issuesData, @NotNull Disposable parent) {
-        super(new JiraIssueListTableModel(issuesData));
+        super(new JiraIssueListTableModel());
 
         Disposer.register(parent, this);
 
