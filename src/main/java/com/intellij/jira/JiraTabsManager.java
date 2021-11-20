@@ -7,6 +7,7 @@ import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.AbstractIssuesUi;
 import com.intellij.jira.ui.JiraUi;
 import com.intellij.jira.ui.JiraUiFactory;
+import com.intellij.jira.ui.SearcherIssuesUi;
 import com.intellij.jira.ui.panels.JiraServerNotConfiguredPanel;
 import com.intellij.jira.ui.panels.JiraTabPanel;
 import com.intellij.jira.util.JiraContentUtil;
@@ -66,23 +67,24 @@ public class JiraTabsManager implements Disposable {
         // check if server is configured
         if (JiraServerManager.getInstance().hasJiraServerConfigured(myProject)) {
             ContentManager contentManager = getContentManager();
-            AbstractIssuesUi issuesUi = createIssuesUi();
-            Disposer.register(this, issuesUi);
+            SearcherIssuesUi searcherIssuesUi = new SearcherIssuesUi(myIssueData);
 
-            Content content = ContentFactory.SERVICE.getInstance().createContent(new JiraTabPanel(issuesUi), TAB_ISSUES, false);
+            Disposer.register(this, searcherIssuesUi);
+
+            Content content = ContentFactory.SERVICE.getInstance().createContent(new JiraTabPanel(searcherIssuesUi), TAB_ISSUES, false);
             content.setCloseable(false);
 
             ContentsUtil.addContent(contentManager, content, true);
             myServerConfigured = true;
-            issuesUi.refresh();
+            searcherIssuesUi.refresh();
         } else {
             openNotConfiguredServerTab();
             myServerConfigured = false;
         }
     }
 
-    public void openFilteredIssuesTab() {
-        AbstractIssuesUi filteredIssuesUi = createFilteredIssuesUi();
+    public void openFilteredIssuesTab(JQLSearcher searcher) {
+        AbstractIssuesUi filteredIssuesUi = createFilteredIssuesUi(searcher);
         openTab(filteredIssuesUi, new TabGroupId("FilteredIssuesGroup", () -> "Filter", false));
         filteredIssuesUi.refresh();
     }
@@ -139,8 +141,8 @@ public class JiraTabsManager implements Disposable {
         return JiraUiFactory.createIssuesUi(myIssueData);
     }
 
-    private AbstractIssuesUi createFilteredIssuesUi() {
-        return JiraUiFactory.createFilteredIssuesUi(myIssueData, getSelectedJQLSearcher());
+    private AbstractIssuesUi createFilteredIssuesUi(JQLSearcher searcher) {
+        return JiraUiFactory.createFilteredIssuesUi(myIssueData, searcher);
     }
 
     private JiraUi createDetailsIssueUi(String issueKey) {

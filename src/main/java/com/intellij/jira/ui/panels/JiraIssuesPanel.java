@@ -21,7 +21,6 @@ import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.vcs.log.ui.frame.ProgressStripe;
 import net.miginfocom.swing.MigLayout;
 import org.jetbrains.annotations.NonNls;
@@ -46,7 +45,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     private final JiraIssueDetailsPanel myJiraIssueDetailsPanel;
     private final ProgressStripe myProgressStripe;
     private final AbstractIssuesUi myUi;
-    private final JiraJQLSearcherPanel mySearcherPanel;
+    //private final JiraJQLSearcherPanel mySearcherPanel;
 
     private final Splitter myIssuesBrowserSplitter;
 
@@ -56,7 +55,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         Disposer.register(parent, this);
 
         myUi = issuesUi;
-        mySearcherPanel = new JiraJQLSearcherPanel(issuesData.getProject(), myUi::refresh);
+        //mySearcherPanel = new JiraJQLSearcherPanel(issuesData.getProject(), myUi::refresh);
         myToolbar = getToolbar(issuesData.getProject());
 
         myJiraIssueTable = new JiraIssueTable(issuesData, parent);
@@ -110,11 +109,11 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR, toolbarGroup, true);
         toolbar.setTargetComponent(this);
 
-        Wrapper jqlFilter = new Wrapper(mySearcherPanel);
+        /*Wrapper jqlFilter = new Wrapper(mySearcherPanel);
         jqlFilter.setVerticalSizeReferent(toolbar.getComponent());
-
+*/
         JPanel panel = new JPanel(new MigLayout("ins 0, fill", "[left]0[left, fill]push[pref:pref, right]", "center"));
-        panel.add(jqlFilter);
+        //panel.add(jqlFilter);
         panel.add(toolbar.getComponent());
 
         return panel;
@@ -161,7 +160,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     }
 
     public void updateSearcherPanel() {
-        mySearcherPanel.updateCombo();
+        //mySearcherPanel.updateCombo();
     }
 
     private class MyListSelectionListener implements ListSelectionListener {

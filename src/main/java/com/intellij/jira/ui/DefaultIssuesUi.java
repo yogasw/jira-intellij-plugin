@@ -2,7 +2,7 @@ package com.intellij.jira.ui;
 
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.jql.JQLSearcherManager;
-import com.intellij.jira.listener.JQLSearcherListener;
+import com.intellij.jira.listener.SearcherListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.panels.JiraIssuesPanel;
@@ -16,7 +16,7 @@ public class DefaultIssuesUi extends AbstractIssuesUi {
 
     private static final String ISSUES_ID = "Issues";
 
-    private final JiraIssuesPanel myIssuesPanel;
+    protected final JiraIssuesPanel myIssuesPanel;
 
     public DefaultIssuesUi(JiraIssuesData issuesData) {
         super(ISSUES_ID, issuesData);
@@ -25,7 +25,7 @@ public class DefaultIssuesUi extends AbstractIssuesUi {
         updateHighlighters();
 
         issuesData.getProject().getMessageBus().connect()
-                .subscribe(JQLSearcherManager.JQL_SEARCHERS_CHANGE, new MyJQLSearcherListener());
+                .subscribe(JQLSearcherManager.JQL_SEARCHERS_CHANGE, new MySearcherListener());
     }
 
     @NotNull
@@ -51,16 +51,21 @@ public class DefaultIssuesUi extends AbstractIssuesUi {
         myIssuesPanel.setIssues(issues);
     }
 
-    private class MyJQLSearcherListener implements JQLSearcherListener {
+    private class MySearcherListener implements SearcherListener {
 
         @Override
-        public void onChange(List<JQLSearcher> editedSearchers) {
-            myIssuesPanel.updateSearcherPanel();
+        public void onAdded(JQLSearcher editedSearcher) {
+            // Do nothing
         }
 
         @Override
-        public void onRemoved(List<JQLSearcher> removedSearchers) {
-            myIssuesPanel.updateSearcherPanel();
+        public void onChange(JQLSearcher searcher) {
+            refresh();
+        }
+
+        @Override
+        public void onRemoved(JQLSearcher removedSearcher) {
+            refresh();
         }
     }
 
