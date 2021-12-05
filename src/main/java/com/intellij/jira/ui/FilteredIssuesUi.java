@@ -3,7 +3,7 @@ package com.intellij.jira.ui;
 import com.intellij.jira.JiraTabsManager;
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.jql.JQLSearcherManager;
-import com.intellij.jira.listener.JQLSearcherListener;
+import com.intellij.jira.listener.SearcherListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.panels.JiraFilteredIssuesPanel;
@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
 import java.util.List;
-import java.util.Optional;
 
 public class FilteredIssuesUi extends AbstractIssuesUi {
 
@@ -27,7 +26,7 @@ public class FilteredIssuesUi extends AbstractIssuesUi {
         updateHighlighters();
 
         issuesData.getProject().getMessageBus().connect()
-                .subscribe(JQLSearcherManager.JQL_SEARCHERS_CHANGE, new MyJQLSearcherListener());
+                .subscribe(JQLSearcherManager.JQL_SEARCHERS_CHANGE, new MySearcherListener());
 
     }
 
@@ -60,25 +59,31 @@ public class FilteredIssuesUi extends AbstractIssuesUi {
         myFilteredIssuesPanel.setIssues(issues);
     }
 
-    private class MyJQLSearcherListener implements JQLSearcherListener {
+    private class MySearcherListener implements SearcherListener {
 
         @Override
-        public void onChange(List<JQLSearcher> editedSearchers) {
-            Optional<JQLSearcher> first = editedSearchers.stream().filter(s -> s.getId().equals(mySearcher.getId())).findFirst();
-            first.ifPresent(searcher -> {
-                mySearcher = searcher;
+        public void onAdded(JQLSearcher editedSearcher) {
+            // Do nothing
+        }
+
+        @Override
+        public void onChange(JQLSearcher editedSearcher) {
+            if (mySearcher.getId().equals(editedSearcher.getId())) {
+                mySearcher = editedSearcher;
 
                 // Update tab name
                 JiraTabsManager.getInstance(myIssuesData.getProject()).updateTabName(FilteredIssuesUi.this);
 
                 // Refresh
                 refresh();
-            });
+            }
         }
 
         @Override
-        public void onRemoved(List<JQLSearcher> removedSearchers) {
-            removedSearchers.forEach(searcher -> JiraTabsManager.getInstance(myIssuesData.getProject()).closeTab(searcher.getAlias()));
+        public void onRemoved(JQLSearcher removedSearcher) {
+            if (mySearcher.getId().equals(removedSearcher.getId())) {
+                JiraTabsManager.getInstance(myIssuesData.getProject()).closeTab(removedSearcher.getAlias());
+            }
         }
     }
 

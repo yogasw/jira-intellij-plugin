@@ -61,21 +61,16 @@
                 icon="AllIcons.Actions.Refresh">
         </action>
 
-        <action class="com.intellij.jira.actions.AddJQLSearcherAction" id="Jira.Issue.Jql.Add"/>
-        <action class="com.intellij.jira.actions.EditJQLSearcherAction" id="Jira.Issue.Jql.Edit"/>
-        <action class="com.intellij.jira.actions.ConfigureJQLSearchersAction" id="Jira.Issue.Jql.Configure"/>
+        <action class="com.intellij.jira.actions.AddSearcherAction" id="Jira.Issue.Jql.Add"/>
+        <action class="com.intellij.jira.actions.EditSearcherAction" id="Jira.Issue.Jql.Edit"/>
         <action class="com.intellij.jira.actions.GoToIssuePopupAction" id="Jira.Issue.GoTo"/>
         <action class="com.intellij.jira.actions.ConfigureJiraServersAction" id="Jira.Issue.Server.Configure"/>
 
         <action class="com.intellij.jira.actions.OpenNewIssuesTabAction" id="Jira.Issues.New.Tab"/>
 
-        <group id="Jira.Issues.Jql" class="com.intellij.jira.actions.JQLSearcherActionGroup"
-               icon="AllIcons.General.Filter" popup="true">
-            <reference id="Jira.Issue.Jql.Add"/>
-            <reference id="Jira.Issue.Jql.Edit"/>
-            <separator/>
-            <reference id="Jira.Issue.Jql.Configure"/>
-        </group>
+
+        <action id="Jira.Issues.Hide.Searchers" class="com.intellij.jira.actions.HideSearchersAction"
+                icon="AllIcons.Actions.ArrowCollapse" text="Hide Searchers"/>
 
         <group class="com.intellij.jira.actions.HighlightersActionGroup" id="Jira.Issue.HighlightersActionGroup"/>
         <action class="com.intellij.jira.actions.ToggleIssueColumnActionGroup" id="Jira.Issue.ToggleColumns"/>
@@ -93,11 +88,8 @@
         </group>
 
         <group id="Jira.Issues.Toolbar">
-            <reference id="Jira.Issues.Jql"/>
-            <separator/>
             <reference id="Jira.Issues.Base.Toolbar"/>
             <separator/>
-            <reference id="Jira.Issues.New.Tab"/>
             <reference id="Jira.Issue.Server.Configure"/>
         </group>
 

@@ -2,7 +2,7 @@ package com.intellij.jira.ui.dialog;
 
 import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
-import com.intellij.jira.rest.model.jql.JQLSearcherEditor;
+import com.intellij.jira.rest.model.jql.SearcherEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -13,28 +13,21 @@ import javax.swing.JComponent;
 
 import static java.util.Objects.nonNull;
 
-public class EditJQLSearcherDialog extends DialogWrapper {
+public class EditSearcherDialog extends DialogWrapper {
 
     protected final Project myProject;
     protected JQLSearcher mySearcher;
     private final JQLSearcher myOldSearcher;
-    protected final JQLSearcherEditor myEditor;
-    protected boolean myApplyOkAction;
+    protected final SearcherEditor myEditor;
 
-    public EditJQLSearcherDialog(@NotNull Project project, @NotNull JQLSearcher searcher) {
-        this(project, searcher, true, true);
-    }
-
-
-    public EditJQLSearcherDialog(@NotNull Project project, @NotNull JQLSearcher searcher, boolean selected, boolean applyOkAction) {
+    public EditSearcherDialog(@NotNull Project project, @NotNull JQLSearcher searcher) {
         super(project, false);
         myProject = project;
         myOldSearcher = searcher.clone();
         mySearcher = searcher;
-        myEditor = new JQLSearcherEditor(myProject, mySearcher, selected);
-        myApplyOkAction = applyOkAction;
+        myEditor = new SearcherEditor(myProject, mySearcher);
 
-        setTitle("Edit JQL Searcher");
+        setTitle("Edit Searcher");
         init();
     }
 
@@ -47,16 +40,25 @@ public class EditJQLSearcherDialog extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        return myEditor.validate();
+        ValidationInfo validationInfo = myEditor.validate();
+        if (validationInfo == null) {
+            String alias = myEditor.getAliasField().getText();
+            JQLSearcher searcher = getJqlSearcherManager().findByAlias(myProject, alias);
+            if (searcher != null && !searcher.getId().equals(mySearcher.getId())) {
+                return new ValidationInfo("Alias '" + alias + "' already exist");
+            }
+        }
+
+        return validationInfo;
     }
 
     @Override
     protected void doOKAction() {
         myEditor.apply();
-        if(myApplyOkAction && nonNull(myProject)){
+        if(nonNull(myProject)){
             JQLSearcherManager jqlManager = getJqlSearcherManager();
             mySearcher.setShared(myEditor.isSharedSearcher());
-            jqlManager.update(myProject, myOldSearcher.getId(), mySearcher, myEditor.isSelectedSearcher());
+            jqlManager.update(myProject, myOldSearcher.getId(), mySearcher);
         }
 
         super.doOKAction();
@@ -76,11 +78,4 @@ public class EditJQLSearcherDialog extends DialogWrapper {
         return mySearcher;
     }
 
-    public boolean isSelectedSearcher(){
-        return myEditor.isSelectedSearcher();
-    }
-
-    public boolean isSharedSearcher(){
-        return myEditor.isSharedSearcher();
-    }
 }
