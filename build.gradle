@@ -40,6 +40,6 @@ patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Support 2021.3+</li>
+        <li>Fix <a href="https://gitlab.com/adrielsr/jira-intellij-plugin/-/issues/66">issue #66</a></li>
       </ul>"""
 }
