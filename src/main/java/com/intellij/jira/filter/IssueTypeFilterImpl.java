@@ -25,6 +25,6 @@ public class IssueTypeFilterImpl implements IssueTypeFilter {
 
     @Override
     public boolean matches(JiraIssueType issueType) {
-        return false;
+        return getIssueTypes().contains(issueType.getName());
     }
 }

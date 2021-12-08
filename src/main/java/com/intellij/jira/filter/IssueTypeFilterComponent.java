@@ -6,27 +6,17 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class IssueTypeFilterComponent extends IssueFilterComponent<IssueTypeFilter, IssueTypeFilterModel> {
-
-    @NotNull private final Collection<Runnable> mySetFilterListeners = new ArrayList<>();
 
     public IssueTypeFilterComponent(IssueTypeFilterModel issueTypeFilterModel) {
         super(() -> "Type", issueTypeFilterModel);
     }
 
-
     @Override
     protected String getText(@NotNull IssueTypeFilter issueTypeFilter) {
         return issueTypeFilter.getDisplayText();
-    }
-
-    @Override
-    public void installChangeListener(@NotNull Runnable onChange) {
-        mySetFilterListeners.add(onChange);
     }
 
     @Override

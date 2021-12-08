@@ -6,20 +6,18 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.ui.GraphicsConfig;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.util.NlsContexts;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ClickListener;
 import com.intellij.ui.popup.PopupState;
-import com.intellij.util.ui.GraphicsUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.StartupUiUtil;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.accessibility.AccessibleContextDelegate;
 import com.intellij.vcs.log.VcsLogBundle;
-import com.intellij.vcs.log.ui.filter.VcsLogPopupComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,28 +31,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Area;
-import java.awt.geom.RoundRectangle2D;
 import java.util.function.Supplier;
 
-public abstract class IssueFilterComponent<Filter, Model extends FilterModel<Filter>> extends JPanel {
+public abstract class IssueFilterComponent<Filter extends IssueFilter, Model extends FilterModel<Filter>> extends JPanel {
 
     protected static final Supplier<@Nls String> ALL = VcsLogBundle.messagePointer("vcs.log.filter.all");
 
-    private static final int GAP_BEFORE_ARROW = 3;
+    private static final int GAP_BEFORE_ARROW = 2;
     protected static final int BORDER_SIZE = 2;
-    protected static final int ARC_SIZE = 10;
 
     private final PopupState<JBPopup> myPopupState = PopupState.forPopup();
     @NotNull private final Supplier<@NlsContexts.Label String> myDisplayName;
@@ -86,24 +75,27 @@ public abstract class IssueFilterComponent<Filter, Model extends FilterModel<Fil
             myValueLabel.revalidate();
             myValueLabel.repaint();
         });
+
         showPopupMenuOnClick();
         showPopupMenuFromKeyboard();
         if (shouldIndicateHovering()) {
             indicateHovering();
         }
-        //indicateFocusing();
+
         return this;
     }
 
 
     public String getCurrentText() {
         Filter filter = myFilterModel.getFilter();
-        return filter == null ? ALL.get() : getText(filter);
+        return filter == null || StringUtil.isEmpty(filter.getDisplayText()) ? ALL.get() : getText(filter);
     }
 
     protected abstract String getText(@NotNull Filter filter);
 
-    public abstract void installChangeListener(@NotNull Runnable onChange);
+    public void installChangeListener(@NotNull Runnable onChange) {
+        myFilterModel.addSetFilterListener(onChange);
+    }
 
     @NotNull
     protected Color getDefaultSelectorForeground() {
@@ -134,20 +126,6 @@ public abstract class IssueFilterComponent<Filter, Model extends FilterModel<Fil
         public void actionPerformed(@NotNull AnActionEvent e) {
             myFilterModel.setFilter(null);
         }
-    }
-
-    private void indicateFocusing() {
-        addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(@NotNull FocusEvent e) {
-                setBorder(wrapBorder(createFocusedBorder()));
-            }
-
-            @Override
-            public void focusLost(@NotNull FocusEvent e) {
-                setBorder(wrapBorder(createUnfocusedBorder()));
-            }
-        });
     }
 
     private void showPopupMenuFromKeyboard() {
@@ -213,56 +191,12 @@ public abstract class IssueFilterComponent<Filter, Model extends FilterModel<Fil
                         JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false);
     }
 
-    private static Border createFocusedBorder() {
-        return new VcsLogPopupComponent.FilledRoundedBorder(UIUtil.getFocusedBorderColor(), ARC_SIZE, BORDER_SIZE);
-    }
-
     protected Border createUnfocusedBorder() {
         return JBUI.Borders.empty(BORDER_SIZE);
     }
 
     private static Border wrapBorder(Border outerBorder) {
         return BorderFactory.createCompoundBorder(outerBorder, JBUI.Borders.empty(2));
-    }
-
-    public static class FilledRoundedBorder implements Border {
-        private final Color myColor;
-        private final int myThickness;
-        private final int myArcSize;
-
-        public FilledRoundedBorder(@NotNull Color color, int arcSize, int thickness) {
-            myColor = color;
-            myThickness = thickness;
-            myArcSize = arcSize;
-        }
-
-        @Override
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            GraphicsConfig config = GraphicsUtil.setupAAPainting(g);
-
-            g.setColor(myColor);
-
-            int thickness = JBUI.scale(myThickness);
-            int arcSize = JBUI.scale(myArcSize);
-            Area area = new Area(new RoundRectangle2D.Double(x, y, width, height, arcSize, arcSize));
-            int innerArc = Math.max(arcSize - thickness, 0);
-            area.subtract(new Area(new RoundRectangle2D.Double(x + thickness, y + thickness,
-                    width - 2 * thickness, height - 2 * thickness,
-                    innerArc, innerArc)));
-            ((Graphics2D)g).fill(area);
-
-            config.restore();
-        }
-
-        @Override
-        public Insets getBorderInsets(Component c) {
-            return JBUI.insets(myThickness);
-        }
-
-        @Override
-        public boolean isBorderOpaque() {
-            return false;
-        }
     }
 
     private static final class DynamicLabel extends JLabel {

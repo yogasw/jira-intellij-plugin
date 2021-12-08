@@ -5,6 +5,8 @@ import com.intellij.jira.filter.FilterModel;
 import com.intellij.jira.filter.IssueFilterCollection;
 import com.intellij.jira.filter.IssueFilterCollectionImpl;
 import com.intellij.jira.filter.IssueFilterComponent;
+import com.intellij.jira.filter.IssueStatusFilterComponent;
+import com.intellij.jira.filter.IssueStatusFilterModel;
 import com.intellij.jira.filter.IssueTypeFilterComponent;
 import com.intellij.jira.filter.IssueTypeFilterModel;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -34,6 +36,7 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
     private Issues myIssues;
 
     private final IssueTypeFilterModel myIssueTypeFilterModel;
+    private final IssueStatusFilterModel myIssueStatusFilterModel;
 
     private final EventDispatcher<IssueFilterListener> myFilterListenerDispatcher = EventDispatcher.create(IssueFilterListener.class);
 
@@ -41,8 +44,9 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
         myIssues = Issues.EMPTY;
 
         myIssueTypeFilterModel = new IssueTypeFilterModel(filters);
+        myIssueStatusFilterModel = new IssueStatusFilterModel(filters);
 
-        FilterModel[] models = {myIssueTypeFilterModel};
+        FilterModel[] models = {myIssueTypeFilterModel, myIssueStatusFilterModel};
         for(FilterModel model : models) {
             model.addSetFilterListener(() -> {
                 filterConsumer.consume(getFilters());
@@ -54,7 +58,8 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
 
     @Override
     public IssueFilterCollection getFilters() {
-        return new IssueFilterCollectionImpl(List.of(myIssueTypeFilterModel.getIssueTypeFilter()));
+        return new IssueFilterCollectionImpl(List.of(myIssueTypeFilterModel.getIssueTypeFilter(),
+                                                    myIssueStatusFilterModel.getIssueTypeFilter()));
     }
 
     @NotNull
@@ -67,7 +72,17 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
             actionGroup.add(issueTypeComponent);
         }
 
+        FilterActionComponent issueStatusComponent = createIssueStatusComponent();
+        if (issueStatusComponent != null) {
+            actionGroup.add(issueStatusComponent);
+        }
+
         return actionGroup;
+    }
+
+    private FilterActionComponent createIssueStatusComponent() {
+        return new FilterActionComponent(() -> "Filter by Issue Type",
+                () -> new IssueStatusFilterComponent(myIssueStatusFilterModel).initUi());
     }
 
     @Override
