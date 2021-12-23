@@ -17,6 +17,7 @@ import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.NlsActions;
+import com.intellij.openapi.util.NotNullComputable;
 import com.intellij.util.Consumer;
 import com.intellij.util.EventDispatcher;
 import com.intellij.util.ui.UIUtil;
@@ -24,7 +25,6 @@ import com.intellij.vcs.log.ui.MainVcsLogUi;
 import com.intellij.vcs.log.ui.VcsLogInternalDataKeys;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 import java.awt.Component;
@@ -43,8 +43,9 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
     public IssuesFilterUiImpl(Consumer<IssueFilterCollection> filterConsumer, IssueFilterCollection filters) {
         myIssues = Issues.EMPTY;
 
-        myIssueTypeFilterModel = new IssueTypeFilterModel(filters);
-        myIssueStatusFilterModel = new IssueStatusFilterModel(filters);
+        NotNullComputable<Issues> issuesGetter = () -> myIssues;
+        myIssueTypeFilterModel = new IssueTypeFilterModel(issuesGetter, filters);
+        myIssueStatusFilterModel = new IssueStatusFilterModel(issuesGetter, filters);
 
         FilterModel[] models = {myIssueTypeFilterModel, myIssueStatusFilterModel};
         for(FilterModel model : models) {
@@ -80,11 +81,6 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
         return actionGroup;
     }
 
-    private FilterActionComponent createIssueStatusComponent() {
-        return new FilterActionComponent(() -> "Filter by Issue Type",
-                () -> new IssueStatusFilterComponent(myIssueStatusFilterModel).initUi());
-    }
-
     @Override
     public void updateIssues(Issues issues) {
         myIssues = issues;
@@ -95,10 +91,14 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
         myFilterListenerDispatcher.addListener(listener);
     }
 
-    @Nullable
     protected FilterActionComponent createIssueTypeComponent() {
         return new FilterActionComponent(() -> "Filter by Issue Type",
                 () -> new IssueTypeFilterComponent(myIssueTypeFilterModel).initUi());
+    }
+
+    private FilterActionComponent createIssueStatusComponent() {
+        return new FilterActionComponent(() -> "Filter by Status",
+                () -> new IssueStatusFilterComponent(myIssueStatusFilterModel).initUi());
     }
 
     protected static class FilterActionComponent extends DumbAwareAction implements CustomComponentAction {

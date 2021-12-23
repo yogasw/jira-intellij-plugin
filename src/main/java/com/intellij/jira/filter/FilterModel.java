@@ -1,5 +1,7 @@
 package com.intellij.jira.filter;
 
+import com.intellij.jira.data.Issues;
+import com.intellij.openapi.util.Computable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +17,14 @@ public abstract class FilterModel<T> {
     @Nullable
     protected T myFilter;
 
-    public FilterModel() {
+    protected final Computable<Issues> myIssuesGetter;
+
+    public FilterModel(Computable<Issues> issuesGetter) {
+        myIssuesGetter = issuesGetter;
+    }
+
+    public Issues getIssues() {
+        return myIssuesGetter.compute();
     }
 
     public void setFilter(@Nullable T filter) {

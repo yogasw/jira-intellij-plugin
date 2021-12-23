@@ -187,6 +187,7 @@ public abstract class AbstractIssuesUi implements IssuesUi {
         @Override
         public void onIssuesChange(Issues newIssues) {
             setIssues(newIssues);
+            myFilterUi.updateIssues(newIssues);
             myVisibleIssuesRefresher.updateIssues(newIssues);
         }
     }

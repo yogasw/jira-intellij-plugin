@@ -1,5 +1,7 @@
 package com.intellij.jira.filter;
 
+import com.intellij.jira.data.Issues;
+import com.intellij.openapi.util.Computable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,7 +12,8 @@ import static com.intellij.jira.filter.IssueFilterCollectionImpl.ISSUE_TYPE_FILT
 
 public class IssueTypeFilterModel extends FilterModel<IssueTypeFilter> {
 
-    public IssueTypeFilterModel(IssueFilterCollection filters) {
+    public IssueTypeFilterModel(Computable<Issues> issuesGetter, IssueFilterCollection filters) {
+        super(issuesGetter);
         myFilter = filters.get(ISSUE_TYPE_FILTER);
     }
 

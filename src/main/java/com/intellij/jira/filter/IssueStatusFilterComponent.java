@@ -7,6 +7,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class IssueStatusFilterComponent extends IssueFilterComponent<IssueStatusFilter, IssueStatusFilterModel> {
 
@@ -25,10 +27,10 @@ public class IssueStatusFilterComponent extends IssueFilterComponent<IssueStatus
         DefaultActionGroup actionGroup = new DefaultActionGroup();
 
         actionGroup.add(createAllAction());
-        // TODO: get all issue status to iterate
-        actionGroup.add(new IssueStatusAction("To Do"));
-        actionGroup.add(new IssueStatusAction("In Progress"));
-        actionGroup.add(new IssueStatusAction("Done"));
+
+        Set<String> issueStatus = myFilterModel.getIssues().get().stream().map(issue -> issue.getStatus().getName()).collect(Collectors.toSet());
+
+        issueStatus.forEach(status -> actionGroup.add(new IssueStatusAction(status)));
 
         return actionGroup;
     }

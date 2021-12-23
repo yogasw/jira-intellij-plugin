@@ -7,6 +7,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class IssueTypeFilterComponent extends IssueFilterComponent<IssueTypeFilter, IssueTypeFilterModel> {
 
@@ -24,9 +26,10 @@ public class IssueTypeFilterComponent extends IssueFilterComponent<IssueTypeFilt
         DefaultActionGroup actionGroup = new DefaultActionGroup();
 
         actionGroup.add(createAllAction());
-        // TODO: get all issue types to iterate
-        actionGroup.add(new IssueTypeAction("Story"));
-        actionGroup.add(new IssueTypeAction("Epic"));
+
+        Set<String> issueTypes = myFilterModel.getIssues().get().stream().map(issue -> issue.getIssuetype().getName()).collect(Collectors.toSet());
+
+        issueTypes.forEach(issueType -> actionGroup.add(new IssueTypeAction(issueType)));
 
         return actionGroup;
     }
