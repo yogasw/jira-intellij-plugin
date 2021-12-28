@@ -1,4 +1,4 @@
-package com.intellij.jira.filter;
+package com.intellij.jira.filter.type;
 
 import com.intellij.jira.rest.model.JiraIssueType;
 

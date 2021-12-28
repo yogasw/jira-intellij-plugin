@@ -2,6 +2,7 @@ package com.intellij.jira.filter;
 
 import com.intellij.jira.data.Issues;
 import com.intellij.jira.filter.priority.PriorityFilter;
+import com.intellij.jira.filter.type.IssueTypeFilter;
 import com.intellij.jira.rest.model.JiraIssue;
 
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
-package com.intellij.jira.filter;
+package com.intellij.jira.filter.type;
 
+import com.intellij.jira.filter.IssueFilterComponent;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;

@@ -1,6 +1,7 @@
 package com.intellij.jira.filter;
 
 import com.intellij.jira.filter.priority.PriorityFilter;
+import com.intellij.jira.filter.type.IssueTypeFilter;
 
 import java.util.Collection;
 import java.util.HashMap;
