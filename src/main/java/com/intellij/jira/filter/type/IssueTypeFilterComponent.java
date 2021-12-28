@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class IssueTypeFilterComponent extends IssueFilterComponent<IssueTypeFilter, IssueTypeFilterModel> {
+public class IssueTypeFilterComponent extends IssueFilterComponent<TypeFilter, IssueTypeFilterModel> {
 
     public IssueTypeFilterComponent(IssueTypeFilterModel issueTypeFilterModel) {
         super(() -> "Type", issueTypeFilterModel);
     }
 
     @Override
-    protected String getText(@NotNull IssueTypeFilter issueTypeFilter) {
-        return issueTypeFilter.getDisplayText();
+    protected String getText(@NotNull TypeFilter typeFilter) {
+        return typeFilter.getDisplayText();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class IssueTypeFilterComponent extends IssueFilterComponent<IssueTypeFilt
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            myFilterModel.setFilter(new IssueTypeFilterImpl(List.of(myType)));
+            myFilterModel.setFilter(new TypeFilterImpl(List.of(myType)));
         }
     }
 

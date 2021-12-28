@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class IssueTypeFilterImpl implements IssueTypeFilter {
+public class TypeFilterImpl implements TypeFilter {
 
     private final List<String> myIssueTypes;
 
-    public IssueTypeFilterImpl() {
+    public TypeFilterImpl() {
         this(new ArrayList<>());
     }
 
-    public IssueTypeFilterImpl(List<String> issueTypes) {
+    public TypeFilterImpl(List<String> issueTypes) {
         myIssueTypes = issueTypes;
     }
 

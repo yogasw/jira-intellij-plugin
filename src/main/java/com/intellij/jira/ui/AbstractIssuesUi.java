@@ -13,7 +13,7 @@ import com.intellij.jira.filter.IssueFilterCollection;
 import com.intellij.jira.filter.IssueFilterCollectionImpl;
 import com.intellij.jira.filter.IssueFilterer;
 import com.intellij.jira.filter.IssueStatusFilterImpl;
-import com.intellij.jira.filter.type.IssueTypeFilterImpl;
+import com.intellij.jira.filter.type.TypeFilterImpl;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighter;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighterFactory;
@@ -60,7 +60,7 @@ public abstract class AbstractIssuesUi implements IssuesUi {
 
         // Create filter UI
         List<IssueFilter> issueFilters = new ArrayList<>();
-        issueFilters.add(new IssueTypeFilterImpl());
+        issueFilters.add(new TypeFilterImpl());
         issueFilters.add(new IssueStatusFilterImpl());
 
         IssueFilterCollection initialFilters = new IssueFilterCollectionImpl(issueFilters);

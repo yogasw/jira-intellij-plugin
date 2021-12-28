@@ -2,7 +2,7 @@ package com.intellij.jira.filter;
 
 import com.intellij.jira.data.Issues;
 import com.intellij.jira.filter.priority.PriorityFilter;
-import com.intellij.jira.filter.type.IssueTypeFilter;
+import com.intellij.jira.filter.type.TypeFilter;
 import com.intellij.jira.rest.model.JiraIssue;
 
 import java.util.ArrayList;
@@ -18,10 +18,10 @@ public class IssueFilterer {
 
     public Issues filter(Issues issues, IssueFilterCollection filters) {
         List<JiraIssue> filteredIssues = new ArrayList<>(issues.get());
-        IssueTypeFilter issueTypeFilter = filters.get(ISSUE_TYPE_FILTER);
-        Collection<String> issueTypes = issueTypeFilter.getIssueTypes();
+        TypeFilter typeFilter = filters.get(ISSUE_TYPE_FILTER);
+        Collection<String> issueTypes = typeFilter.getIssueTypes();
         if (!issueTypes.isEmpty()) {
-            filteredIssues = filteredIssues.stream().filter(issue -> issueTypeFilter.matches(issue.getIssuetype())).collect(Collectors.toList());
+            filteredIssues = filteredIssues.stream().filter(issue -> typeFilter.matches(issue.getIssuetype())).collect(Collectors.toList());
         }
 
         IssueStatusFilter issueStatusFilter = filters.get(ISSUE_STATUS_FILTER);

@@ -9,10 +9,10 @@ import java.util.Collection;
 
 import static com.intellij.jira.filter.IssueFilterCollectionImpl.ISSUE_TYPE_FILTER;
 
-public interface IssueTypeFilter extends IssueFilter {
+public interface TypeFilter extends IssueFilter {
 
     @Override
-    default IssueFilterCollection.FilterKey<IssueTypeFilter> getKey() {
+    default IssueFilterCollection.FilterKey<TypeFilter> getKey() {
         return ISSUE_TYPE_FILTER;
     }
 

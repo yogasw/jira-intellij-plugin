@@ -12,7 +12,7 @@ import java.util.List;
 
 import static com.intellij.jira.filter.IssueFilterCollectionImpl.ISSUE_TYPE_FILTER;
 
-public class IssueTypeFilterModel extends FilterModel<IssueTypeFilter> {
+public class IssueTypeFilterModel extends FilterModel<TypeFilter> {
 
     public IssueTypeFilterModel(Computable<Issues> issuesGetter, IssueFilterCollection filters) {
         super(issuesGetter);
@@ -20,31 +20,31 @@ public class IssueTypeFilterModel extends FilterModel<IssueTypeFilter> {
     }
 
     @Override
-    protected void saveFilterToProperties(@Nullable IssueTypeFilter filter) {
+    protected void saveFilterToProperties(@Nullable TypeFilter filter) {
 
     }
 
     @Override
-    protected @Nullable IssueTypeFilter getFilterFromProperties() {
+    protected @Nullable TypeFilter getFilterFromProperties() {
         return null;
     }
 
     @Nullable
     @Override
-    protected IssueTypeFilter createFilter(@NotNull List<String> values) {
-        return new IssueTypeFilterImpl(values);
+    protected TypeFilter createFilter(@NotNull List<String> values) {
+        return new TypeFilterImpl(values);
     }
 
     @NotNull
     @Override
-    protected List<String> getFilterValues(@NotNull IssueTypeFilter filter) {
+    protected List<String> getFilterValues(@NotNull TypeFilter filter) {
         return new ArrayList<>(filter.getIssueTypes());
     }
 
-    public IssueTypeFilter getIssueTypeFilter() {
-        IssueTypeFilter filter = getFilter();
+    public TypeFilter getIssueTypeFilter() {
+        TypeFilter filter = getFilter();
         if (filter == null) {
-            filter = new IssueTypeFilterImpl();
+            filter = new TypeFilterImpl();
         }
 
         return filter;
