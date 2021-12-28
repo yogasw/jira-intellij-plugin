@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class IssueStatusFilterImpl implements IssueStatusFilter {
+public class StatusFilterImpl implements StatusFilter {
 
     private final List<String> myStatus;
 
-    public IssueStatusFilterImpl() {
+    public StatusFilterImpl() {
         this(new ArrayList<>());
     }
 
-    public IssueStatusFilterImpl(List<String> statuses) {
+    public StatusFilterImpl(List<String> statuses) {
         myStatus = statuses;
     }
 

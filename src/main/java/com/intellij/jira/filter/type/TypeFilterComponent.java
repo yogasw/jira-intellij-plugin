@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class IssueTypeFilterComponent extends IssueFilterComponent<TypeFilter, IssueTypeFilterModel> {
+public class TypeFilterComponent extends IssueFilterComponent<TypeFilter, TypeFilterModel> {
 
-    public IssueTypeFilterComponent(IssueTypeFilterModel issueTypeFilterModel) {
-        super(() -> "Type", issueTypeFilterModel);
+    public TypeFilterComponent(TypeFilterModel typeFilterModel) {
+        super(() -> "Type", typeFilterModel);
     }
 
     @Override

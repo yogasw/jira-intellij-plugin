@@ -12,9 +12,9 @@ import java.util.List;
 
 import static com.intellij.jira.filter.IssueFilterCollectionImpl.ISSUE_TYPE_FILTER;
 
-public class IssueTypeFilterModel extends FilterModel<TypeFilter> {
+public class TypeFilterModel extends FilterModel<TypeFilter> {
 
-    public IssueTypeFilterModel(Computable<Issues> issuesGetter, IssueFilterCollection filters) {
+    public TypeFilterModel(Computable<Issues> issuesGetter, IssueFilterCollection filters) {
         super(issuesGetter);
         myFilter = filters.get(ISSUE_TYPE_FILTER);
     }
