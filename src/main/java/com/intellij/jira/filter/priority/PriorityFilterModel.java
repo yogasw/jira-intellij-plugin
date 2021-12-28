@@ -48,6 +48,5 @@ public class PriorityFilterModel extends FilterModel<PriorityFilter> {
         }
 
         return filter;
-
     }
 }

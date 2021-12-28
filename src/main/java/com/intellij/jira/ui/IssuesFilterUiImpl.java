@@ -5,12 +5,14 @@ import com.intellij.jira.filter.FilterModel;
 import com.intellij.jira.filter.IssueFilterCollection;
 import com.intellij.jira.filter.IssueFilterCollectionImpl;
 import com.intellij.jira.filter.IssueFilterComponent;
+import com.intellij.jira.filter.assignee.AssigneeFilterComponent;
+import com.intellij.jira.filter.assignee.AssigneeFilterModel;
+import com.intellij.jira.filter.priority.PriorityFilterComponent;
+import com.intellij.jira.filter.priority.PriorityFilterModel;
 import com.intellij.jira.filter.status.StatusFilterComponent;
 import com.intellij.jira.filter.status.StatusFilterModel;
 import com.intellij.jira.filter.type.TypeFilterComponent;
 import com.intellij.jira.filter.type.TypeFilterModel;
-import com.intellij.jira.filter.priority.PriorityFilterComponent;
-import com.intellij.jira.filter.priority.PriorityFilterModel;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -40,6 +42,7 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
     private final TypeFilterModel myIssueTypeFilterModel;
     private final StatusFilterModel myStatusFilterModel;
     private final PriorityFilterModel myPriorityFilterModel;
+    private final AssigneeFilterModel myAssigneeFilterModel;
 
     private final EventDispatcher<IssueFilterListener> myFilterListenerDispatcher = EventDispatcher.create(IssueFilterListener.class);
 
@@ -50,8 +53,9 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
         myIssueTypeFilterModel = new TypeFilterModel(issuesGetter, filters);
         myStatusFilterModel = new StatusFilterModel(issuesGetter, filters);
         myPriorityFilterModel = new PriorityFilterModel(issuesGetter, filters);
+        myAssigneeFilterModel = new AssigneeFilterModel(issuesGetter, filters);
 
-        FilterModel[] models = {myIssueTypeFilterModel, myPriorityFilterModel, myStatusFilterModel};
+        FilterModel[] models = {myIssueTypeFilterModel, myPriorityFilterModel, myAssigneeFilterModel, myStatusFilterModel};
         for(FilterModel model : models) {
             model.addSetFilterListener(() -> {
                 filterConsumer.consume(getFilters());
@@ -65,6 +69,7 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
     public IssueFilterCollection getFilters() {
         return new IssueFilterCollectionImpl(List.of(myIssueTypeFilterModel.getIssueTypeFilter(),
                                                     myPriorityFilterModel.getPriorityFilter(),
+                                                    myAssigneeFilterModel.getAssigneeFilter(),
                                                     myStatusFilterModel.getIssueTypeFilter()));
     }
 
@@ -78,6 +83,9 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
 
         FilterActionComponent priorityComponent = createPriorityComponent();
         actionGroup.add(priorityComponent);
+
+        FilterActionComponent assgineeComponent = createAssgineeComponent();
+        actionGroup.add(assgineeComponent);
 
         FilterActionComponent issueStatusComponent = createIssueStatusComponent();
         actionGroup.add(issueStatusComponent);
@@ -103,6 +111,11 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
     private FilterActionComponent createPriorityComponent() {
         return new FilterActionComponent(() -> "Filter by Issue Priority",
                 () -> new PriorityFilterComponent(myPriorityFilterModel).initUi());
+    }
+
+    private FilterActionComponent createAssgineeComponent() {
+        return new FilterActionComponent(() -> "Filter by Issue Priority",
+                () -> new AssigneeFilterComponent(myAssigneeFilterModel).initUi());
     }
 
     private FilterActionComponent createIssueStatusComponent() {
