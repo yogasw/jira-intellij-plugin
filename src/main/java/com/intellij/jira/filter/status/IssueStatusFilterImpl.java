@@ -1,4 +1,4 @@
-package com.intellij.jira.filter;
+package com.intellij.jira.filter.status;
 
 import com.intellij.jira.rest.model.JiraIssueStatus;
 

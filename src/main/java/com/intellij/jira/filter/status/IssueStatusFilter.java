@@ -1,5 +1,7 @@
-package com.intellij.jira.filter;
+package com.intellij.jira.filter.status;
 
+import com.intellij.jira.filter.IssueFilter;
+import com.intellij.jira.filter.IssueFilterCollection;
 import com.intellij.jira.rest.model.JiraIssueStatus;
 import com.intellij.openapi.util.text.StringUtil;
 

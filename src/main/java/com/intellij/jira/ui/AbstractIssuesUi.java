@@ -12,7 +12,7 @@ import com.intellij.jira.filter.IssueFilter;
 import com.intellij.jira.filter.IssueFilterCollection;
 import com.intellij.jira.filter.IssueFilterCollectionImpl;
 import com.intellij.jira.filter.IssueFilterer;
-import com.intellij.jira.filter.IssueStatusFilterImpl;
+import com.intellij.jira.filter.status.IssueStatusFilterImpl;
 import com.intellij.jira.filter.type.TypeFilterImpl;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighter;

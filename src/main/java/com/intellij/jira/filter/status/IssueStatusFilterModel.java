@@ -1,6 +1,8 @@
-package com.intellij.jira.filter;
+package com.intellij.jira.filter.status;
 
 import com.intellij.jira.data.Issues;
+import com.intellij.jira.filter.FilterModel;
+import com.intellij.jira.filter.IssueFilterCollection;
 import com.intellij.openapi.util.Computable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

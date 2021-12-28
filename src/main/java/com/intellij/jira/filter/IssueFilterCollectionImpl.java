@@ -1,6 +1,7 @@
 package com.intellij.jira.filter;
 
 import com.intellij.jira.filter.priority.PriorityFilter;
+import com.intellij.jira.filter.status.IssueStatusFilter;
 import com.intellij.jira.filter.type.TypeFilter;
 
 import java.util.Collection;
