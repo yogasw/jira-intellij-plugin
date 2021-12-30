@@ -74,6 +74,7 @@
 
         <group class="com.intellij.jira.actions.HighlightersActionGroup" id="Jira.Issue.HighlightersActionGroup"/>
         <action class="com.intellij.jira.actions.ToggleIssueColumnActionGroup" id="Jira.Issue.ToggleColumns"/>
+        <action class="com.intellij.jira.actions.AddIssueDialogAction" id="Jira.Issue.Add"/>
 
         <group id="Jira.Issues.PresentationSettings" class="com.intellij.jira.actions.JiraIssueToolbarPopupActionGroup"
                icon="AllIcons.Actions.Show" popup="true">
@@ -91,6 +92,8 @@
             <reference id="Jira.Issues.Base.Toolbar"/>
             <separator/>
             <reference id="Jira.Issue.Server.Configure"/>
+            <separator/>
+            <reference id="Jira.Issue.Add"/>
         </group>
 
     </actions>

@@ -23,8 +23,8 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
 
     public ComboBoxFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, List<T> items) {
         super(issueKey, fieldName, fieldValue, required);
-        this.myComboBoxItems = new CollectionComboBoxModel<>(items);
-        this.myComboBox = new ComboBox(myComboBoxItems, 300);
+        myComboBoxItems = new CollectionComboBoxModel<>(items);
+        myComboBox = new ComboBox(myComboBoxItems, 300);
 
         // TODO: 22/12/2019 mejorar
         T currentValue = getFieldValue();
@@ -32,14 +32,14 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
             for (Object value : (List) currentValue) {
                 T item = findItem(items, value);
                 if (item != null) {
-                    this.myComboBoxItems.setSelectedItem(item);
+                    myComboBoxItems.setSelectedItem(item);
                     break;
                 }
             }
         } else if (currentValue != null) {
             T item = findItem(items, currentValue);
             if (item != null) {
-                this.myComboBoxItems.setSelectedItem(item);
+                myComboBoxItems.setSelectedItem(item);
             }
         }
     }
@@ -56,7 +56,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
     @Override
     public JComponent createPanel() {
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myComboBox)
+                .addLabeledComponent(myLabel, myComboBox)
                 .getPanel();
     }
 

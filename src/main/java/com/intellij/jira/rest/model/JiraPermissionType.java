@@ -1,6 +1,7 @@
 package com.intellij.jira.rest.model;
 
 public enum JiraPermissionType {
+    CREATE_ISSUES("CREATE_ISSUES"),
     EDIT_ISSUES("EDIT_ISSUE"),
     TRANSITION_ISSUES("TRANSITION_ISSUE"),
     ADD_COMMENTS("COMMENT_ISSUE"),

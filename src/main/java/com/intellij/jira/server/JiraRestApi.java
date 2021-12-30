@@ -3,10 +3,12 @@ package com.intellij.jira.server;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.JiraRestClient;
 import com.intellij.jira.rest.model.*;
+import com.intellij.jira.rest.model.metadata.JiraIssueCreateMetadata;
 import com.intellij.jira.util.result.BodyResult;
 import com.intellij.jira.util.result.EmptyResult;
 import com.intellij.jira.util.result.Result;
 import com.intellij.tasks.jira.JiraRepository;
+import org.apache.commons.httpclient.NameValuePair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +152,17 @@ public class JiraRestApi {
 
     }
 
+    public boolean userHasPermission(JiraPermissionType permission) {
+        LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
+        try {
+            permissions = jiraRestClient.findUserPermissions(new NameValuePair("permissions", permission.toString()));
+        } catch (Exception e) {
+            log.error("Current user has not permission to do this action");
+        }
+
+        return isHavePermission(permissions, permission);
+    }
+
     public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType permission){
         LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
         try {
@@ -158,12 +171,16 @@ public class JiraRestApi {
             log.error("Current user has not permission to do this action");
         }
 
+        return isHavePermission(permissions, permission);
+    }
+
+    private boolean isHavePermission(LinkedHashMap<String, JiraPermission> permissions, JiraPermissionType permission) {
         JiraPermission jiraPermission = permissions.get(permission.toString());
         if(Objects.isNull(jiraPermission)){
             jiraPermission = permissions.get(permission.getOldPermission());
         }
 
-        return Objects.isNull(jiraPermission) ? false : jiraPermission.isHavePermission();
+        return Objects.nonNull(jiraPermission) && jiraPermission.isHavePermission();
     }
 
 
@@ -311,8 +328,17 @@ public class JiraRestApi {
         }
     }
 
+    public JiraIssueCreateMetadata getIssueCreateMeta() {
+        try {
+            return jiraRestClient.getIssueCreateMeta();
+        } catch (Exception e) {
+            // TODO: refactor!!
+            return null;
+        }
+
+    }
+
     private JiraIssueUser findCurrentUser() throws Exception {
         return jiraRestClient.getCurrentUser();
     }
-
 }

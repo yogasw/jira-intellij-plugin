@@ -5,6 +5,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.*;
+import com.intellij.jira.rest.model.metadata.JiraIssueCreateMetadata;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
@@ -157,14 +158,19 @@ public class JiraRestClient {
     }
 
     public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey, JiraPermissionType permission) throws Exception {
-        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("mypermissions"));
-        method.setQueryString(new NameValuePair[]{
-                new NameValuePair("issueKey", issueKey),
 
-                // "permissions" to check is required to be added right from the start
-                // https://blog.developer.atlassian.com/change-notice-get-my-permissions-requires-permissions-query-parameter/
+        NameValuePair[] queryParams = {
+                new NameValuePair("issueKey", issueKey),
                 new NameValuePair("permissions", permission.toString())
-        });
+        };
+
+        return findUserPermissions(queryParams);
+    }
+
+    public LinkedHashMap<String, JiraPermission> findUserPermissions(NameValuePair... queryParams) throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("mypermissions"));
+        method.setQueryString(queryParams);
+
         String response = jiraRepository.executeMethod(method);
         return parsePermissions(response);
     }
@@ -380,5 +386,15 @@ public class JiraRestClient {
         jiraRepository.executeMethod(method);
         return method.getStatusCode();
     }
+
+    public JiraIssueCreateMetadata getIssueCreateMeta() throws Exception {
+        GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, "createmeta"));
+        method.setQueryString(new NameValuePair[]{new NameValuePair("expand", "projects.issuetypes.fields")});
+
+        String response = jiraRepository.executeMethod(method);
+
+        return parseIssueCreateMeta(response);
+    }
+
 }
 
