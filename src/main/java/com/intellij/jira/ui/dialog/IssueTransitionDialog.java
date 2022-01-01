@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.JiraIssue;
@@ -12,6 +13,7 @@ import com.intellij.jira.ui.panels.JiraTransitionTaskEditor;
 import com.intellij.jira.ui.renders.JiraIssueTransitionListCellRenderer;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
+import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -46,7 +48,7 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-public class IssueTransitionDialog extends DialogWrapper {
+public class IssueTransitionDialog extends DialogWrapper implements DataProvider {
 
     private final Project project;
     private final JiraIssue issue;
@@ -120,6 +122,17 @@ public class IssueTransitionDialog extends DialogWrapper {
                 .getPanel();
     }
 
+    @Override
+    public @Nullable Object getData(@NotNull String dataId) {
+        if (JiraDataKeys.ISSUE_KEY.is(dataId)) {
+            return issue.getKey();
+        } else if (JiraDataKeys.PROJECT_KEY.is(dataId)) {
+            return issue.getProject().getKey();
+        }
+
+        return null;
+    }
+
     private void updateTransitionFieldPanel(JiraIssueTransition transition) {
         selectedIssueTransition = transition;
         myOKAction.setEnabled(true);
@@ -183,7 +196,7 @@ public class IssueTransitionDialog extends DialogWrapper {
             formBuilder.addComponent(info.getPanel());
         });
 
-        FieldEditorInfo commentInfo = createCommentFieldEditorInfo(issue.getKey());
+        FieldEditorInfo commentInfo = createCommentFieldEditorInfo();
         this.transitionFields.put(commentInfo.getName(), commentInfo);
         formBuilder.addComponent(commentInfo.getPanel());
 

@@ -18,16 +18,16 @@ public class TimeSpentEditor extends TextFieldEditor {
     private static final Pattern TIME_SPENT_SIMPLE_PATTERN = Pattern.compile("(\\d+)([wdhm])");
     private static final Pattern TIME_SPENT_MULTI_PATTERN = Pattern.compile("(\\d+[wdhm])(\\s{1}\\d+[wdhm])*");
 
-    public TimeSpentEditor(String issueKey) {
-        this(issueKey, "Time Spent", null, false);
+    public TimeSpentEditor() {
+        this("Time Spent", null, false);
     }
 
-    public TimeSpentEditor(String issueKey, Object fieldValue, boolean required) {
-        this(issueKey, "Time Spent", fieldValue, required);
+    public TimeSpentEditor(Object fieldValue, boolean required) {
+        this("Time Spent", fieldValue, required);
     }
 
-    public TimeSpentEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public TimeSpentEditor(String fieldName, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override

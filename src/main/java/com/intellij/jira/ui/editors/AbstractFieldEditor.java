@@ -1,52 +1,36 @@
 package com.intellij.jira.ui.editors;
 
-import com.intellij.jira.JiraDataKeys;
-import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.ui.components.JBLabel;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractFieldEditor<T> implements FieldEditor, DataProvider {
+public abstract class AbstractFieldEditor<T> implements FieldEditor {
 
-    protected String issueKey;
     protected MyLabel myLabel;
-    protected Object fieldValue;
-    private boolean required;
+    protected Object myFieldValue;
+    private final boolean myIsRequired;
 
-    public AbstractFieldEditor(String issueKey, String fieldName, Object fieldValue) {
-        this(issueKey, fieldName, fieldValue, false);
+    public AbstractFieldEditor(String fieldName, Object fieldValue) {
+        this(fieldName, fieldValue, false);
     }
 
-    public AbstractFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        this.issueKey = issueKey;
-        this.myLabel = new MyLabel(fieldName, required);
-        this.fieldValue = fieldValue;
-        this.required = required;
-    }
-
-    @Override
-    public @Nullable Object getData(@NotNull @NonNls String dataId) {
-        if (JiraDataKeys.ISSUE_KEY.is(dataId)) {
-            return issueKey;
-        }
-
-        return null;
+    public AbstractFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        myLabel = new MyLabel(fieldName, required);
+        myFieldValue = fieldValue;
+        myIsRequired = required;
     }
 
     public abstract T getFieldValue();
 
     @Override
     public boolean isRequired() {
-        return required;
+        return myIsRequired;
     }
 
     class MyLabel extends JBLabel{
         private String myLabelText;
 
-        public MyLabel(String myLabelText, boolean required) {
+        public MyLabel(String labelText, boolean required) {
             super();
-            this.myLabelText = myLabelText;
+            myLabelText = labelText;
             setText(myLabelText + (required ? " *" : ""));
         }
 

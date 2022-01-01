@@ -8,7 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -26,14 +26,14 @@ import static java.util.stream.Collectors.toList;
 
 public class ProjectSelectFieldEditor extends DataSelectFieldEditor<JiraProject> {
 
-    public ProjectSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect, List<JiraProject> items) {
-        super(fieldName, issueKey, fieldValue, required, isMultiSelect, items);
+    public ProjectSelectFieldEditor(String fieldName, Object fieldValue, boolean required, boolean isMultiSelect, List<JiraProject> items) {
+        super(fieldName, fieldValue, required, isMultiSelect, items);
         myButtonAction = new ProjectPickerDialogAction();
     }
 
     @Override
     protected void initSelectedItems() {
-        JsonElement element = GSON.toJsonTree(fieldValue);
+        JsonElement element = GSON.toJsonTree(myFieldValue);
         if (element.isJsonArray()) {
             mySelectedItems = JiraGsonUtil.getAsList(element, JiraProject[].class);
         } else if (element.isJsonObject()) {

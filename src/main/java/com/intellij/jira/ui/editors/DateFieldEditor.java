@@ -7,7 +7,10 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import java.text.ParseException;
@@ -32,14 +35,14 @@ public class DateFieldEditor extends AbstractFieldEditor<String> {
     protected JFormattedTextField myFormattedTextField;
     protected JLabel myInfoLabel;
 
-    public DateFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public DateFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override
     public String getFieldValue() {
         try {
-            return getDateFormatter().valueToString(Objects.nonNull(fieldValue) ? fieldValue : new Date());
+            return getDateFormatter().valueToString(Objects.nonNull(myFieldValue) ? myFieldValue : new Date());
         } catch (ParseException e) {
             return "";
         }

@@ -21,23 +21,23 @@ public class TextFieldEditor extends AbstractFieldEditor<String> {
 
     protected JBTextField myTextField;
 
-    public TextFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public TextFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override
     public String getFieldValue() {
-        return Objects.nonNull(fieldValue) ? (String) fieldValue : "";
+        return Objects.nonNull(myFieldValue) ? (String) myFieldValue : "";
     }
 
     @Override
     public JComponent createPanel() {
-        this.myTextField = new JBTextField();
-        this.myTextField.setPreferredSize(getFieldSize());
-        this.myTextField.setText(getFieldValue());
+        myTextField = new JBTextField();
+        myTextField.setPreferredSize(getFieldSize());
+        myTextField.setText(getFieldValue());
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myTextField)
+                .addLabeledComponent(myLabel, myTextField)
                 .getPanel();
     }
 

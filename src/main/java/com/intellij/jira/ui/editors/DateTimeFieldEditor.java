@@ -22,12 +22,8 @@ public class DateTimeFieldEditor extends DateFieldEditor {
     private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static final DateTimeFormatter ISO_8601 = DateTimeFormatter.ofPattern(ISO_8601_FORMAT);
 
-    public DateTimeFieldEditor(String issueKey, String fieldName, boolean required) {
-        super(issueKey, fieldName, null, required);
-    }
-
-    public DateTimeFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public DateTimeFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override

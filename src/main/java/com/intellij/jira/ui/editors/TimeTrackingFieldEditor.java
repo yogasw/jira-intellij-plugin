@@ -8,7 +8,10 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.util.regex.Pattern;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
@@ -32,14 +35,13 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
     private JTextField mySecondField;
     private JLabel mySecondInfoLabel;
 
-    public TimeTrackingFieldEditor(String issueKey, boolean required) {
-        super(issueKey, ORIGINAL_ESTIMATE_FIELD, required);
-        this.mySecondLabel = new MyLabel(REMAINING_ESTIMATE_FIELD, required);
+    public TimeTrackingFieldEditor(boolean required) {
+        super(ORIGINAL_ESTIMATE_FIELD, null, required);
+        mySecondLabel = new MyLabel(REMAINING_ESTIMATE_FIELD, required);
     }
 
     @Override
     public JComponent createPanel() {
-
         myFirstInfoLabel.setToolTipText(INFO_MESSAGE);
         myFirstInfoLabel.setIcon(AllIcons.Actions.Help);
 
@@ -47,8 +49,8 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
         mySecondInfoLabel.setIcon(AllIcons.Actions.Help);
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myFirstPanel)
-                .addLabeledComponent(this.mySecondLabel, this.mySecondPanel)
+                .addLabeledComponent(myLabel, myFirstPanel)
+                .addLabeledComponent(mySecondLabel, mySecondPanel)
                 .getPanel();
     }
 

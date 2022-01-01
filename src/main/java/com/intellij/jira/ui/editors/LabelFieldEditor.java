@@ -15,20 +15,20 @@ public class LabelFieldEditor extends AbstractFieldEditor<String> {
 
     private JBLabel myLabelText;
 
-    public LabelFieldEditor(String issueKey, String fieldName) {
-        this(issueKey, fieldName, null);
+    public LabelFieldEditor(String fieldName) {
+        this(fieldName, null);
     }
 
-    public LabelFieldEditor(String issueKey, String fieldName, Object fieldValue) {
-        super(issueKey, fieldName, fieldValue);
+    public LabelFieldEditor(String fieldName, Object fieldValue) {
+        super(fieldName, fieldValue);
     }
 
     @Override
     public JComponent createPanel() {
-        this.myLabelText = JiraLabelUtil.createBoldLabel(getFieldValue());
+        myLabelText = JiraLabelUtil.createBoldLabel(getFieldValue());
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myLabelText)
+                .addLabeledComponent(myLabel, myLabelText)
                 .getPanel();
     }
 
@@ -45,7 +45,7 @@ public class LabelFieldEditor extends AbstractFieldEditor<String> {
 
     @Override
     public String getFieldValue() {
-        return Objects.nonNull(fieldValue) ? (String) fieldValue : "None";
+        return Objects.nonNull(myFieldValue) ? (String) myFieldValue : "None";
     }
 
 }

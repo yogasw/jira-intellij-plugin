@@ -22,8 +22,8 @@ public final class TransitionFieldHelper {
         return new FieldEditorInfo(jsonFieldName, fieldEditor);
     }
 
-    public static FieldEditorInfo createCommentFieldEditorInfo(String issueKey){
-        return new FieldEditorInfo(COMMENT, createCommentFieldEditor(issueKey));
+    public static FieldEditorInfo createCommentFieldEditorInfo(){
+        return new FieldEditorInfo(COMMENT, createCommentFieldEditor());
     }
 
     public static class FieldEditorInfo {

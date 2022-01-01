@@ -8,14 +8,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.regex.Pattern;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
-import static com.intellij.openapi.util.text.StringUtil.*;
+import static com.intellij.openapi.util.text.StringUtil.isEmpty;
+import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
+import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class NumberFieldEditor extends TextFieldEditor {
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+([,.]\\d{1,2})?");
 
-    public NumberFieldEditor(String issueKey, String fieldName, String fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public NumberFieldEditor(String fieldName, String fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override

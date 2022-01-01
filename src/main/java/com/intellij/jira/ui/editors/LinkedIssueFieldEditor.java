@@ -6,7 +6,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
-import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.actions.AddIssueLinkDialogAction;
 import com.intellij.jira.rest.model.JiraIssueLinkType;
 import com.intellij.jira.rest.model.JiraIssueLinkTypeInfo;
@@ -17,10 +16,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.FormBuilder;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.awt.event.InputEvent;
 import java.util.List;
 
@@ -38,11 +39,9 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
 
     private JiraIssueLinkTypeInfo mySelectedLinkType;
     private String mySelectedIssue;
-    private String myProjectKey;
 
-    public LinkedIssueFieldEditor(String issueKey, String fieldName, boolean required, String projectKey) {
-        super(issueKey, fieldName, null, required);
-        myProjectKey = projectKey;
+    public LinkedIssueFieldEditor(String fieldName, boolean required) {
+        super(fieldName, null, required);
     }
 
     @Override
@@ -90,15 +89,6 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
         }
 
         return null;
-    }
-
-    @Override
-    public @Nullable Object getData(@NotNull String dataId) {
-        if (JiraDataKeys.PROJECT_KEY.is(dataId)) {
-            return myProjectKey;
-        }
-
-        return super.getData(dataId);
     }
 
     private class MyAddIssueLinkDialogAction extends AddIssueLinkDialogAction {

@@ -2,6 +2,7 @@ package com.intellij.jira.ui.editors;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.rest.model.JiraIssueUser;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -25,12 +26,12 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
 
     private List<JiraIssueUser> mySelectedUsers = new ArrayList<>();
 
-    public UserSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        this(issueKey, fieldName, fieldValue, required, false);
+    public UserSelectFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        this(fieldName, fieldValue, required, false);
     }
 
-    public UserSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
-        super(issueKey, fieldName, fieldValue, required, isMultiSelect);
+    public UserSelectFieldEditor(String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
+        super(fieldName, fieldValue, required, isMultiSelect);
         myButtonAction = new UserPickerDialogAction();
         JiraIssueUser user = getFieldValue();
         if(Objects.nonNull(user)) {
@@ -55,11 +56,11 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
 
     @Override
     public JiraIssueUser getFieldValue() {
-        if (Objects.isNull(fieldValue)) {
+        if (Objects.isNull(myFieldValue)) {
             return null;
         }
 
-        return ((JiraIssueUser) fieldValue);
+        return ((JiraIssueUser) myFieldValue);
     }
 
     private List<String> getSelectedUserNames() {
@@ -76,6 +77,7 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
         public void actionPerformed(AnActionEvent e) {
             super.actionPerformed(e);
             if(nonNull(myJiraRestApi)){
+                String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
                 List<JiraIssueUser> users = myJiraRestApi.getAssignableUsers(issueKey);
                 UserPickerDialog dialog = new UserPickerDialog(myProject, users, getFieldValue());
                 dialog.show();

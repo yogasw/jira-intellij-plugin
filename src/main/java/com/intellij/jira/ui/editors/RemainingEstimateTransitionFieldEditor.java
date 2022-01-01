@@ -8,20 +8,20 @@ public class RemainingEstimateTransitionFieldEditor extends RemainingEstimateFie
 
     private static final String ADJUST_ESTIMATE = "adjustEstimate";
 
-    public RemainingEstimateTransitionFieldEditor(String issueKey, String fieldName, boolean required, JiraIssueTimeTracking timeTracking) {
-        super(issueKey, fieldName, required, timeTracking, true);
+    public RemainingEstimateTransitionFieldEditor(String fieldName, boolean required, JiraIssueTimeTracking timeTracking) {
+        super(fieldName, required, timeTracking, true);
     }
 
     @Override
     public JsonElement getJsonValue() {
         JsonObject remainingEstimate = new JsonObject();
-        if (newButton.isSelected()){
+        if (myNewButton.isSelected()){
             remainingEstimate.addProperty(ADJUST_ESTIMATE, "new");
             remainingEstimate.addProperty("newEstimate", myNewTextFieldEditor.getMyTextField().getText());
-        } else if (manualButton.isSelected()){
+        } else if (myManualButton.isSelected()){
             remainingEstimate.addProperty(ADJUST_ESTIMATE, "manual");
             remainingEstimate.addProperty("increaseBy", myManualTextFieldEditor.getMyTextField().getText());
-        } else if (leaveButton.isSelected()){
+        } else if (myLeaveButton.isSelected()){
             remainingEstimate.addProperty(ADJUST_ESTIMATE, "leave");
         } else {
             remainingEstimate.addProperty(ADJUST_ESTIMATE, "auto");

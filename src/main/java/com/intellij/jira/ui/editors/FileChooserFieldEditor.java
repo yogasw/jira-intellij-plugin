@@ -6,10 +6,14 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.io.File;
 
-public class FileChooserFieldEditor extends AbstractFieldEditor<String>{
+public class FileChooserFieldEditor extends AbstractFieldEditor<String> {
 
     private File mySelectedFile;
 
@@ -17,8 +21,8 @@ public class FileChooserFieldEditor extends AbstractFieldEditor<String>{
     private JPanel myPanel;
     private JButton myButton;
 
-    public FileChooserFieldEditor(String issueKey) {
-        super(issueKey, "File", null, true);
+    public FileChooserFieldEditor() {
+        super("File", null, true);
     }
 
     @Override
@@ -28,7 +32,7 @@ public class FileChooserFieldEditor extends AbstractFieldEditor<String>{
 
     @Override
     public JComponent createPanel() {
-        this.myButton.addActionListener(e -> {
+        myButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             int result = fileChooser.showOpenDialog(myPanel);
@@ -41,7 +45,7 @@ public class FileChooserFieldEditor extends AbstractFieldEditor<String>{
         });
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, myPanel)
+                .addLabeledComponent(myLabel, myPanel)
                 .getPanel();
     }
 

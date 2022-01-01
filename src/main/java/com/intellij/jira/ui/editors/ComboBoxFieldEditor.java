@@ -8,7 +8,7 @@ import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.util.List;
 
 import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
@@ -21,8 +21,8 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
     protected ComboBox<T> myComboBox;
     private CollectionComboBoxModel<T> myComboBoxItems;
 
-    public ComboBoxFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, List<T> items) {
-        super(issueKey, fieldName, fieldValue, required);
+    public ComboBoxFieldEditor(String fieldName, Object fieldValue, boolean required, List<T> items) {
+        super(fieldName, fieldValue, required);
         myComboBoxItems = new CollectionComboBoxModel<>(items);
         myComboBox = new ComboBox(myComboBoxItems, 300);
 
@@ -50,6 +50,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
                 return item;
             }
         }
+
         return null;
     }
 
@@ -71,7 +72,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
     }
 
     protected String getSelectedValue(){
-        return nonNull(this.myComboBox.getSelectedItem()) ? this.myComboBox.getSelectedItem().toString() : "";
+        return nonNull(myComboBox.getSelectedItem()) ? myComboBox.getSelectedItem().toString() : "";
     }
 
 
@@ -87,7 +88,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
 
     @Override
     public T getFieldValue() {
-        return (T) fieldValue;
+        return (T) myFieldValue;
     }
 
 }
