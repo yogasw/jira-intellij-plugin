@@ -49,8 +49,10 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
         mySecondInfoLabel.setIcon(AllIcons.Actions.Help);
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(myLabel, myFirstPanel)
-                .addLabeledComponent(mySecondLabel, mySecondPanel)
+                .addComponent(myLabel)
+                .addComponent(myFirstPanel)
+                .addComponent(mySecondLabel)
+                .addComponent(mySecondPanel)
                 .getPanel();
     }
 
@@ -77,19 +79,19 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(getOriginalEstimate()) ){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }
 
         if(isRequired() && isEmpty(getRemainingEstimate())){
-            return new ValidationInfo(mySecondLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(mySecondLabel.getText() + " is required.");
         }
 
         if(isNotEmpty(getOriginalEstimate()) && !TIME_TRACKING_PATTERN.matcher(getOriginalEstimate()).matches()){
-            return new ValidationInfo("Wrong format in " + myLabel.getMyLabelText() + " field.");
+            return new ValidationInfo("Wrong format in " + myLabel.getText() + " field.");
         }
 
         if(isNotEmpty(getRemainingEstimate()) && !TIME_TRACKING_PATTERN.matcher(getRemainingEstimate()).matches()){
-            return new ValidationInfo("Wrong format in " + mySecondLabel.getMyLabelText() + " field.");
+            return new ValidationInfo("Wrong format in " + mySecondLabel.getText() + " field.");
         }
 
         return null;

@@ -59,7 +59,7 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
         });
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(myLabel, myPanel)
+                .addLabeledComponent(myLabel, myPanel, true)
                 .getPanel();
     }
 
@@ -85,7 +85,7 @@ public class LinkedIssueFieldEditor extends AbstractFieldEditor<String> {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && StringUtil.isEmpty(myTextField.getText())){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }
 
         return null;

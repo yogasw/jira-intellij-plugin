@@ -19,6 +19,7 @@ import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
 import static com.intellij.openapi.util.text.StringUtil.isEmpty;
 import static com.intellij.openapi.util.text.StringUtil.trim;
 import static com.intellij.util.containers.ContainerUtil.getFirstItem;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -77,8 +78,15 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
         public void actionPerformed(AnActionEvent e) {
             super.actionPerformed(e);
             if(nonNull(myJiraRestApi)){
-                String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
-                List<JiraIssueUser> users = myJiraRestApi.getAssignableUsers(issueKey);
+                List<JiraIssueUser> users;
+                String issueKey = e.getData(JiraDataKeys.ISSUE_KEY);
+                if (isNull(issueKey)) {
+                    String projectKey = e.getData(JiraDataKeys.PROJECT_KEY);
+                    users = myJiraRestApi.getProjectAssignableUsers(projectKey);
+                } else {
+                    users = myJiraRestApi.getIssueAssignableUsers(issueKey);
+                }
+
                 UserPickerDialog dialog = new UserPickerDialog(myProject, users, getFieldValue());
                 dialog.show();
             }

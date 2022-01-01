@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.util.Objects;
 
 public class LabelFieldEditor extends AbstractFieldEditor<String> {
@@ -28,7 +28,7 @@ public class LabelFieldEditor extends AbstractFieldEditor<String> {
         myLabelText = JiraLabelUtil.createBoldLabel(getFieldValue());
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(myLabel, myLabelText)
+                .addLabeledComponent(myLabel, myLabelText, true)
                 .getPanel();
     }
 

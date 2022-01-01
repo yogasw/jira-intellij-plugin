@@ -68,9 +68,18 @@ public class JiraRestApi {
         }
     }
 
-    public List<JiraIssueUser> getAssignableUsers(String issueKey){
+    public List<JiraIssueUser> getIssueAssignableUsers(String issueKey){
         try {
-            return jiraRestClient.getAssignableUsers(issueKey);
+            return jiraRestClient.getIssueAssignableUsers(issueKey);
+        } catch (Exception e) {
+            log.error("Error fetching users to assign");
+            return new ArrayList<>();
+        }
+    }
+
+    public List<JiraIssueUser> getProjectAssignableUsers(String projectKey) {
+        try {
+            return jiraRestClient.getProjectAssignableUsers(projectKey);
         } catch (Exception e) {
             log.error("Error fetching users to assign");
             return new ArrayList<>();

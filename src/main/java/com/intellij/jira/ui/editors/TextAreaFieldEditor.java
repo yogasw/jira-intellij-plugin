@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.JBColor;
+import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.BorderFactory;
@@ -34,7 +35,9 @@ public class TextAreaFieldEditor extends AbstractFieldEditor<String> {
         myTextArea.setText(getFieldValue());
         myTextAreaLabel.setText(myLabel.getText());
 
-        return myPanel;
+        return FormBuilder.createFormBuilder()
+                .addComponent(myPanel)
+                .getPanel();
     }
 
     @Override
@@ -50,7 +53,7 @@ public class TextAreaFieldEditor extends AbstractFieldEditor<String> {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(trim(myTextArea.getText()))){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }
 
         return null;

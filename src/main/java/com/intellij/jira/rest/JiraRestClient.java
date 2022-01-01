@@ -73,7 +73,15 @@ public class JiraRestClient {
         return jiraRepository.executeMethod(method);
     }
 
-    public List<JiraIssueUser> getAssignableUsers(String issueKey) throws Exception {
+    public List<JiraIssueUser> getIssueAssignableUsers(String issueKey) throws Exception {
+        return fetchUsers(new NameValuePair("issueKey", issueKey));
+    }
+
+    public List<JiraIssueUser> getProjectAssignableUsers(String projectKey) throws Exception {
+        return fetchUsers(new NameValuePair("project", projectKey));
+    }
+
+    private List<JiraIssueUser> fetchUsers(NameValuePair issueOrProjectParam) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl("user", "assignable", SEARCH));
 
         List<JiraIssueUser> newUsers;
@@ -81,7 +89,7 @@ public class JiraRestClient {
 
         do {
             method.setQueryString(new NameValuePair[]{
-                    new NameValuePair("issueKey", issueKey),
+                    issueOrProjectParam,
                     new NameValuePair("startAt", String.valueOf(jiraUsers.size())),
                     new NameValuePair("maxResults", String.valueOf(MAX_USERS_RESULTS)),
             });
@@ -93,7 +101,6 @@ public class JiraRestClient {
 
         return jiraUsers;
     }
-
 
     public String assignUserToIssue(String accountId,  String username, String issueKey) throws Exception {
         String requestBody = accountId != null ? JiraGsonUtil.createObject("accountId", accountId).toString() : JiraGsonUtil.createObject("name", username).toString();

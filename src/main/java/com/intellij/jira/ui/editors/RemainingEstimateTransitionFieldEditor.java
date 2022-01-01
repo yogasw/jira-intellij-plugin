@@ -17,10 +17,10 @@ public class RemainingEstimateTransitionFieldEditor extends RemainingEstimateFie
         JsonObject remainingEstimate = new JsonObject();
         if (myNewButton.isSelected()){
             remainingEstimate.addProperty(ADJUST_ESTIMATE, "new");
-            remainingEstimate.addProperty("newEstimate", myNewTextFieldEditor.getMyTextField().getText());
+            remainingEstimate.addProperty("newEstimate", myNewTextFieldEditor.getTextField().getText());
         } else if (myManualButton.isSelected()){
             remainingEstimate.addProperty(ADJUST_ESTIMATE, "manual");
-            remainingEstimate.addProperty("increaseBy", myManualTextFieldEditor.getMyTextField().getText());
+            remainingEstimate.addProperty("increaseBy", myManualTextFieldEditor.getTextField().getText());
         } else if (myLeaveButton.isSelected()){
             remainingEstimate.addProperty(ADJUST_ESTIMATE, "leave");
         } else {

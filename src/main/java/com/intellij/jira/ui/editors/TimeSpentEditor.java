@@ -3,15 +3,14 @@ package com.intellij.jira.ui.editors;
 import com.google.gson.JsonElement;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Dimension;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.intellij.openapi.util.text.StringUtil.*;
+import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
+import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class TimeSpentEditor extends TextFieldEditor {
 
@@ -28,11 +27,6 @@ public class TimeSpentEditor extends TextFieldEditor {
 
     public TimeSpentEditor(String fieldName, Object fieldValue, boolean required) {
         super(fieldName, fieldValue, required);
-    }
-
-    @Override
-    public Dimension getFieldSize() {
-        return JBUI.size(150, 24);
     }
 
     @Override

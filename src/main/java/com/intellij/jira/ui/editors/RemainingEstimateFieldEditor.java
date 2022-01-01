@@ -4,15 +4,13 @@ import com.google.gson.JsonElement;
 import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.util.Objects;
 
 public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
@@ -22,11 +20,15 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
     protected JRadioButton myNewButton;
     protected JRadioButton myManualButton;
 
-    protected TimeSpentEditor myNewTextFieldEditor;
-    protected TimeSpentEditor myManualTextFieldEditor;
+    protected TextFieldEditor myNewTextFieldEditor;
+    protected TextFieldEditor myManualTextFieldEditor;
 
     private JiraIssueTimeTracking myTimeTracking;
     private boolean myShowManualField;
+
+    private JPanel myPanel;
+    private JPanel myNewPanel;
+    private JPanel myManualPanel;
 
     public RemainingEstimateFieldEditor(String fieldName, boolean required, JiraIssueTimeTracking timeTracking, boolean showManualField) {
         super(fieldName, null, required);
@@ -36,49 +38,29 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
 
     @Override
     public JComponent createPanel() {
-        myAutoButton = new JRadioButton("Adjust automatically", true);
-        myLeaveButton = new JRadioButton(getTimeTrackingText());
-        myNewButton = new JRadioButton();
-        myManualButton = new JRadioButton();
+        myLeaveButton.setText(getTimeTrackingText());
 
-        ButtonGroup myRadioGroup = new ButtonGroup();
-        myRadioGroup.add(myAutoButton);
-        myRadioGroup.add(myLeaveButton);
-        myRadioGroup.add(myNewButton);
-        if (myShowManualField) {
-            myRadioGroup.add(myManualButton);
-        }
+        myNewTextFieldEditor = new MyTimeSpentEditor("Set to");
+        myManualTextFieldEditor = new MyTimeSpentEditor("Reduce by");
 
-        myNewTextFieldEditor = new TimeSpentEditor("Set to", "", false);
-        myManualTextFieldEditor = new TimeSpentEditor("Reduce by", "", false);
-
-        JPanel radioPanel = new JPanel();
-        radioPanel.setLayout(new GridLayout(4, 1));
-        radioPanel.add(myAutoButton);
-        radioPanel.add(myLeaveButton);
-        JPanel radioWithTexFieldPanel = new JPanel(new FlowLayout());
-        radioWithTexFieldPanel.add(myNewButton);
-        radioWithTexFieldPanel.add(myNewTextFieldEditor.createPanel());
-        radioPanel.add(radioWithTexFieldPanel);
+        myNewPanel.add(myNewTextFieldEditor.createPanel());
 
         if (myShowManualField) {
-            JPanel radioWithTexFieldPanel2 = new JPanel(new FlowLayout());
-            radioWithTexFieldPanel2.add(myManualButton);
-            radioWithTexFieldPanel2.add(myManualTextFieldEditor.createPanel());
-            radioPanel.add(radioWithTexFieldPanel2);
+            myManualButton.setVisible(true);
+            myManualPanel.add(myManualTextFieldEditor.createPanel());
         }
 
         return FormBuilder.createFormBuilder()
-                    .addLabeledComponent(myLabel, radioPanel)
+                    .addComponent(myPanel)
                     .getPanel();
     }
 
     @Override
     public JsonElement getJsonValue() {
         if (myNewButton.isSelected()) {
-            return JiraGsonUtil.createPrimitive("new&newEstimate=" + myNewTextFieldEditor.getMyTextField().getText());
+            return JiraGsonUtil.createPrimitive("new&newEstimate=" + myNewTextFieldEditor.getTextField().getText());
         } else if(myManualButton.isSelected()) {
-            return JiraGsonUtil.createPrimitive("manual&increaseBy=" + myManualTextFieldEditor.getMyTextField().getText());
+            return JiraGsonUtil.createPrimitive("manual&increaseBy=" + myManualTextFieldEditor.getTextField().getText());
         } else if(myLeaveButton.isSelected()) {
             return JiraGsonUtil.createPrimitive("leave");
         }
@@ -106,4 +88,24 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
     public String getFieldValue() {
         return null;
     }
+
+
+
+    private static class MyTimeSpentEditor extends TimeSpentEditor {
+
+        public MyTimeSpentEditor(String fieldName) {
+            super(fieldName, "", false);
+        }
+
+        @Override
+        public JComponent createPanel() {
+            myTextField = new JBTextField();
+            myTextField.setText(super.getFieldValue());
+
+            return FormBuilder.createFormBuilder()
+                    .addLabeledComponent(myLabel, getTextField())
+                    .getPanel();
+        }
+    }
+
 }

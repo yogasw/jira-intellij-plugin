@@ -55,13 +55,13 @@ public class DateTimeFieldEditor extends DateFieldEditor {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(trim(myFormattedTextField.getText()))){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }else{
             if(isNotEmpty(trim(myFormattedTextField.getText()))){
                 try{
                     LocalDateTime.parse(myFormattedTextField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
                 }catch (DateTimeParseException e){
-                    return new ValidationInfo("Wrong format in " + myLabel.getMyLabelText() + " field.");
+                    return new ValidationInfo("Wrong format in " + myLabel.getText() + " field.");
                 }
             }
 

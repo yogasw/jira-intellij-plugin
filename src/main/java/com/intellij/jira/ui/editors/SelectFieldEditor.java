@@ -58,7 +58,7 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
         });
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(myLabel, myPanel)
+                .addLabeledComponent(myLabel, myPanel, true)
                 .getPanel();
     }
 
@@ -66,7 +66,7 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && StringUtil.isEmpty(myTextField.getText())){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }
 
         return null;

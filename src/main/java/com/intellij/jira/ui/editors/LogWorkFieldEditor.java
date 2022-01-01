@@ -45,13 +45,13 @@ public class LogWorkFieldEditor extends AbstractFieldEditor<String> {
                 .getPanel();
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(myLabel, myWorkLogPanel)
+                .addLabeledComponent(myLabel, myWorkLogPanel, true)
                 .getPanel();
     }
 
     @Override
     public JsonElement getJsonValue() {
-        if (StringUtil.isEmpty(StringUtil.trim(myTimeSpentEditor.getMyTextField().getText()))){
+        if (StringUtil.isEmpty(StringUtil.trim(myTimeSpentEditor.getTextField().getText()))){
             return JsonNull.INSTANCE;
         }
 

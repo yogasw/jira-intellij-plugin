@@ -32,7 +32,7 @@ public class JiraIssueAssigneePopupAction extends JiraIssuePopupAction {
             throw new InvalidPermissionException("Edit Issue Failed", "You don't have permission to change asignment");
         }
 
-        List<JiraIssueUser> assignableUsers = jiraRestApi.getAssignableUsers(issue.getKey());
+        List<JiraIssueUser> assignableUsers = jiraRestApi.getIssueAssignableUsers(issue.getKey());
         JiraIssueAssignableUsersPopup popup = new JiraIssueAssignableUsersPopup(createActionGroup(assignableUsers, issue), project);
         popup.showInCenterOf(getComponent());
     }

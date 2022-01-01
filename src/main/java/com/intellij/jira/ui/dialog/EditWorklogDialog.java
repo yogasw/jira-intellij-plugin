@@ -12,7 +12,8 @@ import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.JComponent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,30 +22,30 @@ import static java.util.Objects.nonNull;
 public class EditWorklogDialog extends DialogWrapper {
 
     protected final Project myProject;
-    protected String issueKey;
-    protected List<String> projectRoles;
-    private JiraIssueWorklog worklog;
+    protected String myIssueKey;
+    protected List<String> myProjectRoles;
+    private JiraIssueWorklog myWorklog;
 
-    protected TimeSpentEditor timeSpentEditor;
-    protected DateTimeFieldEditor startedEditor;
-    protected RemainingEstimateFieldEditor remainingEstimateEditor;
-    protected TextAreaFieldEditor worklogCommentEditor;
-    protected VisibilityFieldEditor visibilityEditor;
+    protected TimeSpentEditor myTimeSpentEditor;
+    protected DateTimeFieldEditor myStartedEditor;
+    protected RemainingEstimateFieldEditor myRemainingEstimateEditor;
+    protected TextAreaFieldEditor myWorklogCommentEditor;
+    protected VisibilityFieldEditor myVisibilityEditor;
 
-    protected List<TransitionFieldHelper.FieldEditorInfo> worklogFields = new ArrayList<>();
+    protected List<TransitionFieldHelper.FieldEditorInfo> myWorklogFields = new ArrayList<>();
 
-    private JiraIssueTimeTracking timeTracking;
-    private boolean showManualField;
+    private JiraIssueTimeTracking myTimeTracking;
+    private boolean myShowManualField;
 
     public EditWorklogDialog(@Nullable Project project, String issueKey, List<String> projectRoles, JiraIssueWorklog worklog, JiraIssueTimeTracking timeTracking, boolean showManualField) {
         super(project, false);
-        this.myProject = project;
-        this.issueKey = issueKey;
-        this.projectRoles = projectRoles;
-        this.projectRoles.add(0, "All Users");
-        this.worklog = worklog;
-        this.timeTracking = timeTracking;
-        this.showManualField = showManualField;
+        myProject = project;
+        myIssueKey = issueKey;
+        myProjectRoles = projectRoles;
+        myProjectRoles.add(0, "All Users");
+        myWorklog = worklog;
+        myTimeTracking = timeTracking;
+        myShowManualField = showManualField;
 
         setTitle("Edit Log Work: " + issueKey);
         init();
@@ -53,30 +54,31 @@ public class EditWorklogDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        this.timeSpentEditor = new TimeSpentEditor(this.worklog.getTimeSpent(), true);
-        this.startedEditor = new DateTimeFieldEditor("Date Started", this.worklog.getStarted(), true);
-        this.remainingEstimateEditor = new RemainingEstimateFieldEditor("Remaining Estimate", false, this.timeTracking, this.showManualField);
-        this.worklogCommentEditor = new TextAreaFieldEditor("Work Description", this.worklog.getComment(), false);
-        this.visibilityEditor = new VisibilityFieldEditor(this.worklog.getVisibility(), this.projectRoles);
+        myTimeSpentEditor = new TimeSpentEditor(myWorklog.getTimeSpent(), true);
+        myStartedEditor = new DateTimeFieldEditor("Date Started", myWorklog.getStarted(), true);
+        myRemainingEstimateEditor = new RemainingEstimateFieldEditor("Remaining Estimate", false, myTimeTracking, myShowManualField);
+        myWorklogCommentEditor = new TextAreaFieldEditor("Work Description", myWorklog.getComment(), false);
+        myVisibilityEditor = new VisibilityFieldEditor(myWorklog.getVisibility(), myProjectRoles);
 
-        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("timeSpentSeconds", timeSpentEditor));
-        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("started", startedEditor));
-        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("comment", worklogCommentEditor));
-        worklogFields.add(TransitionFieldHelper.createFieldEditorInfo("visibility", visibilityEditor));
+        myWorklogFields.add(TransitionFieldHelper.createFieldEditorInfo("timeSpentSeconds", myTimeSpentEditor));
+        myWorklogFields.add(TransitionFieldHelper.createFieldEditorInfo("started", myStartedEditor));
+        myWorklogFields.add(TransitionFieldHelper.createFieldEditorInfo("comment", myWorklogCommentEditor));
+        myWorklogFields.add(TransitionFieldHelper.createFieldEditorInfo("visibility", myVisibilityEditor));
 
         return FormBuilder.createFormBuilder()
-                .addComponent(timeSpentEditor.createPanel())
-                .addComponent(startedEditor.createPanel())
-                .addComponent(remainingEstimateEditor.createPanel())
-                .addComponent(worklogCommentEditor.createPanel())
-                .addComponent(visibilityEditor.createPanel())
+                .setVerticalGap(10)
+                .addComponent(myTimeSpentEditor.createPanel())
+                .addComponent(myStartedEditor.createPanel())
+                .addComponent(myRemainingEstimateEditor.createPanel())
+                .addComponent(myWorklogCommentEditor.createPanel())
+                .addComponent(myVisibilityEditor.createPanel())
                 .getPanel();
     }
 
     @Nullable
     @Override
     public JComponent getPreferredFocusedComponent() {
-        return timeSpentEditor.getMyTextField();
+        return myTimeSpentEditor.getTextField();
     }
 
     @NotNull
@@ -88,20 +90,20 @@ public class EditWorklogDialog extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        for(TransitionFieldHelper.FieldEditorInfo info : worklogFields){
+        for(TransitionFieldHelper.FieldEditorInfo info : myWorklogFields){
             ValidationInfo fieldValidation = info.validateField();
             if(nonNull(fieldValidation)){
                 return fieldValidation;
             }
         }
 
-        return remainingEstimateEditor.validate();
+        return myRemainingEstimateEditor.validate();
     }
 
     @Override
     protected void doOKAction() {
         if(nonNull(myProject)){
-            new EditWorklogTask(myProject, issueKey, worklog.getId(), worklogFields, remainingEstimateEditor.getJsonValue()).queue();
+            new EditWorklogTask(myProject, myIssueKey, myWorklog.getId(), myWorklogFields, myRemainingEstimateEditor.getJsonValue()).queue();
         }
 
         close(0);

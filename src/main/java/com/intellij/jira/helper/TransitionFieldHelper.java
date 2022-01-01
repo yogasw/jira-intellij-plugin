@@ -14,8 +14,8 @@ import static com.intellij.jira.util.JiraIssueField.COMMENT;
 
 public final class TransitionFieldHelper {
 
-    public static FieldEditorInfo createFieldEditorInfo(JiraIssueFieldProperties properties, JiraIssue issueKey){
-        return new FieldEditorInfo(properties, issueKey);
+    public static FieldEditorInfo createFieldEditorInfo(JiraIssueFieldProperties properties, JiraIssue issue){
+        return new FieldEditorInfo(properties, issue);
     }
 
     public static FieldEditorInfo createFieldEditorInfo(String jsonFieldName, FieldEditor fieldEditor){

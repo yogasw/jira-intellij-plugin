@@ -33,12 +33,12 @@ public class NumberFieldEditor extends TextFieldEditor {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(trim(myTextField.getText()))){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required");
+            return new ValidationInfo(myLabel.getText() + " is required");
         }
 
         if(isNotEmpty(trim(myTextField.getText()))){
             if(!NUMBER_PATTERN.matcher(trim(myTextField.getText())).matches()){
-                return new ValidationInfo("Wrong format in " + myLabel.getMyLabelText() + " field.");
+                return new ValidationInfo("Wrong format in " + myLabel.getText() + " field.");
             }
         }
 
