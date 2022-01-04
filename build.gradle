@@ -40,6 +40,7 @@ patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Fix <a href="https://gitlab.com/adrielsr/jira-intellij-plugin/-/issues/66">issue #66</a></li>
+        <li>Better way to manage searchers</li>
+        <li>Bug fixes</li>
       </ul>"""
 }
