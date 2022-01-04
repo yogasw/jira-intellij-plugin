@@ -25,6 +25,7 @@ public class MyIssuesHighlighter implements JiraIssueHighlighter {
 
         if (currentUser != null
                 && assigneeUser != null
+                && currentUser.getEmailAddress() != null
                 && currentUser.getEmailAddress().equals(assigneeUser.getEmailAddress())) {
             return JiraIssueStyleFactory.bold();
         }

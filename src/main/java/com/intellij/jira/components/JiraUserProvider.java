@@ -6,14 +6,16 @@ import com.intellij.jira.util.result.Result;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 
+import static com.intellij.jira.server.JiraServerManager.JIRA_SERVER_CHANGED;
+
 public class JiraUserProvider {
 
     private final Project myProject;
     private JiraIssueUser myCurrentUser;
 
     public JiraUserProvider(Project project) {
-        this.myProject = project;
-        //JiraServerManager.getInstance(myProject).addConfigurationServerChangedListener(() -> clearCurrentUser());
+        myProject = project;
+        project.getMessageBus().connect().subscribe(JIRA_SERVER_CHANGED, this::clearCurrentUser);
     }
 
     public JiraIssueUser getCurrent() {
