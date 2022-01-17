@@ -45,7 +45,6 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     private final JiraIssueDetailsPanel myJiraIssueDetailsPanel;
     private final ProgressStripe myProgressStripe;
     private final AbstractIssuesUi myUi;
-    //private final JiraJQLSearcherPanel mySearcherPanel;
 
     private final Splitter myIssuesBrowserSplitter;
 
@@ -55,7 +54,6 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         Disposer.register(parent, this);
 
         myUi = issuesUi;
-        //mySearcherPanel = new JiraJQLSearcherPanel(issuesData.getProject(), myUi::refresh);
         myToolbar = getToolbar(issuesData.getProject());
 
         myJiraIssueTable = new JiraIssueTable(issuesData, parent);
@@ -104,17 +102,23 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     @NotNull
     protected JComponent getToolbar(@NotNull Project project) {
         DefaultActionGroup toolbarGroup = new DefaultActionGroup();
-        toolbarGroup.copyFromGroup((DefaultActionGroup) ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR));
+        toolbarGroup.copyFromGroup((DefaultActionGroup) ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_LEFT));
 
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR, toolbarGroup, true);
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE, toolbarGroup, true);
         toolbar.setTargetComponent(this);
 
-        /*Wrapper jqlFilter = new Wrapper(mySearcherPanel);
-        jqlFilter.setVerticalSizeReferent(toolbar.getComponent());
-*/
-        JPanel panel = new JPanel(new MigLayout("ins 0, fill", "[left]0[left, fill]push[pref:pref, right]", "center"));
-        //panel.add(jqlFilter);
+        DefaultActionGroup rightCornerGroup =
+                new DefaultActionGroup(ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_RIGHT));
+        ActionToolbar rightCornerToolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE,
+                rightCornerGroup, true);
+        rightCornerToolbar.setTargetComponent(this);
+        rightCornerToolbar.setReservePlaceAutoPopupIcon(false);
+        rightCornerToolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
+
+        JPanel panel = new JPanel(new MigLayout("ins 0, fill", "[left]push[pref:pref, right]", "center"));
+
         panel.add(toolbar.getComponent());
+        panel.add(rightCornerToolbar.getComponent());
 
         return panel;
     }
@@ -157,10 +161,6 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
             JiraIssue issueToShow = myJiraIssueTable.getModel().getItem(currentPosIssue);
             myJiraIssueTable.addSelection(issueToShow);
         }
-    }
-
-    public void updateSearcherPanel() {
-        //mySearcherPanel.updateCombo();
     }
 
     private class MyListSelectionListener implements ListSelectionListener {
