@@ -1,8 +1,19 @@
 package com.intellij.jira.server;
 
+import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.JiraRestClient;
-import com.intellij.jira.rest.model.*;
+import com.intellij.jira.rest.model.JiraCreatedIssue;
+import com.intellij.jira.rest.model.JiraGroup;
+import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueComment;
+import com.intellij.jira.rest.model.JiraIssueLinkType;
+import com.intellij.jira.rest.model.JiraIssuePriority;
+import com.intellij.jira.rest.model.JiraIssueTransition;
+import com.intellij.jira.rest.model.JiraIssueUser;
+import com.intellij.jira.rest.model.JiraIssueWorklog;
+import com.intellij.jira.rest.model.JiraPermission;
+import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.rest.model.metadata.JiraIssueCreateMetadata;
 import com.intellij.jira.util.result.BodyResult;
 import com.intellij.jira.util.result.EmptyResult;
@@ -14,7 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class JiraRestApi {
 
@@ -38,6 +53,16 @@ public class JiraRestApi {
         return BodyResult.error();
     }
 
+    public Result<JiraCreatedIssue> createIssue(Map<String, TransitionFieldHelper.FieldEditorInfo> createIssueFields) {
+        try {
+            JiraCreatedIssue issue = this.jiraRestClient.createIssue(createIssueFields);
+            return BodyResult.ok(issue);
+        } catch (Exception e) {
+            log.error("Cannot create issue");
+        }
+
+        return BodyResult.error();
+    }
 
     public List<JiraIssue> getIssues(String searchQuery) {
         try {
@@ -345,6 +370,14 @@ public class JiraRestApi {
             return null;
         }
 
+    }
+
+    public List<String> findLabels(String prefix, String autoCompleteUrl) {
+        try {
+            return jiraRestClient.findLabels(prefix, autoCompleteUrl);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     private JiraIssueUser findCurrentUser() throws Exception {

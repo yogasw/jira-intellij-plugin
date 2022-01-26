@@ -62,7 +62,7 @@ public class IssueTransitionDialog extends DialogWrapper implements DataProvider
 
     private JiraTransitionTaskEditor myTransitionTaskEditor;
 
-    private Map<String, FieldEditorInfo> myTransitionFields = new HashMap<>();
+    private final Map<String, FieldEditorInfo> myTransitionFields = new HashMap<>();
 
 
     public IssueTransitionDialog(@NotNull Project project, @NotNull JiraIssue issue, List<JiraIssueTransition> transitions) {
@@ -186,7 +186,7 @@ public class IssueTransitionDialog extends DialogWrapper implements DataProvider
         FormBuilder formBuilder = FormBuilder.createFormBuilder().setVerticalGap(10);
 
         transitionFields.forEach(fieldProperties -> {
-            FieldEditorInfo info = TransitionFieldHelper.createFieldEditorInfo(fieldProperties, myIssue);
+            FieldEditorInfo info = TransitionFieldHelper.createFieldEditorInfo(myProject, fieldProperties, myIssue);
             myTransitionFields.put(info.getName(), info);
 
             formBuilder.addComponent(info.getPanel());

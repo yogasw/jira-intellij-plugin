@@ -31,12 +31,12 @@ import static java.util.Objects.isNull;
 
 public class CreateIssueButtonAction extends AnActionButton implements CustomComponentAction {
 
-    private JButton myButton;
-    private JPanel myPanel;
+    private final JButton myButton;
+    private final JPanel myPanel;
 
     public CreateIssueButtonAction() {
         myButton = new JButton("Create Issue");
-        int buttonHeight = JBUI.scale(28);
+        int buttonHeight = JBUI.scale(26);
         myButton.setPreferredSize(new Dimension(myButton.getPreferredSize().width, buttonHeight));
         myButton.setBorder(new DarculaButtonPainter() {
                                @Override

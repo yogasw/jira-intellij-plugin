@@ -14,7 +14,7 @@ public class VisibilityFieldEditor extends ComboBoxFieldEditor<String> {
 
     @Override
     public JsonElement getJsonValue() {
-        String selectedValue = getSelectedValue();
+        String selectedValue = getSelectedValueAsString();
         if("All Users".equals(selectedValue)){
             return JsonNull.INSTANCE;
         }

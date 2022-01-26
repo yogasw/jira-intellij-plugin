@@ -4,13 +4,29 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
-import com.intellij.jira.rest.model.*;
+import com.intellij.jira.rest.model.JiraCreatedIssue;
+import com.intellij.jira.rest.model.JiraGroup;
+import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueAttachment;
+import com.intellij.jira.rest.model.JiraIssueComment;
+import com.intellij.jira.rest.model.JiraIssueLinkType;
+import com.intellij.jira.rest.model.JiraIssuePriority;
+import com.intellij.jira.rest.model.JiraIssueTransition;
+import com.intellij.jira.rest.model.JiraIssueUser;
+import com.intellij.jira.rest.model.JiraIssueWorklog;
+import com.intellij.jira.rest.model.JiraPermission;
+import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.rest.model.metadata.JiraIssueCreateMetadata;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.jira.JiraRepository;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
@@ -22,9 +38,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.intellij.jira.rest.JiraIssueParser.*;
+import static com.intellij.jira.rest.JiraIssueParser.parseCreatedIssue;
+import static com.intellij.jira.rest.JiraIssueParser.parseGroups;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssue;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssueAttachments;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssueComment;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssueCreateMeta;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssueLinkTypes;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssuePriorities;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssueTransitions;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssueWorklog;
+import static com.intellij.jira.rest.JiraIssueParser.parseIssues;
+import static com.intellij.jira.rest.JiraIssueParser.parseLabels;
+import static com.intellij.jira.rest.JiraIssueParser.parsePermissions;
+import static com.intellij.jira.rest.JiraIssueParser.parseRoles;
+import static com.intellij.jira.rest.JiraIssueParser.parseUser;
+import static com.intellij.jira.rest.JiraIssueParser.parseUsers;
 import static com.intellij.jira.ui.dialog.AddCommentDialog.ALL_USERS;
-import static com.intellij.jira.util.JiraGsonUtil.*;
+import static com.intellij.jira.util.JiraGsonUtil.createIdObject;
+import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
+import static com.intellij.jira.util.JiraGsonUtil.createObject;
 import static com.intellij.jira.util.JiraIssueField.KEY;
 import static java.util.Objects.nonNull;
 
@@ -50,6 +83,15 @@ public class JiraRestClient {
         method.setQueryString(new NameValuePair[]{new NameValuePair("expand", "renderedFields")});
         String response = jiraRepository.executeMethod(method);
         return parseIssue(response);
+    }
+
+    public JiraCreatedIssue createIssue(Map<String, FieldEditorInfo> createIssueFields) throws Exception {
+        PostMethod method = new PostMethod(this.jiraRepository.getRestUrl(ISSUE));
+        String requestBody = getCreateIssueRequestBody(createIssueFields);
+        method.setRequestEntity(createJsonEntity(requestBody));
+        String response = jiraRepository.executeMethod(method);
+
+        return parseCreatedIssue(response);
     }
 
     public List<JiraIssue> findIssues(String searchQuery) throws Exception {
@@ -194,55 +236,6 @@ public class JiraRestClient {
         return parseGroups(response);
     }
 
-    private String getTransitionRequestBody(String transitionId, Map<String, FieldEditorInfo> fields) {
-        JsonObject transition = new JsonObject();
-        transition.add("transition", createIdObject(transitionId));
-
-        // Update
-        JsonObject updateObject = new JsonObject();
-
-        // Comment
-        FieldEditorInfo commentField = fields.remove("comment");
-        if(nonNull(commentField) && !(commentField.getJsonValue() instanceof JsonNull)){
-            updateObject.add("comment", commentField.getJsonValue());
-        }
-
-        // Work Log
-        FieldEditorInfo worklogField = fields.remove("worklog");
-        if(nonNull(worklogField)) {
-            JsonElement worklogFieldValue = worklogField.getJsonValue();
-            if (!(worklogFieldValue instanceof JsonNull)) {
-                updateObject.add("worklog", worklogFieldValue);
-            }
-        }
-
-        // Linked Issues
-        FieldEditorInfo issueLinkField = fields.remove("issuelinks");
-        if(nonNull(issueLinkField) && !(issueLinkField.getJsonValue() instanceof JsonNull)){
-            updateObject.add("issuelinks", issueLinkField.getJsonValue());
-        }
-
-        if(updateObject.size() > 0){
-            transition.add("update", updateObject);
-        }
-
-        //Fields
-        JsonObject fieldsObject = new JsonObject();
-        fields.forEach((key, value) -> {
-            JsonElement jsonValue = value.getJsonValue();
-            if(!(jsonValue instanceof JsonNull)){
-                fieldsObject.add(key, jsonValue);
-            }
-        });
-
-        if(fieldsObject.size() > 0){
-            transition.add("fields", fieldsObject);
-        }
-
-
-        return transition.toString();
-    }
-
 
     public String getDefaultSearchQuery() {
         return jiraRepository.getSearchQuery();
@@ -255,35 +248,12 @@ public class JiraRestClient {
         return parseRoles(response);
     }
 
-    private String prepareCommentBody(String body, String viewableBy){
-        JsonObject commentBody = new JsonObject();
-        commentBody.addProperty("body", body);
-
-        if(!ALL_USERS.equals(viewableBy)){
-            JsonObject visibility = new JsonObject();
-            visibility.addProperty("type", "role");
-            visibility.addProperty("value", viewableBy);
-            commentBody.add("visibility", visibility);
-        }
-
-        return commentBody.toString();
-    }
-
     public Integer addIssueLink(String linkType, String inIssueKey, String outIssueKey) throws Exception {
         String requestBody = prepareIssueLinkBody(linkType, inIssueKey, outIssueKey);
         PostMethod method = new PostMethod(this.jiraRepository.getRestUrl("issueLink"));
         method.setRequestEntity(createJsonEntity(requestBody));
         jiraRepository.executeMethod(method);
         return method.getStatusCode();
-    }
-
-    private String prepareIssueLinkBody(String linkType, String inIssueKey, String outIssueKey) {
-        JsonObject linkObject = new JsonObject();
-        linkObject.add("type", createNameObject(linkType));
-        linkObject.add("inwardIssue", createObject(KEY, inIssueKey));
-        linkObject.add("outwardIssue", createObject(KEY, outIssueKey));
-
-        return linkObject.toString();
     }
 
     public Integer deleteIssueLink(String issueLinkId) throws Exception {
@@ -299,7 +269,7 @@ public class JiraRestClient {
     public JiraIssueWorklog getWorklog(String issueKey, String worklogId) throws Exception {
         GetMethod method = new GetMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, worklogId));
         String response = jiraRepository.executeMethod(method);
-        
+
         return parseIssueWorklog(response);
     }
 
@@ -311,10 +281,10 @@ public class JiraRestClient {
         }
         method.setRequestEntity(createJsonEntity(requestBody));
         String response = jiraRepository.executeMethod(method);
-        
+
         return parseIssueWorklog(response);
     }
-    
+
     public JiraIssueWorklog updateIssueWorklog(String issueKey, String workLogId, List<FieldEditorInfo> worklogFields, String remainingEstimate) throws Exception {
         String requestBody = prepareWorklogBody(worklogFields);
         PutMethod method = new PutMethod(this.jiraRepository.getRestUrl(ISSUE, issueKey, WORKLOG, workLogId));
@@ -325,18 +295,6 @@ public class JiraRestClient {
         String response = jiraRepository.executeMethod(method);
 
         return parseIssueWorklog(response);
-    }
-
-    private String prepareWorklogBody(List<FieldEditorInfo> worklogFields){
-        JsonObject worklogObject = new JsonObject();
-        for(FieldEditorInfo editorInfo : worklogFields){
-            JsonElement jsonValue = editorInfo.getJsonValue();
-            if(!jsonValue.isJsonNull()){
-                worklogObject.add(editorInfo.getName(), jsonValue);
-            }
-        }
-
-        return worklogObject.toString();
     }
 
     public Integer deleteIssueWorklog(String issueKey, String worklogId, String remainingEstimate) throws Exception {
@@ -403,5 +361,142 @@ public class JiraRestClient {
         return parseIssueCreateMeta(response);
     }
 
+    public List<String> findLabels(String prefix, String autoCompleteUrl) throws Exception {
+        GetMethod method = new GetMethod(autoCompleteUrl + prefix);
+        String response = jiraRepository.executeMethod(method);
+
+        return parseLabels(response).getSuggestionLabels();
+    }
+
+    private String getTransitionRequestBody(String transitionId, Map<String, FieldEditorInfo> fields) {
+        JsonObject transition = new JsonObject();
+        transition.add("transition", createIdObject(transitionId));
+
+        // Update
+        JsonObject updateObject = new JsonObject();
+
+        // Comment
+        FieldEditorInfo commentField = fields.remove("comment");
+        if(nonNull(commentField) && !(commentField.getJsonValue() instanceof JsonNull)){
+            updateObject.add("comment", commentField.getJsonValue());
+        }
+
+        // Work Log
+        FieldEditorInfo worklogField = fields.remove("worklog");
+        if(nonNull(worklogField)) {
+            JsonElement worklogFieldValue = worklogField.getJsonValue();
+            if (!(worklogFieldValue instanceof JsonNull)) {
+                updateObject.add("worklog", worklogFieldValue);
+            }
+        }
+
+        // Linked Issues
+        FieldEditorInfo issueLinkField = fields.remove("issuelinks");
+        if(nonNull(issueLinkField) && !(issueLinkField.getJsonValue() instanceof JsonNull)){
+            updateObject.add("issuelinks", issueLinkField.getJsonValue());
+        }
+
+        if(updateObject.size() > 0){
+            transition.add("update", updateObject);
+        }
+
+        //Fields
+        JsonObject fieldsObject = new JsonObject();
+        fields.forEach((key, value) -> {
+            JsonElement jsonValue = value.getJsonValue();
+            if(!(jsonValue instanceof JsonNull)){
+                fieldsObject.add(key, jsonValue);
+            }
+        });
+
+        if(fieldsObject.size() > 0){
+            transition.add("fields", fieldsObject);
+        }
+
+
+        return transition.toString();
+    }
+
+    private String prepareWorklogBody(List<FieldEditorInfo> worklogFields){
+        JsonObject worklogObject = new JsonObject();
+        for(FieldEditorInfo editorInfo : worklogFields){
+            JsonElement jsonValue = editorInfo.getJsonValue();
+            if(!jsonValue.isJsonNull()){
+                worklogObject.add(editorInfo.getName(), jsonValue);
+            }
+        }
+
+        return worklogObject.toString();
+    }
+
+    private String prepareCommentBody(String body, String viewableBy){
+        JsonObject commentBody = new JsonObject();
+        commentBody.addProperty("body", body);
+
+        if(!ALL_USERS.equals(viewableBy)){
+            JsonObject visibility = new JsonObject();
+            visibility.addProperty("type", "role");
+            visibility.addProperty("value", viewableBy);
+            commentBody.add("visibility", visibility);
+        }
+
+        return commentBody.toString();
+    }
+
+    private String prepareIssueLinkBody(String linkType, String inIssueKey, String outIssueKey) {
+        JsonObject linkObject = new JsonObject();
+        linkObject.add("type", createNameObject(linkType));
+        linkObject.add("inwardIssue", createObject(KEY, inIssueKey));
+        linkObject.add("outwardIssue", createObject(KEY, outIssueKey));
+
+        return linkObject.toString();
+    }
+
+    private String getCreateIssueRequestBody(Map<String, FieldEditorInfo> createIssueFields) {
+        JsonObject createIssueObject = new JsonObject();
+
+        // Update
+        JsonObject updateObject = new JsonObject();
+
+        // Comment
+        FieldEditorInfo commentField = createIssueFields.remove("comment");
+        if(nonNull(commentField) && !(commentField.getJsonValue() instanceof JsonNull)){
+            updateObject.add("comment", commentField.getJsonValue());
+        }
+
+        // Work Log
+        FieldEditorInfo worklogField = createIssueFields.remove("worklog");
+        if(nonNull(worklogField)) {
+            JsonElement worklogFieldValue = worklogField.getJsonValue();
+            if (!(worklogFieldValue instanceof JsonNull)) {
+                updateObject.add("worklog", worklogFieldValue);
+            }
+        }
+
+        // Linked Issues
+        FieldEditorInfo issueLinkField = createIssueFields.remove("issuelinks");
+        if(nonNull(issueLinkField) && !(issueLinkField.getJsonValue() instanceof JsonNull)){
+            updateObject.add("issuelinks", issueLinkField.getJsonValue());
+        }
+
+        if(updateObject.size() > 0){
+            createIssueObject.add("update", updateObject);
+        }
+
+        //Fields
+        JsonObject fieldsObject = new JsonObject();
+        createIssueFields.forEach((key, value) -> {
+            JsonElement jsonValue = value.getJsonValue();
+            if(!(jsonValue instanceof JsonNull)){
+                fieldsObject.add(StringUtil.toLowerCase(key), jsonValue);
+            }
+        });
+
+        if(fieldsObject.size() > 0){
+            createIssueObject.add("fields", fieldsObject);
+        }
+
+        return createIssueObject.toString();
+    }
 }
 

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import static com.intellij.jira.rest.model.JiraPermissionType.LINK_ISSUES;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
 public class AddIssueLinkDialogAction extends JiraIssueDialogAction {
@@ -25,10 +26,12 @@ public class AddIssueLinkDialogAction extends JiraIssueDialogAction {
 
     @Override
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
-        String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, LINK_ISSUES);
-        if(!hasPermission){
-            throw new InvalidPermissionException("Jira", "You don't have permission to create issue links");
+        String issueKey = e.getData(JiraDataKeys.ISSUE_KEY);
+        if (nonNull(issueKey)) {
+            boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, LINK_ISSUES);
+            if(!hasPermission){
+                throw new InvalidPermissionException("Jira", "You don't have permission to create issue links");
+            }
         }
 
         String projectKey = e.getRequiredData(JiraDataKeys.PROJECT_KEY);

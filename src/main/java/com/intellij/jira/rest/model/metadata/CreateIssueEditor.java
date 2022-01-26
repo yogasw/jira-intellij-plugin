@@ -1,5 +1,7 @@
 package com.intellij.jira.rest.model.metadata;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.rest.model.JiraIssueFieldProperties;
@@ -9,6 +11,7 @@ import com.intellij.jira.ui.editors.ComboBoxFieldEditor;
 import com.intellij.jira.ui.editors.Editor;
 import com.intellij.jira.ui.editors.FieldEditor;
 import com.intellij.jira.ui.editors.FieldEditorFactory;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.tasks.jira.JiraRepository;
 import com.intellij.ui.ScrollPaneFactory;
@@ -16,6 +19,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
@@ -27,20 +31,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.intellij.jira.util.JiraGsonUtil.createIdObject;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class CreateIssueEditor implements Editor {
 
-    private final Map<String, List<JiraIssueTypeIssueCreateMetadata>> myIssueCreateMeta;
+    private final Project myProject;
+    private final Map<JiraProject, List<JiraIssueTypeIssueCreateMetadata>> myIssueCreateMeta;
 
     private ProjectComboBox myProjectCombo;
     private IssueTypeComboBox myIssueTypeCombo;
     private FieldsEditor myFieldsEditor;
     private BorderLayoutPanel myFieldsPanel;
 
-    public CreateIssueEditor(JiraIssueCreateMetadata issueCreateMeta) {
+    public CreateIssueEditor(@NotNull Project project, JiraIssueCreateMetadata issueCreateMeta) {
+        myProject = project;
         myIssueCreateMeta = issueCreateMeta.getProjects().stream()
-                .collect(Collectors.toMap(JiraProject::getKey,
+                .collect(Collectors.toMap(k -> k,
                         JiraProjectIssueCreateMetadata::getIssuetypes,
                         (k, v) -> k,
                         LinkedHashMap::new));
@@ -50,7 +58,7 @@ public class CreateIssueEditor implements Editor {
     public JComponent createPanel() {
         myFieldsPanel = new BorderLayoutPanel();
 
-        List<String> projectKeys = new ArrayList<>(myIssueCreateMeta.keySet());
+        List<JiraProject> projectKeys = new ArrayList<>(myIssueCreateMeta.keySet());
         myProjectCombo = new ProjectComboBox(projectKeys);
         myProjectCombo.addActionListener(e -> updateIssueTypesCombo());
         myProjectCombo.setSelectedValue(ContainerUtil.getFirstItem(projectKeys));
@@ -71,7 +79,15 @@ public class CreateIssueEditor implements Editor {
     }
 
     public String getProjectKey() {
-        return myProjectCombo.getSelectedValue();
+        return myProjectCombo.getSelectedValue().getKey();
+    }
+
+    public Map<String, TransitionFieldHelper.FieldEditorInfo> getCreateIssueFields() {
+        Map<String, TransitionFieldHelper.FieldEditorInfo> createIssueFields = myFieldsEditor.myCreateIssueFields;
+        createIssueFields.put("Project", TransitionFieldHelper.createFieldEditorInfo("project", myProjectCombo));
+        createIssueFields.put("IssueType", TransitionFieldHelper.createFieldEditorInfo("issuetype", myIssueTypeCombo));
+
+        return createIssueFields;
     }
 
     @Override
@@ -80,9 +96,9 @@ public class CreateIssueEditor implements Editor {
     }
 
     private void updateIssueTypesCombo() {
-        String selectedProjectKey = myProjectCombo.getSelectedValue();
+        JiraProject selectedProject = myProjectCombo.getSelectedValue();
 
-        List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myIssueCreateMeta.get(selectedProjectKey);
+        List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myIssueCreateMeta.get(selectedProject);
         List<String> issueTypes = issueTypeIssueCreateMetadata.stream().map(JiraIssueType::getName).collect(Collectors.toList());
         myIssueTypeCombo = new IssueTypeComboBox(issueTypes);
         myIssueTypeCombo.addActionListener(e -> updateFieldsInForm());
@@ -92,9 +108,9 @@ public class CreateIssueEditor implements Editor {
     private void updateFieldsInForm() {
         myFieldsPanel.removeAll();
 
-        String selectedProjectKey = myProjectCombo.getSelectedValue();
+        JiraProject selectedProject = myProjectCombo.getSelectedValue();
 
-        List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myIssueCreateMeta.get(selectedProjectKey);
+        List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myIssueCreateMeta.get(selectedProject);
         JiraIssueTypeIssueCreateMetadata firstIssueType = ContainerUtil.getFirstItem(issueTypeIssueCreateMetadata);
 
         myFieldsEditor = new FieldsEditor(firstIssueType.getFields());
@@ -106,10 +122,19 @@ public class CreateIssueEditor implements Editor {
     }
 
 
-    private class ProjectComboBox extends ComboBoxFieldEditor<String> {
+    private class ProjectComboBox extends ComboBoxFieldEditor<JiraProject> {
 
-        public ProjectComboBox(List<String> items) {
+        public ProjectComboBox(List<JiraProject> items) {
             super("Project", null, true, items);
+        }
+
+        @Override
+        public JsonElement getJsonValue() {
+            if(isNull(getSelectedValue())){
+                return JsonNull.INSTANCE;
+            }
+
+            return createIdObject(getSelectedValue().getId());
         }
     }
 
@@ -139,7 +164,7 @@ public class CreateIssueEditor implements Editor {
                     .collect(Collectors.toList());
 
             fields.forEach(fieldProperties -> {
-                FieldEditor fieldEditor = FieldEditorFactory.create(fieldProperties);
+                FieldEditor fieldEditor = FieldEditorFactory.create(myProject, fieldProperties);
                 TransitionFieldHelper.FieldEditorInfo info = TransitionFieldHelper.createFieldEditorInfo(fieldProperties.getName(), fieldEditor);
                 myCreateIssueFields.put(info.getName(), info);
 
@@ -161,6 +186,7 @@ public class CreateIssueEditor implements Editor {
 
             return null;
         }
+
     }
 
 }

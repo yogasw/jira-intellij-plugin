@@ -22,7 +22,11 @@ public class FileChooserFieldEditor extends AbstractFieldEditor<String> {
     private JButton myButton;
 
     public FileChooserFieldEditor() {
-        super("File", null, true);
+        this("File", true);
+    }
+
+    protected FileChooserFieldEditor(String fieldName, boolean required) {
+        super(fieldName, null, required);
     }
 
     @Override

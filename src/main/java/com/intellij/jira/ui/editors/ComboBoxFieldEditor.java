@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.util.ui.FormBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
@@ -45,11 +46,16 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
             return JsonNull.INSTANCE;
         }
 
-        return createNameObject(getSelectedValue());
+        return createNameObject(getSelectedValueAsString());
     }
 
-    public String getSelectedValue(){
-        return nonNull(myComboBox.getSelectedItem()) ? myComboBox.getSelectedItem().toString() : "";
+    public T getSelectedValue(){
+        return (T) myComboBox.getSelectedItem();
+    }
+
+    @NotNull
+    public String getSelectedValueAsString(){
+        return nonNull(getSelectedValue()) ? getSelectedValue().toString() : "";
     }
 
     public void setSelectedValue(T value) {
@@ -59,7 +65,7 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
     @Nullable
     @Override
     public ValidationInfo validate() {
-        if(isRequired() && isEmpty(getSelectedValue())){
+        if(isRequired() && isEmpty(getSelectedValueAsString())){
             return new ValidationInfo(myLabel.getText() + " is required.");
         }
 

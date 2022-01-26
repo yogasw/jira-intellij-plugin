@@ -2,6 +2,7 @@ package com.intellij.jira.rest;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.intellij.jira.rest.model.JiraCreatedIssue;
 import com.intellij.jira.rest.model.JiraGroup;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueAttachment;
@@ -32,6 +33,10 @@ public class JiraIssueParser {
 
     public static JiraIssue parseIssue(String response){
         return JiraGsonUtil.getAs(response, JiraIssue.class);
+    }
+
+    public static JiraCreatedIssue parseCreatedIssue(String response) {
+        return JiraGsonUtil.getAs(response, JiraCreatedIssue.class);
     }
 
     public static List<JiraIssue> parseIssues(String response){
@@ -114,6 +119,10 @@ public class JiraIssueParser {
 
     public static JiraIssueCreateMetadata parseIssueCreateMeta(String response) {
         return JiraGsonUtil.getAs(response, JiraIssueCreateMetadata.class);
+    }
+
+    public static JiraSuggestions parseLabels(String response) {
+        return JiraGsonUtil.getAs(response, JiraSuggestions.class);
     }
 
 }

@@ -16,7 +16,6 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.OnePixelSplitter;
@@ -54,7 +53,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         Disposer.register(parent, this);
 
         myUi = issuesUi;
-        myToolbar = getToolbar(issuesData.getProject());
+        myToolbar = getToolbar();
 
         myJiraIssueTable = new JiraIssueTable(issuesData, parent);
         myJiraIssueDetailsPanel = new JiraIssueDetailsPanel(issuesData, parent);
@@ -100,7 +99,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     }
 
     @NotNull
-    protected JComponent getToolbar(@NotNull Project project) {
+    protected JComponent getToolbar() {
         DefaultActionGroup toolbarGroup = new DefaultActionGroup();
         toolbarGroup.copyFromGroup((DefaultActionGroup) ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_LEFT));
 

@@ -10,7 +10,7 @@ public class BodyResult implements Result {
         this.body = body;
     }
 
-    public static BodyResult ok(Object body){
+    public static <T> BodyResult ok(T body){
         return new BodyResult(body);
     }
 

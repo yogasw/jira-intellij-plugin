@@ -10,6 +10,7 @@ import com.intellij.jira.rest.model.JiraProject;
 import com.intellij.jira.rest.model.JiraProjectComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
 import com.intellij.jira.util.JiraGsonUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 
 import static com.intellij.jira.util.JiraGsonUtil.isEmpty;
 import static com.intellij.jira.util.JiraIssueField.ASSIGNEE;
+import static com.intellij.jira.util.JiraIssueField.ATTACHMENT;
 import static com.intellij.jira.util.JiraIssueField.COMPONENT;
 import static com.intellij.jira.util.JiraIssueField.DESCRIPTION;
 import static com.intellij.jira.util.JiraIssueField.DUEDATE;
@@ -27,6 +29,7 @@ import static com.intellij.jira.util.JiraIssueField.ENVIRONMENT;
 import static com.intellij.jira.util.JiraIssueField.FIX_VERSIONS;
 import static com.intellij.jira.util.JiraIssueField.ISSUE_LINKS;
 import static com.intellij.jira.util.JiraIssueField.ISSUE_TYPE;
+import static com.intellij.jira.util.JiraIssueField.LABELS;
 import static com.intellij.jira.util.JiraIssueField.PRIORITY;
 import static com.intellij.jira.util.JiraIssueField.PROJECT;
 import static com.intellij.jira.util.JiraIssueField.REPORTER;
@@ -47,11 +50,11 @@ public class FieldEditorFactory {
 
     private FieldEditorFactory() { }
 
-    public static FieldEditor create(JiraIssueFieldProperties properties) {
-        return create(properties, null);
+    public static FieldEditor create(Project project, JiraIssueFieldProperties properties) {
+        return create(project, properties, null);
     }
 
-    public static FieldEditor create(JiraIssueFieldProperties properties, @Nullable JiraIssue issue) {
+    public static FieldEditor create(Project project, JiraIssueFieldProperties properties, @Nullable JiraIssue issue) {
 
         if (properties.getSchema().isCustomField()) {
             return createCustomFieldEditor(properties, issue);
@@ -74,20 +77,26 @@ public class FieldEditorFactory {
             return new LabelFieldEditor(properties.getName(), isNull(issue) ? null : issue.getIssuetype().getName());
         } else if(WORKLOG.equals(fieldName)) {
             return new LogWorkFieldEditor(properties.getName(), isNull(issue) ? null : issue.getTimetracking(), properties.isRequired());
+        } else if (LABELS.equals(fieldName)) {
+            return new LabelsFieldEditor(project, properties.getName(), properties.getAutoCompleteUrl());
+        } else if (ATTACHMENT.equals(fieldName)) {
+            return new AttachmentFieldEditor(properties.getName(), properties.isRequired());
         }
 
-        return createCustomComboBoxFieldEditor(properties, issue);
+        return createCustomComboBoxFieldEditor(project, properties, issue);
     }
 
     public static CommentFieldEditor createCommentFieldEditor() {
         return new CommentFieldEditor();
     }
 
-    private static FieldEditor createCustomComboBoxFieldEditor(JiraIssueFieldProperties properties, @Nullable JiraIssue issue) {
+    private static FieldEditor createCustomComboBoxFieldEditor(Project project, JiraIssueFieldProperties properties, @Nullable JiraIssue issue) {
         JsonArray allowedValues = properties.getAllowedValues();
         if (isNull(allowedValues) || isEmpty(allowedValues)) {
             if (StringUtil.isEmpty(properties.getAutoCompleteUrl())) {
                 return new LabelFieldEditor(properties.getName());
+            } else {
+                return new LabelsFieldEditor(project, properties.getName(), properties.getAutoCompleteUrl());
             }
         }
 

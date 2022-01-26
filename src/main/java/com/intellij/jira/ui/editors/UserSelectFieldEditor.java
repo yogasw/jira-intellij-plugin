@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.intellij.jira.util.JiraGsonUtil.createArrayNameObjects;
-import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
+import static com.intellij.jira.util.JiraGsonUtil.createIdObject;
 import static com.intellij.openapi.util.text.StringUtil.isEmpty;
 import static com.intellij.openapi.util.text.StringUtil.trim;
 import static com.intellij.util.containers.ContainerUtil.getFirstItem;
@@ -52,7 +52,7 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
             return createArrayNameObjects(selectedUserNames);
         }
 
-        return createNameObject(getFirstItem(selectedUserNames));
+        return createIdObject(getFirstItem(selectedUserNames));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class UserSelectFieldEditor extends SelectFieldEditor<JiraIssueUser> {
     }
 
     private List<String> getSelectedUserNames() {
-        return mySelectedUsers.stream().map(JiraIssueUser::getName).collect(toList());
+        return mySelectedUsers.stream().map(JiraIssueUser::getAccountId).collect(toList());
     }
 
     private class UserPickerDialogAction extends PickerDialogAction {
