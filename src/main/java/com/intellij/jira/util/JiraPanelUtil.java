@@ -1,5 +1,6 @@
 package com.intellij.jira.util;
 
+import com.intellij.execution.ui.TagButton;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueComponent;
 import com.intellij.jira.rest.model.JiraProjectVersion;
@@ -10,6 +11,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JLabel;
@@ -17,12 +19,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -146,9 +150,17 @@ public class JiraPanelUtil {
 
     public static JiraPanel createLabelsPanel(@NotNull JiraIssue issue) {
         JBLabel label = JiraLabelUtil.createBoldLabel("Labels: ");
-        JBLabel valueLabel = JiraLabelUtil.createLabel(String.join(", ", issue.getLabels()));
 
-        return createWhiteBorderPanel(label, valueLabel);
+        JiraPanel labelsPanel = createWhitePanel(new FlowLayout(FlowLayout.LEFT));
+        labelsPanel.add(label);
+
+        issue.getLabels().forEach(labelText -> labelsPanel.add(new Badge(labelText)));
+
+        JiraPanel panel = createWhiteBorderPanel();
+        panel.add(label, LINE_START);
+        panel.add(labelsPanel, BorderLayout.CENTER);
+
+        return panel;
     }
 
     private static JPanel createPanelWithLine(boolean horizontal){
@@ -197,6 +209,25 @@ public class JiraPanelUtil {
         return components.stream()
                 .map(JiraIssueComponent::getName)
                 .collect(Collectors.joining(", "));
+    }
+
+
+    private static class Badge extends TagButton {
+
+        public Badge(@Nls String text) {
+            super(text, null);
+            remove(myCloseButton);
+            myButton.setBackground(JBColor.WHITE);
+        }
+
+        @Override
+        protected void layoutButtons() {
+            myButton.setMargin(JBUI.emptyInsets());
+            Dimension size = myButton.getPreferredSize();
+            Dimension tagSize = new Dimension(size.width - ourInset * 2, size.height);
+            setPreferredSize(tagSize);
+            myButton.setBounds(new Rectangle(tagSize));
+        }
     }
 
 }
