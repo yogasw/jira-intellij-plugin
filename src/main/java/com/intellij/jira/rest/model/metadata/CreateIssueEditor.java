@@ -10,7 +10,7 @@ import com.intellij.jira.rest.model.JiraProject;
 import com.intellij.jira.ui.editors.ComboBoxFieldEditor;
 import com.intellij.jira.ui.editors.Editor;
 import com.intellij.jira.ui.editors.FieldEditor;
-import com.intellij.jira.ui.editors.FieldEditorFactory;
+import com.intellij.jira.ui.editors.factory.CreateFieldEditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.tasks.jira.JiraRepository;
@@ -164,8 +164,8 @@ public class CreateIssueEditor implements Editor {
                     .collect(Collectors.toList());
 
             fields.forEach(fieldProperties -> {
-                FieldEditor fieldEditor = FieldEditorFactory.create(myProject, fieldProperties);
-                TransitionFieldHelper.FieldEditorInfo info = TransitionFieldHelper.createFieldEditorInfo(fieldProperties.getName(), fieldEditor);
+                FieldEditor fieldEditor = CreateFieldEditorFactory.getInstance().create(myProject, fieldProperties);
+                TransitionFieldHelper.FieldEditorInfo info = TransitionFieldHelper.createFieldEditorInfo(fieldProperties.getSchema().getFieldName(), fieldEditor);
                 myCreateIssueFields.put(info.getName(), info);
 
                 formBuilder.addComponent(info.getPanel());

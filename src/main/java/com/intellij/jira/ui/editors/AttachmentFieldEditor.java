@@ -11,8 +11,6 @@ public class AttachmentFieldEditor extends FileChooserFieldEditor {
 
     @Override
     public JsonElement getJsonValue() {
-        // TODO: 26/1/22
-
         return JsonNull.INSTANCE;
     }
 

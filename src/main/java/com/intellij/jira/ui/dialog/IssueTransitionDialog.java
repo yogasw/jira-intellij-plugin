@@ -50,6 +50,8 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class IssueTransitionDialog extends DialogWrapper implements DataProvider {
 
+    private static final int DEFAULT_HEIGHT = 300;
+
     private final Project myProject;
     private final JiraIssue myIssue;
 
@@ -90,7 +92,7 @@ public class IssueTransitionDialog extends DialogWrapper implements DataProvider
         transitionList.setModel(new JiraIssueTransitionListModel(myTransitions));
         transitionList.setCellRenderer(new JiraIssueTransitionListCellRenderer());
         transitionList.setSelectionMode(SINGLE_SELECTION);
-        transitionList.setPreferredSize(new JBDimension(100, 300));
+        transitionList.setPreferredSize(new JBDimension(100, DEFAULT_HEIGHT));
         transitionList.setBorder(BorderFactory.createLineBorder(JBColor.border()));
         transitionList.addListSelectionListener(e ->
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -102,17 +104,17 @@ public class IssueTransitionDialog extends DialogWrapper implements DataProvider
         myTransitionsPanel.add(transitionList, BorderLayout.CENTER);
 
         myTransitionFieldsPanel = new JiraPanel(new GridBagLayout());
-        myTransitionFieldsPanel.setMinimumSize(JBUI.size(450, 300));
+        myTransitionFieldsPanel.setMinimumSize(JBUI.size(300, DEFAULT_HEIGHT));
         myTransitionFieldsPanel.setBorder(JBUI.Borders.empty(5));
         myTransitionFieldsPanel.add(JiraPanelUtil.createPlaceHolderPanel("Select transition"), new GridBagConstraints());
 
         myTransitionPreviewPanel = new JiraPanel(new BorderLayout());
-        myTransitionPreviewPanel.setMinimumSize(JBUI.size(100, 300));
+        myTransitionPreviewPanel.setMinimumSize(JBUI.size(100, DEFAULT_HEIGHT));
 
         panel.add(myTransitionsPanel, BorderLayout.WEST);
         panel.add(ScrollPaneFactory.createScrollPane(myTransitionFieldsPanel, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
         panel.add(myTransitionPreviewPanel, BorderLayout.EAST);
-        panel.setMinimumSize(JBUI.size(650, 300));
+        panel.setMinimumSize(JBUI.size(500, DEFAULT_HEIGHT));
 
         myTransitionTaskEditor = new JiraTransitionTaskEditor(myProject, myIssue);
 
