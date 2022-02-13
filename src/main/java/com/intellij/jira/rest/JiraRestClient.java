@@ -34,9 +34,11 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.intellij.jira.rest.JiraIssueParser.parseCreatedIssue;
 import static com.intellij.jira.rest.JiraIssueParser.parseGroups;
@@ -206,11 +208,14 @@ public class JiraRestClient {
         return jiraRepository.executeMethod(method);
     }
 
-    public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey, JiraPermissionType permission) throws Exception {
+    public LinkedHashMap<String, JiraPermission> findUserPermissionsOnIssue(String issueKey, JiraPermissionType... permissions) throws Exception {
+        String permissionTypes = Arrays.stream(permissions)
+                .map(JiraPermissionType::toString)
+                .collect(Collectors.joining(","));
 
         NameValuePair[] queryParams = {
                 new NameValuePair("issueKey", issueKey),
-                new NameValuePair("permissions", permission.toString())
+                new NameValuePair("permissions", permissionTypes)
         };
 
         return findUserPermissions(queryParams);

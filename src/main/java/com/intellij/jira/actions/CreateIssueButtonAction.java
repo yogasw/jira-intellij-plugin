@@ -2,7 +2,6 @@ package com.intellij.jira.actions;
 
 import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonPainter;
 import com.intellij.jira.exceptions.InvalidPermissionException;
-import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
@@ -26,6 +25,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 
+import static com.intellij.jira.rest.model.JiraPermissionType.BROWSE_PROJECTS;
+import static com.intellij.jira.rest.model.JiraPermissionType.CREATE_ISSUES;
 import static java.util.Objects.isNull;
 
 public class CreateIssueButtonAction extends AnActionButton implements CustomComponentAction {
@@ -69,7 +70,7 @@ public class CreateIssueButtonAction extends AnActionButton implements CustomCom
             return;
         }
 
-        boolean hasPermission = jiraRestApi.userHasPermission(JiraPermissionType.CREATE_ISSUES);
+        boolean hasPermission = jiraRestApi.userHasPermission(BROWSE_PROJECTS, CREATE_ISSUES);
         if(!hasPermission){
             throw new InvalidPermissionException("Jira", "You don't have permission to create issues");
         }

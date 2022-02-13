@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import static com.intellij.jira.rest.model.JiraPermissionType.BROWSE_PROJECTS;
 import static com.intellij.jira.rest.model.JiraPermissionType.MANAGE_WATCHERS;
 
 public class ToggleWatchIssueTask extends AbstractBackgroundableTask {
@@ -23,7 +24,7 @@ public class ToggleWatchIssueTask extends AbstractBackgroundableTask {
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
 
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueIdOrKey, MANAGE_WATCHERS);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueIdOrKey, BROWSE_PROJECTS, MANAGE_WATCHERS);
         if(!hasPermission){
             throw new InvalidPermissionException("Edit Issue Failed", "You don't have permission to manage watchers");
         }

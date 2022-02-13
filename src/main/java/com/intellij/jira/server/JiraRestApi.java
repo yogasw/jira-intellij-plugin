@@ -26,10 +26,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class JiraRestApi {
 
@@ -186,35 +188,46 @@ public class JiraRestApi {
 
     }
 
-    public boolean userHasPermission(JiraPermissionType permission) {
+    public boolean userHasPermission(JiraPermissionType... permissionTypes) {
         LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
         try {
-            permissions = jiraRestClient.findUserPermissions(new NameValuePair("permissions", permission.toString()));
+            String permissionList = Arrays.stream(permissionTypes)
+                    .map(JiraPermissionType::toString)
+                    .collect(Collectors.joining(","));
+
+            permissions = jiraRestClient.findUserPermissions(new NameValuePair("permissions", permissionList));
         } catch (Exception e) {
             log.error("Current user has not permission to do this action");
         }
 
-        return isHavePermission(permissions, permission);
+        return isHavePermission(permissions, permissionTypes);
     }
 
-    public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType permission){
+    public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType... permissionTypes){
         LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
         try {
-            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey, permission);
+            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey, permissionTypes);
         } catch (Exception e) {
             log.error("Current user has not permission to do this action");
         }
 
-        return isHavePermission(permissions, permission);
+        return isHavePermission(permissions, permissionTypes);
     }
 
-    private boolean isHavePermission(LinkedHashMap<String, JiraPermission> permissions, JiraPermissionType permission) {
-        JiraPermission jiraPermission = permissions.get(permission.toString());
-        if(Objects.isNull(jiraPermission)){
-            jiraPermission = permissions.get(permission.getOldPermission());
+    private boolean isHavePermission(LinkedHashMap<String, JiraPermission> permissions, JiraPermissionType... permissionTypes) {
+        for (JiraPermissionType permission : permissionTypes) {
+            JiraPermission jiraPermission = permissions.get(permission.toString());
+            if(Objects.isNull(jiraPermission)){
+                jiraPermission = permissions.get(permission.getOldPermission());
+            }
+
+            if (Objects.isNull(jiraPermission) || !jiraPermission.isHavePermission()) {
+                return false;
+            }
+
         }
 
-        return Objects.nonNull(jiraPermission) && jiraPermission.isHavePermission();
+        return true;
     }
 
 

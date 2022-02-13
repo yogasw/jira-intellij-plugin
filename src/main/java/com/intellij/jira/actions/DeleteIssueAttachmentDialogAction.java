@@ -10,6 +10,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import static com.intellij.jira.rest.model.JiraPermissionType.BROWSE_PROJECTS;
 import static com.intellij.jira.rest.model.JiraPermissionType.DELETE_ALL_ATTACHMENTS;
 import static com.intellij.jira.rest.model.JiraPermissionType.DELETE_OWN_ATTACHMENTS;
 import static java.util.Objects.nonNull;
@@ -25,9 +26,9 @@ public class DeleteIssueAttachmentDialogAction extends JiraIssueDialogAction {
     @Override
     public void onClick(@NotNull AnActionEvent e, @NotNull Project project, @NotNull JiraRestApi jiraRestApi) {
         String issueKey = e.getRequiredData(JiraDataKeys.ISSUE_KEY);
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, DELETE_ALL_ATTACHMENTS);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, BROWSE_PROJECTS, DELETE_ALL_ATTACHMENTS);
         if(!hasPermission){
-            hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, DELETE_OWN_ATTACHMENTS);
+            hasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, BROWSE_PROJECTS, DELETE_OWN_ATTACHMENTS);
             if (!hasPermission) {
                 throw new InvalidPermissionException("Jira", "You don't have permission to delete attached files");
             }
