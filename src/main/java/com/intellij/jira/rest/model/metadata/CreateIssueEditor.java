@@ -3,14 +3,18 @@ package com.intellij.jira.rest.model.metadata;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.intellij.jira.components.CreateIssueMetaProvider;
 import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.rest.model.JiraIssueFieldProperties;
 import com.intellij.jira.rest.model.JiraIssueType;
 import com.intellij.jira.rest.model.JiraProject;
-import com.intellij.jira.ui.editors.ComboBoxFieldEditor;
+import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.editors.Editor;
 import com.intellij.jira.ui.editors.FieldEditor;
+import com.intellij.jira.ui.editors.LoadableComboBoxEditor;
+import com.intellij.jira.ui.editors.LoadableFieldEditor;
 import com.intellij.jira.ui.editors.factory.CreateFieldEditorFactory;
+import com.intellij.jira.util.JiraBorders;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.tasks.jira.JiraRepository;
@@ -24,11 +28,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.intellij.jira.util.JiraGsonUtil.createIdObject;
@@ -38,42 +41,56 @@ import static java.util.Objects.nonNull;
 public class CreateIssueEditor implements Editor {
 
     private final Project myProject;
-    private final Map<JiraProject, List<JiraIssueTypeIssueCreateMetadata>> myIssueCreateMeta;
+
+    private CreateIssueMetaProvider myCreateIssueMetaProvider;
 
     private ProjectComboBox myProjectCombo;
     private IssueTypeComboBox myIssueTypeCombo;
     private FieldsEditor myFieldsEditor;
     private BorderLayoutPanel myFieldsPanel;
 
-    public CreateIssueEditor(@NotNull Project project, JiraIssueCreateMetadata issueCreateMeta) {
+    public CreateIssueEditor(@NotNull Project project, JiraRestApi jiraRestApi) {
         myProject = project;
-        myIssueCreateMeta = issueCreateMeta.getProjects().stream()
-                .collect(Collectors.toMap(k -> k,
-                        JiraProjectIssueCreateMetadata::getIssuetypes,
-                        (k, v) -> k,
-                        LinkedHashMap::new));
+        myCreateIssueMetaProvider = new CreateIssueMetaProvider(jiraRestApi);
+
+        myProjectCombo = new ProjectComboBox();
+        myProjectCombo.addActionListener(e -> updateIssueTypesCombo());
+
+        myIssueTypeCombo = new IssueTypeComboBox();
+        myIssueTypeCombo.addActionListener(e -> updateFieldsInForm());
+
+        myProjectCombo.setDataProvider(new LoadableFieldEditor.DataProvider<>() {
+            @Override
+            public @Nullable Set<JiraProject> getCachedValues() {
+                return myCreateIssueMetaProvider.getCachedValues();
+            }
+
+            @Override
+            public void updateValuesAsynchronously() {
+                myCreateIssueMetaProvider.updateValuesAsynchronously(CreateIssueEditor.this);
+            }
+        });
+
+        myProjectCombo.reloadValuesInBackground();
+
     }
 
     @Override
     public JComponent createPanel() {
         myFieldsPanel = new BorderLayoutPanel();
+        myFieldsPanel.setBorder(JiraBorders.emptyTop(10));
 
-        List<JiraProject> projectKeys = new ArrayList<>(myIssueCreateMeta.keySet());
-        myProjectCombo = new ProjectComboBox(projectKeys);
-        myProjectCombo.addActionListener(e -> updateIssueTypesCombo());
-        myProjectCombo.setSelectedValue(ContainerUtil.getFirstItem(projectKeys));
-
-        JPanel createIssuePanel = FormBuilder.createFormBuilder()
+        JPanel projectIssueTypePanel = FormBuilder.createFormBuilder()
                 .addComponent(myProjectCombo.createPanel())
                 .addComponent(myIssueTypeCombo.createPanel())
                 .addSeparator()
-                .addComponent(myFieldsPanel)
                 .getPanel();
 
         BorderLayoutPanel panel = new BorderLayoutPanel();
         panel.setMinimumSize(JBUI.size(300, 450));
         panel.setPreferredSize(JBUI.size(400, 500));
-        panel.addToCenter(ScrollPaneFactory.createScrollPane(createIssuePanel, true));
+        panel.addToTop(projectIssueTypePanel);
+        panel.addToCenter(ScrollPaneFactory.createScrollPane(myFieldsPanel, true));
 
         return panel;
     }
@@ -96,13 +113,23 @@ public class CreateIssueEditor implements Editor {
     }
 
     private void updateIssueTypesCombo() {
-        JiraProject selectedProject = myProjectCombo.getSelectedValue();
+        myIssueTypeCombo.setDataProvider(new LoadableFieldEditor.DataProvider<>() {
+            @Override
+            public @Nullable Set<String> getCachedValues() {
+                JiraProject selectedProject = myProjectCombo.getSelectedValue();
+                if (selectedProject == null) {
+                    return null;
+                }
 
-        List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myIssueCreateMeta.get(selectedProject);
-        List<String> issueTypes = issueTypeIssueCreateMetadata.stream().map(JiraIssueType::getName).collect(Collectors.toList());
-        myIssueTypeCombo = new IssueTypeComboBox(issueTypes);
-        myIssueTypeCombo.addActionListener(e -> updateFieldsInForm());
-        myIssueTypeCombo.setSelectedValue(ContainerUtil.getFirstItem(issueTypes));
+                List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myCreateIssueMetaProvider.getIssueTypes(selectedProject);
+                return issueTypeIssueCreateMetadata.stream().map(JiraIssueType::getName).collect(Collectors.toSet());
+            }
+
+            @Override
+            public void updateValuesAsynchronously() {
+
+            }
+        });
     }
 
     private void updateFieldsInForm() {
@@ -110,7 +137,7 @@ public class CreateIssueEditor implements Editor {
 
         JiraProject selectedProject = myProjectCombo.getSelectedValue();
 
-        List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myIssueCreateMeta.get(selectedProject);
+        List<JiraIssueTypeIssueCreateMetadata> issueTypeIssueCreateMetadata = myCreateIssueMetaProvider.getIssueTypes(selectedProject);
         JiraIssueTypeIssueCreateMetadata firstIssueType = ContainerUtil.getFirstItem(issueTypeIssueCreateMetadata);
 
         myFieldsEditor = new FieldsEditor(firstIssueType.getFields());
@@ -121,11 +148,15 @@ public class CreateIssueEditor implements Editor {
         myFieldsPanel.repaint();
     }
 
+    public void onUpdateValues(Set<JiraProject> jiraProjects) {
+        myProjectCombo.onUpdateValues(jiraProjects);
+    }
 
-    private class ProjectComboBox extends ComboBoxFieldEditor<JiraProject> {
 
-        public ProjectComboBox(List<JiraProject> items) {
-            super("Project", null, true, items);
+    private class ProjectComboBox extends LoadableComboBoxEditor<JiraProject> {
+
+        public ProjectComboBox() {
+            super("Project", true);
         }
 
         @Override
@@ -138,10 +169,10 @@ public class CreateIssueEditor implements Editor {
         }
     }
 
-    private class IssueTypeComboBox extends ComboBoxFieldEditor<String> {
+    private class IssueTypeComboBox extends LoadableComboBoxEditor<String> {
 
-        public IssueTypeComboBox(List<String> items) {
-            super("Issue Type", null, true, items);
+        public IssueTypeComboBox() {
+            super("Issue Type", true);
         }
     }
 

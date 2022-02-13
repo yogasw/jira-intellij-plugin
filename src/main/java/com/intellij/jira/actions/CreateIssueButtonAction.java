@@ -3,7 +3,6 @@ package com.intellij.jira.actions;
 import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonPainter;
 import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.rest.model.JiraPermissionType;
-import com.intellij.jira.rest.model.metadata.JiraIssueCreateMetadata;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.server.JiraServerManager;
 import com.intellij.jira.ui.JiraIssueActionPlaces;
@@ -72,12 +71,10 @@ public class CreateIssueButtonAction extends AnActionButton implements CustomCom
 
         boolean hasPermission = jiraRestApi.userHasPermission(JiraPermissionType.CREATE_ISSUES);
         if(!hasPermission){
-            throw new InvalidPermissionException("Jira", "You don't have permission to create issue");
+            throw new InvalidPermissionException("Jira", "You don't have permission to create issues");
         }
 
-        JiraIssueCreateMetadata issueCreateMeta = jiraRestApi.getIssueCreateMeta();
-
-        CreateIssueDialog createIssueDialog = new CreateIssueDialog(project, issueCreateMeta);
+        CreateIssueDialog createIssueDialog = new CreateIssueDialog(project, jiraRestApi);
         createIssueDialog.show();
     }
 
