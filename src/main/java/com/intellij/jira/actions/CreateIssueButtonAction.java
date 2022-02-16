@@ -31,30 +31,8 @@ import static java.util.Objects.isNull;
 
 public class CreateIssueButtonAction extends AnActionButton implements CustomComponentAction {
 
-    private final JButton myButton;
-    private final JPanel myPanel;
-
     public CreateIssueButtonAction() {
-        myButton = new JButton("Create Issue");
-        int buttonHeight = JBUI.scale(26);
-        myButton.setPreferredSize(new Dimension(myButton.getPreferredSize().width, buttonHeight));
-        myButton.setBorder(new DarculaButtonPainter() {
-                               @Override
-                               public Insets getBorderInsets(Component c) {
-                                   return JBUI.emptyInsets();
-                               }});
 
-
-        myButton.setFocusable(false);
-        myButton.setEnabled(true);
-
-        myButton.addActionListener(e -> {
-            DataContext dataContext = ActionToolbar.getDataContextFor(myButton);
-            actionPerformed(AnActionEvent.createFromAnAction(this, null, JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE, dataContext));
-        });
-
-        myPanel = new BorderLayoutPanel().addToCenter(myButton);
-        myPanel.setBorder(JBUI.Borders.emptyLeft(6));
     }
 
     @Override
@@ -79,9 +57,29 @@ public class CreateIssueButtonAction extends AnActionButton implements CustomCom
         createIssueDialog.show();
     }
 
-
     @Override
     public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
-        return myPanel;
+        JButton createIssueButton = new JButton("Create Issue");
+        int buttonHeight = JBUI.scale(26);
+        createIssueButton.setPreferredSize(new Dimension(createIssueButton.getPreferredSize().width, buttonHeight));
+        createIssueButton.setBorder(new DarculaButtonPainter() {
+            @Override
+            public Insets getBorderInsets(Component c) {
+                return JBUI.emptyInsets();
+            }});
+
+
+        createIssueButton.setFocusable(false);
+        createIssueButton.setEnabled(true);
+
+        createIssueButton.addActionListener(e -> {
+            DataContext dataContext = ActionToolbar.getDataContextFor(createIssueButton);
+            actionPerformed(AnActionEvent.createFromAnAction(this, null, JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE, dataContext));
+        });
+
+        JPanel panel = new BorderLayoutPanel().addToCenter(createIssueButton);
+        panel.setBorder(JBUI.Borders.emptyLeft(6));
+
+        return panel;
     }
 }
