@@ -493,7 +493,7 @@ public class JiraRestClient {
         createIssueFields.forEach((key, value) -> {
             JsonElement jsonValue = value.getJsonValue();
             if(!(jsonValue instanceof JsonNull)){
-                fieldsObject.add(StringUtil.toLowerCase(key), jsonValue);
+                fieldsObject.add(key, jsonValue);
             }
         });
 

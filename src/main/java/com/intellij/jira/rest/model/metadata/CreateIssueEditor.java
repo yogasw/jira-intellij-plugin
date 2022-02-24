@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.intellij.jira.util.JiraGsonUtil.createIdObject;
+import static com.intellij.jira.util.JiraIssueField.ISSUE_TYPE;
+import static com.intellij.jira.util.JiraIssueField.PROJECT;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -101,8 +103,8 @@ public class CreateIssueEditor implements Editor {
 
     public Map<String, TransitionFieldHelper.FieldEditorInfo> getCreateIssueFields() {
         Map<String, TransitionFieldHelper.FieldEditorInfo> createIssueFields = myFieldsEditor.myCreateIssueFields;
-        createIssueFields.put("Project", TransitionFieldHelper.createFieldEditorInfo("project", myProjectCombo));
-        createIssueFields.put("IssueType", TransitionFieldHelper.createFieldEditorInfo("issuetype", myIssueTypeCombo));
+        createIssueFields.put(PROJECT, TransitionFieldHelper.createFieldEditorInfo(PROJECT, myProjectCombo));
+        createIssueFields.put(ISSUE_TYPE, TransitionFieldHelper.createFieldEditorInfo(ISSUE_TYPE, myIssueTypeCombo));
 
         return createIssueFields;
     }
@@ -190,7 +192,7 @@ public class CreateIssueEditor implements Editor {
             FormBuilder formBuilder = FormBuilder.createFormBuilder().setVerticalGap(10);
 
             List<JiraIssueFieldProperties> fields = myFields.entrySet().stream()
-                    .filter(field -> !"project".equals(field.getKey()) && !"issuetype".equals(field.getKey()))
+                    .filter(field -> !PROJECT.equals(field.getKey()) && !ISSUE_TYPE.equals(field.getKey()))
                     .map(entry -> JiraRepository.GSON.fromJson(entry.getValue(), JiraIssueFieldProperties.class))
                     .collect(Collectors.toList());
 
