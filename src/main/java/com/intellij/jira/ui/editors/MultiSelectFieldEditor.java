@@ -19,10 +19,11 @@ import static com.intellij.util.containers.ContainerUtil.getFirstItem;
 import static java.util.Objects.nonNull;
 
 public class MultiSelectFieldEditor<T> extends SelectFieldEditor<T> {
-    private List<String> selectedItems = new ArrayList<>();
 
-    public MultiSelectFieldEditor(String issueKey, String fieldName, List<T> items, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required, true);
+    private List<String> mySelectedItems = new ArrayList<>();
+
+    public MultiSelectFieldEditor(String fieldName, List<T> items, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required, true);
         List currentItems = Collections.emptyList();
         if (fieldValue instanceof List) {
             currentItems = (List) fieldValue;
@@ -57,10 +58,10 @@ public class MultiSelectFieldEditor<T> extends SelectFieldEditor<T> {
         }
 
         if (myIsMultiSelect) {
-            return createArrayNameObjects(selectedItems);
+            return createArrayNameObjects(mySelectedItems);
         }
 
-        return createNameObject(getFirstItem(selectedItems));
+        return createNameObject(getFirstItem(mySelectedItems));
     }
 
     @Override
@@ -105,8 +106,8 @@ public class MultiSelectFieldEditor<T> extends SelectFieldEditor<T> {
 
         @Override
         protected void doOKAction() {
-            selectedItems = myList.getSelectedValuesList();
-            myTextField.setText(selectedItems.isEmpty() ? "" : String.join(", ", selectedItems));
+            mySelectedItems = myList.getSelectedValuesList();
+            myTextField.setText(mySelectedItems.isEmpty() ? "" : String.join(", ", mySelectedItems));
 
             super.doOKAction();
         }

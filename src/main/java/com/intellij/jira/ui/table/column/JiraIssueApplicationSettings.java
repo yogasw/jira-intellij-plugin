@@ -1,6 +1,7 @@
 package com.intellij.jira.ui.table.column;
 
 import com.intellij.jira.ui.JiraIssueUiProperties;
+import com.intellij.jira.ui.SearcherIssuesUi;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighterProperty;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -51,6 +52,13 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
             }
 
             return (T)result;
+        } else if (property instanceof SearcherIssuesUi.ShowSearchersProperty) {
+            Boolean result = getState().CUSTOM_BOOLEAN_PROPERTIES.get(property.getName());
+            if (result == null) {
+                return (T)Boolean.FALSE;
+            }
+
+            return (T)result;
         }
 
         return (T)Boolean.FALSE;
@@ -62,6 +70,8 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
             getState().COLUMN_ID_VISIBILITY.put(property.getName(), (Boolean)value);
         } else if (property instanceof JiraIssueHighlighterProperty) {
             getState().HIGHLIGHTERS.put(((JiraIssueHighlighterProperty)property).getId(), (Boolean)value);
+        } else if (property instanceof SearcherIssuesUi.ShowSearchersProperty) {
+            getState().CUSTOM_BOOLEAN_PROPERTIES.put(property.getName(), (Boolean)value);
         }
 
         myEventDispatcher.getMulticaster().onChanged(property);
@@ -70,7 +80,8 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
     @Override
     public <T> boolean exists(@NotNull JiraIssueUiProperty<T> property) {
         return property instanceof JiraIssueColumnProperties.TableColumnVisibilityProperty
-                || property instanceof JiraIssueHighlighterProperty;
+                || property instanceof JiraIssueHighlighterProperty
+                || property instanceof SearcherIssuesUi.ShowSearchersProperty;
     }
 
     @Override
@@ -86,6 +97,7 @@ public class JiraIssueApplicationSettings implements PersistentStateComponent<Ji
     public static class State {
         public Map<String, Boolean> HIGHLIGHTERS = new TreeMap<>();
         public Map<String, Boolean> COLUMN_ID_VISIBILITY = new HashMap<>();
+        public Map<String, Boolean> CUSTOM_BOOLEAN_PROPERTIES = new HashMap<>();
     }
 
 }

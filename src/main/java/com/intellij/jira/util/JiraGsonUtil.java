@@ -60,6 +60,14 @@ public class JiraGsonUtil {
         return array;
     }
 
+    public static JsonArray createArray(List<String> values) {
+        JsonArray array = new JsonArray();
+        for(String value : values){
+            array.add(value);
+        }
+
+        return array;
+    }
 
     public static boolean isEmpty(JsonArray jsonArray){
         return nonNull(jsonArray) && jsonArray.size() == 0;

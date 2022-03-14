@@ -20,10 +20,10 @@ import static java.util.stream.Collectors.toList;
 
 public class GroupSelectFieldEditor extends SelectFieldEditor<String> {
 
-    private List<String> selectedGroups = new ArrayList<>();
+    private List<String> mySelectedGroups = new ArrayList<>();
 
-    public GroupSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
-        super(issueKey, fieldName, fieldValue, required, isMultiSelect);
+    public GroupSelectFieldEditor(String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
+        super(fieldName, fieldValue, required, isMultiSelect);
         myButtonAction = new GroupPickerDialogAction();
     }
 
@@ -34,10 +34,10 @@ public class GroupSelectFieldEditor extends SelectFieldEditor<String> {
         }
 
         if(myIsMultiSelect){
-            return createArrayNameObjects(selectedGroups);
+            return createArrayNameObjects(mySelectedGroups);
         }
 
-        return createNameObject(getFirstItem(selectedGroups));
+        return createNameObject(getFirstItem(mySelectedGroups));
     }
 
     @Override
@@ -72,9 +72,8 @@ public class GroupSelectFieldEditor extends SelectFieldEditor<String> {
 
         @Override
         protected void doOKAction() {
-            selectedGroups = myList.getSelectedValuesList();
-            myTextField.setText(selectedGroups.isEmpty() ? "" : String.join(", ", selectedGroups));
-
+            mySelectedGroups = myList.getSelectedValuesList();
+            myTextField.setText(mySelectedGroups.isEmpty() ? "" : String.join(", ", mySelectedGroups));
 
             super.doOKAction();
         }

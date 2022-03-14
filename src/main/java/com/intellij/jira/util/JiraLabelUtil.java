@@ -60,6 +60,9 @@ public class JiraLabelUtil {
     public static final Color ISSUE_ATTACHMENT_COLOR = new Color(235, 240, 170);
     public static final Color DARK_ISSUE_ATTACHMENT_COLOR = new Color(240, 233, 111);
 
+    public static final Color SEARCHER_SELECTED_COLOR = new Color(232, 229, 168);
+
+
     public static JBLabel createEmptyLabel(){
         return createLabel(EMPTY_TEXT);
     }

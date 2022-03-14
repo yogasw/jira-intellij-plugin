@@ -2,13 +2,23 @@ package com.intellij.jira.rest;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.intellij.jira.rest.model.*;
+import com.intellij.jira.rest.model.JiraCreatedIssue;
+import com.intellij.jira.rest.model.JiraGroup;
+import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueAttachment;
+import com.intellij.jira.rest.model.JiraIssueComment;
+import com.intellij.jira.rest.model.metadata.JiraIssueCreateMetadata;
+import com.intellij.jira.rest.model.JiraIssueLinkType;
+import com.intellij.jira.rest.model.JiraIssuePriority;
+import com.intellij.jira.rest.model.JiraIssueTransition;
+import com.intellij.jira.rest.model.JiraIssueUser;
+import com.intellij.jira.rest.model.JiraIssueWorklog;
+import com.intellij.jira.rest.model.JiraPermission;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.tasks.jira.JiraRepository;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -23,6 +33,10 @@ public class JiraIssueParser {
 
     public static JiraIssue parseIssue(String response){
         return JiraGsonUtil.getAs(response, JiraIssue.class);
+    }
+
+    public static JiraCreatedIssue parseCreatedIssue(String response) {
+        return JiraGsonUtil.getAs(response, JiraCreatedIssue.class);
     }
 
     public static List<JiraIssue> parseIssues(String response){
@@ -101,6 +115,14 @@ public class JiraIssueParser {
 
     public static List<JiraIssueAttachment> parseIssueAttachments(String response){
         return JiraGsonUtil.getAsList(response, JiraIssueAttachment[].class);
+    }
+
+    public static JiraIssueCreateMetadata parseIssueCreateMeta(String response) {
+        return JiraGsonUtil.getAs(response, JiraIssueCreateMetadata.class);
+    }
+
+    public static JiraSuggestions parseLabels(String response) {
+        return JiraGsonUtil.getAs(response, JiraSuggestions.class);
     }
 
 }

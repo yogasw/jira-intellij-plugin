@@ -4,6 +4,7 @@ import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.data.JiraIssuesRefresherImpl;
 import com.intellij.jira.data.JiraProgress;
 import com.intellij.jira.data.JiraProgressImpl;
+import com.intellij.jira.listener.IssueCreatedListener;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighter;
@@ -44,6 +45,8 @@ public abstract class AbstractIssuesUi implements IssuesUi {
         };
 
         myIssuesRefresher.addVisibleIssueChangeListener(myVisibleIssueChangeListener);
+
+        issuesData.getProject().getMessageBus().connect().subscribe(IssueCreatedListener.TOPIC, createdIssue -> refresh());
 
         Disposer.register(this, myIssuesRefresher);
 

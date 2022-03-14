@@ -5,12 +5,10 @@ import com.google.gson.JsonNull;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
-
-import java.awt.Dimension;
+import javax.swing.JTextField;
 import java.util.Objects;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
@@ -19,30 +17,25 @@ import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class TextFieldEditor extends AbstractFieldEditor<String> {
 
-    protected JBTextField myTextField;
+    protected JTextField myTextField;
 
-    public TextFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public TextFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override
     public String getFieldValue() {
-        return Objects.nonNull(fieldValue) ? (String) fieldValue : "";
+        return Objects.nonNull(myFieldValue) ? (String) myFieldValue : "";
     }
 
     @Override
     public JComponent createPanel() {
-        this.myTextField = new JBTextField();
-        this.myTextField.setPreferredSize(getFieldSize());
-        this.myTextField.setText(getFieldValue());
+        myTextField = new JBTextField();
+        myTextField.setText(getFieldValue());
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myTextField)
+                .addLabeledComponent(myLabel, myTextField, true)
                 .getPanel();
-    }
-
-    public Dimension getFieldSize() {
-        return JBUI.size(250, 24);
     }
 
     @Override
@@ -58,13 +51,13 @@ public class TextFieldEditor extends AbstractFieldEditor<String> {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(trim(myTextField.getText()))){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required");
+            return new ValidationInfo(myLabel.getText() + " is required");
         }
 
         return null;
     }
 
-    public JBTextField getMyTextField() {
+    public JTextField getTextField() {
         return myTextField;
     }
 }

@@ -5,7 +5,6 @@ import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.exceptions.InvalidPermissionException;
 import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.rest.model.JiraIssueWorklog;
-import com.intellij.jira.rest.model.JiraPermissionType;
 import com.intellij.jira.server.JiraRestApi;
 import com.intellij.jira.ui.dialog.EditWorklogDialog;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -15,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 
+import static com.intellij.jira.rest.model.JiraPermissionType.BROWSE_PROJECTS;
+import static com.intellij.jira.rest.model.JiraPermissionType.EDIT_ALL_WORKLOGS;
+import static com.intellij.jira.rest.model.JiraPermissionType.EDIT_OWN_WORKLOGS;
 import static java.util.Objects.nonNull;
 
 public class EditWorklogDialogAction extends JiraIssueDialogAction {
@@ -30,9 +32,9 @@ public class EditWorklogDialogAction extends JiraIssueDialogAction {
         JiraIssueWorklog issueWorklog = e.getRequiredData(JiraDataKeys.ISSUE_WORKLOG);
         JiraIssueWorklog worklogToEdit = jiraRestApi.getWorklog(issueKey, issueWorklog.getId());
         // Check permissions
-        boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_ALL_WORKLOGS);
+        boolean userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, BROWSE_PROJECTS, EDIT_ALL_WORKLOGS);
         if (!userHasPermission) {
-            userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, JiraPermissionType.EDIT_OWN_WORKLOGS);
+            userHasPermission = jiraRestApi.userHasPermissionOnIssue(issueKey, BROWSE_PROJECTS, EDIT_OWN_WORKLOGS);
             if (!userHasPermission) {
                 throw new InvalidPermissionException("Edit Work Log Failed", "You don't have permission to edit work logs");
             }

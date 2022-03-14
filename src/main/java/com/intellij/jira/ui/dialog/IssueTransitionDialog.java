@@ -1,5 +1,6 @@
 package com.intellij.jira.ui.dialog;
 
+import com.intellij.jira.JiraDataKeys;
 import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.model.JiraIssue;
@@ -12,6 +13,7 @@ import com.intellij.jira.ui.panels.JiraTransitionTaskEditor;
 import com.intellij.jira.ui.renders.JiraIssueTransitionListCellRenderer;
 import com.intellij.jira.util.JiraLabelUtil;
 import com.intellij.jira.util.JiraPanelUtil;
+import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -46,35 +48,37 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-public class IssueTransitionDialog extends DialogWrapper {
+public class IssueTransitionDialog extends DialogWrapper implements DataProvider {
 
-    private final Project project;
-    private final JiraIssue issue;
+    private static final int DEFAULT_HEIGHT = 300;
 
-    private List<JiraIssueTransition> transitions;
-    private JiraIssueTransition selectedIssueTransition;
+    private final Project myProject;
+    private final JiraIssue myIssue;
 
-    private JPanel transitionsPanel;
-    private JPanel transitionFieldsPanel;
-    private JPanel transitionPreviewPanel;
+    private List<JiraIssueTransition> myTransitions;
+    private JiraIssueTransition mySelectedIssueTransition;
 
-    private JiraTransitionTaskEditor jiraTransitionTaskEditor;
+    private JPanel myTransitionsPanel;
+    private JPanel myTransitionFieldsPanel;
+    private JPanel myTransitionPreviewPanel;
 
-    private Map<String, FieldEditorInfo> transitionFields = new HashMap<>();
+    private JiraTransitionTaskEditor myTransitionTaskEditor;
+
+    private final Map<String, FieldEditorInfo> myTransitionFields = new HashMap<>();
 
 
     public IssueTransitionDialog(@NotNull Project project, @NotNull JiraIssue issue, List<JiraIssueTransition> transitions) {
         super(project, false);
-        this.project = project;
-        this.issue = issue;
-        this.transitions = transitions;
+        myProject = project;
+        myIssue = issue;
+        myTransitions = transitions;
         myOKAction = new TransitIssueExecuteAction().disabled();
         init();
     }
 
     @Override
     protected void init() {
-        setTitle("Transit Issue " + issue.getKey());
+        setTitle("Transit Issue " + myIssue.getKey());
         super.init();
     }
 
@@ -82,13 +86,13 @@ public class IssueTransitionDialog extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
         JPanel panel = new JiraPanel(new BorderLayout());
-        transitionsPanel = new JiraPanel(new BorderLayout());
+        myTransitionsPanel = new JiraPanel(new BorderLayout());
         JBList<JiraIssueTransition> transitionList = new JBList<>();
         transitionList.setEmptyText("No transitions");
-        transitionList.setModel(new JiraIssueTransitionListModel(transitions));
+        transitionList.setModel(new JiraIssueTransitionListModel(myTransitions));
         transitionList.setCellRenderer(new JiraIssueTransitionListCellRenderer());
         transitionList.setSelectionMode(SINGLE_SELECTION);
-        transitionList.setPreferredSize(new JBDimension(100, 300));
+        transitionList.setPreferredSize(new JBDimension(100, DEFAULT_HEIGHT));
         transitionList.setBorder(BorderFactory.createLineBorder(JBColor.border()));
         transitionList.addListSelectionListener(e ->
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -97,31 +101,42 @@ public class IssueTransitionDialog extends DialogWrapper {
                 })
         );
 
-        transitionsPanel.add(transitionList, BorderLayout.CENTER);
+        myTransitionsPanel.add(transitionList, BorderLayout.CENTER);
 
-        transitionFieldsPanel = new JiraPanel(new GridBagLayout());
-        transitionFieldsPanel.setMinimumSize(JBUI.size(450, 300));
-        transitionFieldsPanel.setBorder(JBUI.Borders.empty(5));
-        transitionFieldsPanel.add(JiraPanelUtil.createPlaceHolderPanel("Select transition"), new GridBagConstraints());
+        myTransitionFieldsPanel = new JiraPanel(new GridBagLayout());
+        myTransitionFieldsPanel.setMinimumSize(JBUI.size(300, DEFAULT_HEIGHT));
+        myTransitionFieldsPanel.setBorder(JBUI.Borders.empty(5));
+        myTransitionFieldsPanel.add(JiraPanelUtil.createPlaceHolderPanel("Select transition"), new GridBagConstraints());
 
-        transitionPreviewPanel = new JiraPanel(new BorderLayout());
-        transitionPreviewPanel.setMinimumSize(JBUI.size(100, 300));
+        myTransitionPreviewPanel = new JiraPanel(new BorderLayout());
+        myTransitionPreviewPanel.setMinimumSize(JBUI.size(100, DEFAULT_HEIGHT));
 
-        panel.add(transitionsPanel, BorderLayout.WEST);
-        panel.add(ScrollPaneFactory.createScrollPane(transitionFieldsPanel, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
-        panel.add(transitionPreviewPanel, BorderLayout.EAST);
-        panel.setMinimumSize(JBUI.size(650, 300));
+        panel.add(myTransitionsPanel, BorderLayout.WEST);
+        panel.add(ScrollPaneFactory.createScrollPane(myTransitionFieldsPanel, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+        panel.add(myTransitionPreviewPanel, BorderLayout.EAST);
+        panel.setMinimumSize(JBUI.size(500, DEFAULT_HEIGHT));
 
-        jiraTransitionTaskEditor = new JiraTransitionTaskEditor(project, issue);
+        myTransitionTaskEditor = new JiraTransitionTaskEditor(myProject, myIssue);
 
         return FormBuilder.createFormBuilder()
                 .addComponent(panel)
-                .addComponent(jiraTransitionTaskEditor.createPanel())
+                .addComponent(myTransitionTaskEditor.createPanel())
                 .getPanel();
     }
 
+    @Override
+    public @Nullable Object getData(@NotNull String dataId) {
+        if (JiraDataKeys.ISSUE_KEY.is(dataId)) {
+            return myIssue.getKey();
+        } else if (JiraDataKeys.PROJECT_KEY.is(dataId)) {
+            return myIssue.getProject().getKey();
+        }
+
+        return null;
+    }
+
     private void updateTransitionFieldPanel(JiraIssueTransition transition) {
-        selectedIssueTransition = transition;
+        mySelectedIssueTransition = transition;
         myOKAction.setEnabled(true);
 
         List<JiraIssueFieldProperties> transitionFields = transition.getFields().entrySet().stream()
@@ -129,30 +144,29 @@ public class IssueTransitionDialog extends DialogWrapper {
                 .collect(Collectors.toList());
 
 
-        this.transitionFields.clear();
+        myTransitionFields.clear();
 
-        transitionFieldsPanel.removeAll();
-        transitionFieldsPanel.setLayout(new GridBagLayout());
+        myTransitionFieldsPanel.removeAll();
+        myTransitionFieldsPanel.setLayout(new GridBagLayout());
 
-        if(transitionFields.isEmpty()){
-            transitionFieldsPanel.add(JiraPanelUtil.createPlaceHolderPanel("No fields required"), new GridBagConstraints());
-        }else{
+        if(transitionFields.isEmpty()) {
+            myTransitionFieldsPanel.add(JiraPanelUtil.createPlaceHolderPanel("No fields required"), new GridBagConstraints());
+        } else {
             createTransitionFields(transitionFields);
         }
 
 
-        transitionFieldsPanel.revalidate();
-        transitionFieldsPanel.repaint();
-
+        myTransitionFieldsPanel.revalidate();
+        myTransitionFieldsPanel.repaint();
     }
 
 
     private void updateTransitionPreviewPanel(JiraIssueTransition transition){
-        transitionPreviewPanel.removeAll();
+        myTransitionPreviewPanel.removeAll();
 
         JPanel sourceStatusPanel = new JiraPanel();
         sourceStatusPanel.setBorder(JBUI.Borders.empty(5));
-        JBLabel sourceStatusLabel = JiraLabelUtil.createStatusLabel(issue.getStatus());
+        JBLabel sourceStatusLabel = JiraLabelUtil.createStatusLabel(myIssue.getStatus());
         sourceStatusPanel.add(sourceStatusLabel);
 
         JPanel verticalLinePanel = createPanelWithVerticalLine();
@@ -162,29 +176,26 @@ public class IssueTransitionDialog extends DialogWrapper {
         JBLabel targetStatusLabel = JiraLabelUtil.createStatusLabel(transition.getTo());
         targetStatusPanel.add(targetStatusLabel);
 
-        transitionPreviewPanel.add(sourceStatusPanel, BorderLayout.PAGE_START);
-        transitionPreviewPanel.add(verticalLinePanel, BorderLayout.CENTER);
-        transitionPreviewPanel.add(targetStatusPanel, BorderLayout.PAGE_END);
+        myTransitionPreviewPanel.add(sourceStatusPanel, BorderLayout.PAGE_START);
+        myTransitionPreviewPanel.add(verticalLinePanel, BorderLayout.CENTER);
+        myTransitionPreviewPanel.add(targetStatusPanel, BorderLayout.PAGE_END);
 
-        transitionPreviewPanel.revalidate();
-        transitionPreviewPanel.repaint();
+        myTransitionPreviewPanel.revalidate();
+        myTransitionPreviewPanel.repaint();
     }
 
-
-
-
     private void createTransitionFields(List<JiraIssueFieldProperties> transitionFields) {
-        FormBuilder formBuilder = FormBuilder.createFormBuilder().setAlignLabelOnRight(true);
+        FormBuilder formBuilder = FormBuilder.createFormBuilder().setVerticalGap(10);
 
         transitionFields.forEach(fieldProperties -> {
-            FieldEditorInfo info = TransitionFieldHelper.createFieldEditorInfo(fieldProperties, issue);
-            this.transitionFields.put(info.getName(), info);
+            FieldEditorInfo info = TransitionFieldHelper.createFieldEditorInfo(myProject, fieldProperties, myIssue);
+            myTransitionFields.put(info.getName(), info);
 
             formBuilder.addComponent(info.getPanel());
         });
 
-        FieldEditorInfo commentInfo = createCommentFieldEditorInfo(issue.getKey());
-        this.transitionFields.put(commentInfo.getName(), commentInfo);
+        FieldEditorInfo commentInfo = createCommentFieldEditorInfo();
+        myTransitionFields.put(commentInfo.getName(), commentInfo);
         formBuilder.addComponent(commentInfo.getPanel());
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -194,18 +205,17 @@ public class IssueTransitionDialog extends DialogWrapper {
         constraints.weighty = 1;
 
 
-        transitionFieldsPanel.add(formBuilder.getPanel(), constraints);
-
+        myTransitionFieldsPanel.add(formBuilder.getPanel(), constraints);
     }
 
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        if(isNull(selectedIssueTransition)){
+        if(isNull(mySelectedIssueTransition)){
             return new ValidationInfo("You must select transition");
         }
 
-        for(FieldEditorInfo info : transitionFields.values()){
+        for(FieldEditorInfo info : myTransitionFields.values()){
             ValidationInfo fieldValidation = info.validateField();
             if(nonNull(fieldValidation)){
                 return fieldValidation;
@@ -213,15 +223,15 @@ public class IssueTransitionDialog extends DialogWrapper {
 
         }
 
-        return jiraTransitionTaskEditor.validate();
+        return myTransitionTaskEditor.validate();
     }
 
 
     @Override
     protected void doOKAction() {
-        if (nonNull(project)) {
-            jiraTransitionTaskEditor.doTask();
-            new TransitIssueTask(project, issue.getId(), selectedIssueTransition.getId(), transitionFields).queue();
+        if (nonNull(myProject)) {
+            myTransitionTaskEditor.doTask();
+            new TransitIssueTask(myProject, myIssue.getId(), mySelectedIssueTransition.getId(), myTransitionFields).queue();
         }
 
         close(0);

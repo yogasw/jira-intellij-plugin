@@ -1,18 +1,37 @@
 package com.intellij.jira.server;
 
+import com.intellij.jira.helper.TransitionFieldHelper;
 import com.intellij.jira.helper.TransitionFieldHelper.FieldEditorInfo;
 import com.intellij.jira.rest.JiraRestClient;
-import com.intellij.jira.rest.model.*;
+import com.intellij.jira.rest.model.JiraCreatedIssue;
+import com.intellij.jira.rest.model.JiraGroup;
+import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.rest.model.JiraIssueComment;
+import com.intellij.jira.rest.model.JiraIssueLinkType;
+import com.intellij.jira.rest.model.JiraIssuePriority;
+import com.intellij.jira.rest.model.JiraIssueTransition;
+import com.intellij.jira.rest.model.JiraIssueUser;
+import com.intellij.jira.rest.model.JiraIssueWorklog;
+import com.intellij.jira.rest.model.JiraPermission;
+import com.intellij.jira.rest.model.JiraPermissionType;
+import com.intellij.jira.rest.model.metadata.JiraIssueCreateMetadata;
 import com.intellij.jira.util.result.BodyResult;
 import com.intellij.jira.util.result.EmptyResult;
 import com.intellij.jira.util.result.Result;
 import com.intellij.tasks.jira.JiraRepository;
+import org.apache.commons.httpclient.NameValuePair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class JiraRestApi {
 
@@ -36,6 +55,16 @@ public class JiraRestApi {
         return BodyResult.error();
     }
 
+    public Result<JiraCreatedIssue> createIssue(Map<String, TransitionFieldHelper.FieldEditorInfo> createIssueFields) {
+        try {
+            JiraCreatedIssue issue = this.jiraRestClient.createIssue(createIssueFields);
+            return BodyResult.ok(issue);
+        } catch (Exception e) {
+            log.error("Cannot create issue");
+        }
+
+        return BodyResult.error();
+    }
 
     public List<JiraIssue> getIssues(String searchQuery) {
         try {
@@ -66,9 +95,18 @@ public class JiraRestApi {
         }
     }
 
-    public List<JiraIssueUser> getAssignableUsers(String issueKey){
+    public List<JiraIssueUser> getIssueAssignableUsers(String issueKey){
         try {
-            return jiraRestClient.getAssignableUsers(issueKey);
+            return jiraRestClient.getIssueAssignableUsers(issueKey);
+        } catch (Exception e) {
+            log.error("Error fetching users to assign");
+            return new ArrayList<>();
+        }
+    }
+
+    public List<JiraIssueUser> getProjectAssignableUsers(String projectKey) {
+        try {
+            return jiraRestClient.getProjectAssignableUsers(projectKey);
         } catch (Exception e) {
             log.error("Error fetching users to assign");
             return new ArrayList<>();
@@ -150,20 +188,46 @@ public class JiraRestApi {
 
     }
 
-    public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType permission){
+    public boolean userHasPermission(JiraPermissionType... permissionTypes) {
         LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
         try {
-            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey, permission);
+            String permissionList = Arrays.stream(permissionTypes)
+                    .map(JiraPermissionType::toString)
+                    .collect(Collectors.joining(","));
+
+            permissions = jiraRestClient.findUserPermissions(new NameValuePair("permissions", permissionList));
         } catch (Exception e) {
             log.error("Current user has not permission to do this action");
         }
 
-        JiraPermission jiraPermission = permissions.get(permission.toString());
-        if(Objects.isNull(jiraPermission)){
-            jiraPermission = permissions.get(permission.getOldPermission());
+        return isHavePermission(permissions, permissionTypes);
+    }
+
+    public boolean userHasPermissionOnIssue(String issueKey, JiraPermissionType... permissionTypes){
+        LinkedHashMap<String, JiraPermission> permissions = new LinkedHashMap<>();
+        try {
+            permissions = jiraRestClient.findUserPermissionsOnIssue(issueKey, permissionTypes);
+        } catch (Exception e) {
+            log.error("Current user has not permission to do this action");
         }
 
-        return Objects.isNull(jiraPermission) ? false : jiraPermission.isHavePermission();
+        return isHavePermission(permissions, permissionTypes);
+    }
+
+    private boolean isHavePermission(LinkedHashMap<String, JiraPermission> permissions, JiraPermissionType... permissionTypes) {
+        for (JiraPermissionType permission : permissionTypes) {
+            JiraPermission jiraPermission = permissions.get(permission.toString());
+            if(Objects.isNull(jiraPermission)){
+                jiraPermission = permissions.get(permission.getOldPermission());
+            }
+
+            if (Objects.isNull(jiraPermission) || !jiraPermission.isHavePermission()) {
+                return false;
+            }
+
+        }
+
+        return true;
     }
 
 
@@ -311,8 +375,25 @@ public class JiraRestApi {
         }
     }
 
+    public JiraIssueCreateMetadata getIssueCreateMeta() {
+        try {
+            return jiraRestClient.getIssueCreateMeta();
+        } catch (Exception e) {
+            // TODO: refactor!!
+            return null;
+        }
+
+    }
+
+    public List<String> findLabels(String prefix, String autoCompleteUrl) {
+        try {
+            return jiraRestClient.findLabels(prefix, autoCompleteUrl);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
     private JiraIssueUser findCurrentUser() throws Exception {
         return jiraRestClient.getCurrentUser();
     }
-
 }

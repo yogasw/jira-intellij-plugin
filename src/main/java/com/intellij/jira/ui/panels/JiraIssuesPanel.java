@@ -16,12 +16,10 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.OnePixelSplitter;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.components.panels.Wrapper;
 import com.intellij.vcs.log.ui.frame.ProgressStripe;
 import net.miginfocom.swing.MigLayout;
 import org.jetbrains.annotations.NonNls;
@@ -46,7 +44,6 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     private final JiraIssueDetailsPanel myJiraIssueDetailsPanel;
     private final ProgressStripe myProgressStripe;
     private final AbstractIssuesUi myUi;
-    private final JiraJQLSearcherPanel mySearcherPanel;
 
     private final Splitter myIssuesBrowserSplitter;
 
@@ -56,8 +53,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         Disposer.register(parent, this);
 
         myUi = issuesUi;
-        mySearcherPanel = new JiraJQLSearcherPanel(issuesData.getProject(), myUi::refresh);
-        myToolbar = getToolbar(issuesData.getProject());
+        myToolbar = getToolbar();
 
         myJiraIssueTable = new JiraIssueTable(issuesData, parent);
         myJiraIssueDetailsPanel = new JiraIssueDetailsPanel(issuesData, parent);
@@ -103,19 +99,25 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
     }
 
     @NotNull
-    protected JComponent getToolbar(@NotNull Project project) {
+    protected JComponent getToolbar() {
         DefaultActionGroup toolbarGroup = new DefaultActionGroup();
-        toolbarGroup.copyFromGroup((DefaultActionGroup) ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR));
+        toolbarGroup.copyFromGroup((DefaultActionGroup) ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_LEFT));
 
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR, toolbarGroup, true);
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE, toolbarGroup, true);
         toolbar.setTargetComponent(this);
 
-        Wrapper jqlFilter = new Wrapper(mySearcherPanel);
-        jqlFilter.setVerticalSizeReferent(toolbar.getComponent());
+        DefaultActionGroup rightCornerGroup =
+                new DefaultActionGroup(ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_RIGHT));
+        ActionToolbar rightCornerToolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE,
+                rightCornerGroup, true);
+        rightCornerToolbar.setTargetComponent(this);
+        rightCornerToolbar.setReservePlaceAutoPopupIcon(false);
+        rightCornerToolbar.setLayoutPolicy(ActionToolbar.NOWRAP_LAYOUT_POLICY);
 
-        JPanel panel = new JPanel(new MigLayout("ins 0, fill", "[left]0[left, fill]push[pref:pref, right]", "center"));
-        panel.add(jqlFilter);
+        JPanel panel = new JPanel(new MigLayout("ins 0, fill", "[left]push[pref:pref, right]", "center"));
+
         panel.add(toolbar.getComponent());
+        panel.add(rightCornerToolbar.getComponent());
 
         return panel;
     }
@@ -158,10 +160,6 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
             JiraIssue issueToShow = myJiraIssueTable.getModel().getItem(currentPosIssue);
             myJiraIssueTable.addSelection(issueToShow);
         }
-    }
-
-    public void updateSearcherPanel() {
-        mySearcherPanel.updateCombo();
     }
 
     private class MyListSelectionListener implements ListSelectionListener {

@@ -8,13 +8,13 @@ import java.util.List;
 
 public class VisibilityFieldEditor extends ComboBoxFieldEditor<String> {
 
-    public VisibilityFieldEditor(String issueKey, Object fieldValue, List<String> items) {
-        super(issueKey, "Viewable by", fieldValue, false, items);
+    public VisibilityFieldEditor(Object fieldValue, List<String> items) {
+        super("Viewable by", fieldValue, false, items);
     }
 
     @Override
     public JsonElement getJsonValue() {
-        String selectedValue = getSelectedValue();
+        String selectedValue = getSelectedValueAsString();
         if("All Users".equals(selectedValue)){
             return JsonNull.INSTANCE;
         }

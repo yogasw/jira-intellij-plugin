@@ -22,12 +22,8 @@ public class DateTimeFieldEditor extends DateFieldEditor {
     private static final String ISO_8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static final DateTimeFormatter ISO_8601 = DateTimeFormatter.ofPattern(ISO_8601_FORMAT);
 
-    public DateTimeFieldEditor(String issueKey, String fieldName, boolean required) {
-        super(issueKey, fieldName, null, required);
-    }
-
-    public DateTimeFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public DateTimeFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override
@@ -59,13 +55,13 @@ public class DateTimeFieldEditor extends DateFieldEditor {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(trim(myFormattedTextField.getText()))){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }else{
             if(isNotEmpty(trim(myFormattedTextField.getText()))){
                 try{
                     LocalDateTime.parse(myFormattedTextField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
                 }catch (DateTimeParseException e){
-                    return new ValidationInfo("Wrong format in " + myLabel.getMyLabelText() + " field.");
+                    return new ValidationInfo("Wrong format in " + myLabel.getText() + " field.");
                 }
             }
 

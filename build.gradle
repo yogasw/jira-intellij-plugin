@@ -40,13 +40,6 @@ patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>New features:
-            <ul>
-                <li>Open filtered issues tabs</li>
-                <li>Global jira servers</li>
-            </ul>
-        </li>
-        <li>UI improvements</li>
-        <li>Bug fixes</li>
+        <<li>New feature: create issues</li>
       </ul>"""
 }
