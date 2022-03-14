@@ -40,7 +40,6 @@ patchPluginXml {
     changeNotes """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Better way to manage searchers</li>
-        <li>Bug fixes</li>
+        <<li>New feature: create issues</li>
       </ul>"""
 }
