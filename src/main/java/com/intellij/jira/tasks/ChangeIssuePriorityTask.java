@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import static com.intellij.jira.rest.model.JiraPermissionType.BROWSE_PROJECTS;
 import static com.intellij.jira.rest.model.JiraPermissionType.EDIT_ISSUES;
 
 public class ChangeIssuePriorityTask extends AbstractBackgroundableTask {
@@ -23,7 +24,7 @@ public class ChangeIssuePriorityTask extends AbstractBackgroundableTask {
     public void run(@NotNull ProgressIndicator indicator) {
         JiraRestApi jiraRestApi = getJiraRestApi();
         // Check user permissions
-        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueIdOrKey, EDIT_ISSUES);
+        boolean hasPermission = jiraRestApi.userHasPermissionOnIssue(issueIdOrKey, BROWSE_PROJECTS, EDIT_ISSUES);
         if(!hasPermission){
             throw new InvalidPermissionException("Edit Issue Failed", "You don't have permission to change priority");
         }

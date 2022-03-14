@@ -45,8 +45,8 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
     protected PickerDialogAction myButtonAction;
     protected boolean myIsMultiSelect;
 
-    public SelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
-        super(issueKey, fieldName, fieldValue, required);
+    public SelectFieldEditor(String fieldName, Object fieldValue, boolean required, boolean isMultiSelect) {
+        super(fieldName, fieldValue, required);
         myIsMultiSelect = isMultiSelect;
     }
 
@@ -58,16 +58,15 @@ public abstract class SelectFieldEditor<T> extends AbstractFieldEditor<T> {
         });
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(myLabel, myPanel)
+                .addLabeledComponent(myLabel, myPanel, true)
                 .getPanel();
     }
-
 
     @Nullable
     @Override
     public ValidationInfo validate() {
         if(isRequired() && StringUtil.isEmpty(myTextField.getText())){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }
 
         return null;

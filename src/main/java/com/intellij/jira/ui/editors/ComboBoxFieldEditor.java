@@ -6,9 +6,11 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.util.ui.FormBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import static com.intellij.jira.util.JiraGsonUtil.createNameObject;
@@ -19,27 +21,81 @@ import static java.util.Objects.nonNull;
 public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
 
     protected ComboBox<T> myComboBox;
-    private CollectionComboBoxModel<T> myComboBoxItems;
+    private final CollectionComboBoxModel<T> myComboBoxItems;
 
-    public ComboBoxFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, List<T> items) {
-        super(issueKey, fieldName, fieldValue, required);
-        this.myComboBoxItems = new CollectionComboBoxModel<>(items);
-        this.myComboBox = new ComboBox(myComboBoxItems, 300);
+    public ComboBoxFieldEditor(String fieldName, Object fieldValue, boolean required, List<T> items) {
+        super(fieldName, fieldValue, required);
+        myComboBoxItems = new CollectionComboBoxModel<>(items);
+        myComboBox = new ComboBox(myComboBoxItems, 300);
 
+        if (nonNull(fieldValue)) {
+            selectItem();
+        }
+    }
+
+    @Override
+    public JComponent createPanel() {
+        return FormBuilder.createFormBuilder()
+                .addLabeledComponent(myLabel, myComboBox, true)
+                .getPanel();
+    }
+
+    @Override
+    public JsonElement getJsonValue() {
+        if(isNull(myComboBox.getSelectedItem())){
+            return JsonNull.INSTANCE;
+        }
+
+        return createNameObject(getSelectedValueAsString());
+    }
+
+    public T getSelectedValue(){
+        return (T) myComboBox.getSelectedItem();
+    }
+
+    @NotNull
+    public String getSelectedValueAsString(){
+        return nonNull(getSelectedValue()) ? getSelectedValue().toString() : "";
+    }
+
+    public void setSelectedValue(T value) {
+        myComboBox.setSelectedItem(value);
+    }
+
+    @Nullable
+    @Override
+    public ValidationInfo validate() {
+        if(isRequired() && isEmpty(getSelectedValueAsString())){
+            return new ValidationInfo(myLabel.getText() + " is required.");
+        }
+
+        return null;
+    }
+
+    @Override
+    public T getFieldValue() {
+        return (T) myFieldValue;
+    }
+
+    public void addActionListener(ActionListener listener) {
+        myComboBox.addActionListener(listener);
+    }
+
+    private void selectItem() {
         // TODO: 22/12/2019 mejorar
         T currentValue = getFieldValue();
         if (currentValue instanceof List) {
             for (Object value : (List) currentValue) {
-                T item = findItem(items, value);
+                T item = findItem(myComboBoxItems.getItems(), value);
                 if (item != null) {
-                    this.myComboBoxItems.setSelectedItem(item);
+                    myComboBoxItems.setSelectedItem(item);
                     break;
                 }
             }
         } else if (currentValue != null) {
-            T item = findItem(items, currentValue);
+            T item = findItem(myComboBoxItems.getItems(), currentValue);
             if (item != null) {
-                this.myComboBoxItems.setSelectedItem(item);
+                myComboBoxItems.setSelectedItem(item);
             }
         }
     }
@@ -50,44 +106,8 @@ public class ComboBoxFieldEditor<T> extends AbstractFieldEditor<T> {
                 return item;
             }
         }
-        return null;
-    }
-
-    @Override
-    public JComponent createPanel() {
-        return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myComboBox)
-                .getPanel();
-    }
-
-
-    @Override
-    public JsonElement getJsonValue() {
-        if(isNull(myComboBox.getSelectedItem())){
-            return JsonNull.INSTANCE;
-        }
-
-        return createNameObject(getSelectedValue());
-    }
-
-    protected String getSelectedValue(){
-        return nonNull(this.myComboBox.getSelectedItem()) ? this.myComboBox.getSelectedItem().toString() : "";
-    }
-
-
-    @Nullable
-    @Override
-    public ValidationInfo validate() {
-        if(isRequired() && isEmpty(getSelectedValue())){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
-        }
 
         return null;
-    }
-
-    @Override
-    public T getFieldValue() {
-        return (T) fieldValue;
     }
 
 }

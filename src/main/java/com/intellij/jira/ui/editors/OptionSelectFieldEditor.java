@@ -25,14 +25,14 @@ import static java.util.stream.Collectors.toList;
 
 public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFieldOption> {
 
-    public OptionSelectFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required, boolean isMultiSelect, List<JiraCustomFieldOption> items) {
-        super(issueKey, fieldName, fieldValue, required, isMultiSelect, items);
+    public OptionSelectFieldEditor(String fieldName, Object fieldValue, boolean required, boolean isMultiSelect, List<JiraCustomFieldOption> items) {
+        super(fieldName, fieldValue, required, isMultiSelect, items);
         myButtonAction = new OptionPickerDialogAction();
     }
 
     @Override
     protected void initSelectedItems() {
-        JsonElement element = GSON.toJsonTree(fieldValue);
+        JsonElement element = GSON.toJsonTree(myFieldValue);
         if (element.isJsonArray()) {
             mySelectedItems = JiraGsonUtil.getAsList(element, JiraCustomFieldOption[].class);
         } else if (element.isJsonObject()) {
@@ -93,7 +93,6 @@ public class OptionSelectFieldEditor extends DataSelectFieldEditor<JiraCustomFie
         protected void doOKAction() {
             mySelectedItems = myList.getSelectedValuesList();
             myTextField.setText(mySelectedItems.isEmpty() ? "" :  mySelectedItems.stream().map(JiraCustomFieldOption::getValue).collect(joining(", ")));
-
 
             super.doOKAction();
         }

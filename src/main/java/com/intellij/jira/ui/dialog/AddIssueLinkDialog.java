@@ -12,7 +12,7 @@ import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.util.List;
 
 import static java.util.Objects.nonNull;

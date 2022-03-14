@@ -11,8 +11,10 @@ import static com.intellij.openapi.util.text.StringUtil.trim;
 
 public class CommentFieldEditor extends TextAreaFieldEditor {
 
-    public CommentFieldEditor(String issueKey) {
-        super(issueKey, "Comment", null, false);
+    public static final CommentFieldEditor INSTANCE = new CommentFieldEditor();
+
+    public CommentFieldEditor() {
+        super("Comment", null, false);
     }
 
     @Override

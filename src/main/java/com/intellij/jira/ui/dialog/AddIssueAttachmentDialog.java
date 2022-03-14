@@ -21,7 +21,7 @@ public class AddIssueAttachmentDialog extends DialogWrapper {
 
     public AddIssueAttachmentDialog(@NotNull Project project, @NotNull String issueKey) {
         super(project, false);
-        this.myProject = project;
+        myProject = project;
         this.issueKey = issueKey;
 
         setTitle(String.format("Add Attachment to %s", issueKey));
@@ -31,10 +31,10 @@ public class AddIssueAttachmentDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        this.myFileChooserFieldEditor = new FileChooserFieldEditor(issueKey);
+        myFileChooserFieldEditor = new FileChooserFieldEditor();
 
         return FormBuilder.createFormBuilder()
-                .addComponent(this.myFileChooserFieldEditor.createPanel())
+                .addComponent(myFileChooserFieldEditor.createPanel())
                 .addVerticalGap(5)
                 .getPanel();
     }

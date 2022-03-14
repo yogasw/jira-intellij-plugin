@@ -4,79 +4,64 @@ import com.google.gson.JsonElement;
 import com.intellij.jira.rest.model.JiraIssueTimeTracking;
 import com.intellij.jira.util.JiraGsonUtil;
 import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import java.util.Objects;
 
 public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
 
-    private JRadioButton autoButton;
-    protected JRadioButton leaveButton;
-    protected JRadioButton newButton;
-    protected JRadioButton manualButton;
+    private JRadioButton myAutoButton;
+    protected JRadioButton myLeaveButton;
+    protected JRadioButton myNewButton;
+    protected JRadioButton myManualButton;
 
-    protected TimeSpentEditor myNewTextFieldEditor;
-    protected TimeSpentEditor myManualTextFieldEditor;
+    protected TextFieldEditor myNewTextFieldEditor;
+    protected TextFieldEditor myManualTextFieldEditor;
 
-    private JiraIssueTimeTracking timeTracking;
-    private boolean showManualField;
+    private JiraIssueTimeTracking myTimeTracking;
+    private boolean myShowManualField;
 
-    public RemainingEstimateFieldEditor(String issueKey, String fieldName, boolean required, JiraIssueTimeTracking timeTracking, boolean showManualField) {
-        super(issueKey, fieldName, null, required);
-        this.showManualField = showManualField;
-        this.timeTracking = timeTracking;
+    private JPanel myPanel;
+    private JPanel myNewPanel;
+    private JPanel myManualPanel;
+
+    public RemainingEstimateFieldEditor(String fieldName, boolean required, JiraIssueTimeTracking timeTracking, boolean showManualField) {
+        super(fieldName, null, required);
+        myShowManualField = showManualField;
+        myTimeTracking = timeTracking;
     }
 
     @Override
     public JComponent createPanel() {
+        myLeaveButton.setText(getTimeTrackingText());
 
-        this.autoButton = new JRadioButton("Adjust automatically", true);
-        this.leaveButton = new JRadioButton(getTimeTrackingText());
-        this.newButton = new JRadioButton();
-        this.manualButton = new JRadioButton();
+        myNewTextFieldEditor = new MyTimeSpentEditor("Set to");
+        myManualTextFieldEditor = new MyTimeSpentEditor("Reduce by");
 
-        ButtonGroup myRadioGroup = new ButtonGroup();
-        myRadioGroup.add(autoButton);
-        myRadioGroup.add(leaveButton);
-        myRadioGroup.add(newButton);
-        if(showManualField){
-            myRadioGroup.add(manualButton);
-        }
+        myNewPanel.add(myNewTextFieldEditor.createPanel());
 
-        this.myNewTextFieldEditor = new TimeSpentEditor( this.issueKey, "Set to", "", false);
-        this.myManualTextFieldEditor = new TimeSpentEditor( this.issueKey, "Reduce by", "", false);
-
-        JPanel radioPanel = new JPanel();
-        radioPanel.setLayout(new GridLayout(4, 1));
-        radioPanel.add(autoButton);
-        radioPanel.add(leaveButton);
-        JPanel radioWithTexFieldPanel = new JPanel(new FlowLayout());
-        radioWithTexFieldPanel.add(newButton);
-        radioWithTexFieldPanel.add(myNewTextFieldEditor.createPanel());
-        radioPanel.add(radioWithTexFieldPanel);
-
-        if(showManualField){
-            JPanel radioWithTexFieldPanel2 = new JPanel(new FlowLayout());
-            radioWithTexFieldPanel2.add(manualButton);
-            radioWithTexFieldPanel2.add(myManualTextFieldEditor.createPanel());
-            radioPanel.add(radioWithTexFieldPanel2);
+        if (myShowManualField) {
+            myManualButton.setVisible(true);
+            myManualPanel.add(myManualTextFieldEditor.createPanel());
         }
 
         return FormBuilder.createFormBuilder()
-                    .addLabeledComponent(myLabel, radioPanel)
+                    .addComponent(myPanel)
                     .getPanel();
     }
 
     @Override
     public JsonElement getJsonValue() {
-        if(newButton.isSelected()){
-            return JiraGsonUtil.createPrimitive("new&newEstimate=" + myNewTextFieldEditor.getMyTextField().getText());
-        }else if(manualButton.isSelected()){
-            return JiraGsonUtil.createPrimitive("manual&increaseBy=" + myManualTextFieldEditor.getMyTextField().getText());
-        }else if(leaveButton.isSelected()){
+        if (myNewButton.isSelected()) {
+            return JiraGsonUtil.createPrimitive("new&newEstimate=" + myNewTextFieldEditor.getTextField().getText());
+        } else if(myManualButton.isSelected()) {
+            return JiraGsonUtil.createPrimitive("manual&increaseBy=" + myManualTextFieldEditor.getTextField().getText());
+        } else if(myLeaveButton.isSelected()) {
             return JiraGsonUtil.createPrimitive("leave");
         }
 
@@ -86,9 +71,9 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
     @Nullable
     @Override
     public ValidationInfo validate() {
-       if(newButton.isSelected()){
+       if (myNewButton.isSelected()) {
            return myNewTextFieldEditor.validate();
-       }else if(manualButton.isSelected()){
+       } else if (myManualButton.isSelected()) {
            return myManualTextFieldEditor.validate();
        }
 
@@ -96,11 +81,31 @@ public class RemainingEstimateFieldEditor extends AbstractFieldEditor<String> {
     }
 
     private String getTimeTrackingText(){
-        return Objects.isNull(this.timeTracking) ? "Leave estimate unset" : "Use existing estimate of " + this.timeTracking.getRemainingEstimate();
+        return Objects.isNull(myTimeTracking) ? "Leave estimate unset" : "Use existing estimate of " + myTimeTracking.getRemainingEstimate();
     }
 
     @Override
     public String getFieldValue() {
         return null;
     }
+
+
+
+    private static class MyTimeSpentEditor extends TimeSpentEditor {
+
+        public MyTimeSpentEditor(String fieldName) {
+            super(fieldName, "", false);
+        }
+
+        @Override
+        public JComponent createPanel() {
+            myTextField = new JBTextField();
+            myTextField.setText(super.getFieldValue());
+
+            return FormBuilder.createFormBuilder()
+                    .addLabeledComponent(myLabel, getTextField())
+                    .getPanel();
+        }
+    }
+
 }

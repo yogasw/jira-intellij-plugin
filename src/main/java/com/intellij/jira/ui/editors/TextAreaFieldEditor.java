@@ -4,9 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.JBColor;
+import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import java.util.Objects;
 
@@ -20,17 +25,19 @@ public class TextAreaFieldEditor extends AbstractFieldEditor<String> {
     private JLabel myTextAreaLabel;
     protected JTextArea myTextArea;
 
-    public TextAreaFieldEditor(String issueKey, String fieldName, Object fieldValue, boolean required) {
-        super(issueKey, fieldName, fieldValue, required);
+    public TextAreaFieldEditor(String fieldName, Object fieldValue, boolean required) {
+        super(fieldName, fieldValue, required);
     }
 
     @Override
     public JComponent createPanel() {
-        this.myTextArea.setBorder(BorderFactory.createLineBorder(JBColor.border()));
-        this.myTextArea.setText(getFieldValue());
-        this.myTextAreaLabel.setText(myLabel.getText());
+        myTextArea.setBorder(BorderFactory.createLineBorder(JBColor.border()));
+        myTextArea.setText(getFieldValue());
+        myTextAreaLabel.setText(myLabel.getText());
 
-        return myPanel;
+        return FormBuilder.createFormBuilder()
+                .addComponent(myPanel)
+                .getPanel();
     }
 
     @Override
@@ -46,7 +53,7 @@ public class TextAreaFieldEditor extends AbstractFieldEditor<String> {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(trim(myTextArea.getText()))){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }
 
         return null;
@@ -54,10 +61,7 @@ public class TextAreaFieldEditor extends AbstractFieldEditor<String> {
 
     @Override
     public String getFieldValue() {
-        return Objects.nonNull(fieldValue) ? (String) fieldValue : "";
+        return Objects.nonNull(myFieldValue) ? (String) myFieldValue : "";
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
 }

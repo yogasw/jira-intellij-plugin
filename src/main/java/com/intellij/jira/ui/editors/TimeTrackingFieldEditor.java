@@ -8,7 +8,10 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.util.regex.Pattern;
 
 import static com.intellij.jira.util.JiraGsonUtil.createPrimitive;
@@ -32,14 +35,13 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
     private JTextField mySecondField;
     private JLabel mySecondInfoLabel;
 
-    public TimeTrackingFieldEditor(String issueKey, boolean required) {
-        super(issueKey, ORIGINAL_ESTIMATE_FIELD, required);
-        this.mySecondLabel = new MyLabel(REMAINING_ESTIMATE_FIELD, required);
+    public TimeTrackingFieldEditor(boolean required) {
+        super(ORIGINAL_ESTIMATE_FIELD, null, required);
+        mySecondLabel = new MyLabel(REMAINING_ESTIMATE_FIELD, required);
     }
 
     @Override
     public JComponent createPanel() {
-
         myFirstInfoLabel.setToolTipText(INFO_MESSAGE);
         myFirstInfoLabel.setIcon(AllIcons.Actions.Help);
 
@@ -47,8 +49,10 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
         mySecondInfoLabel.setIcon(AllIcons.Actions.Help);
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(this.myLabel, this.myFirstPanel)
-                .addLabeledComponent(this.mySecondLabel, this.mySecondPanel)
+                .addComponent(myLabel)
+                .addComponent(myFirstPanel)
+                .addComponent(mySecondLabel)
+                .addComponent(mySecondPanel)
                 .getPanel();
     }
 
@@ -75,19 +79,19 @@ public class TimeTrackingFieldEditor extends AbstractFieldEditor {
     @Override
     public ValidationInfo validate() {
         if(isRequired() && isEmpty(getOriginalEstimate()) ){
-            return new ValidationInfo(myLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(myLabel.getText() + " is required.");
         }
 
         if(isRequired() && isEmpty(getRemainingEstimate())){
-            return new ValidationInfo(mySecondLabel.getMyLabelText() + " is required.");
+            return new ValidationInfo(mySecondLabel.getText() + " is required.");
         }
 
         if(isNotEmpty(getOriginalEstimate()) && !TIME_TRACKING_PATTERN.matcher(getOriginalEstimate()).matches()){
-            return new ValidationInfo("Wrong format in " + myLabel.getMyLabelText() + " field.");
+            return new ValidationInfo("Wrong format in " + myLabel.getText() + " field.");
         }
 
         if(isNotEmpty(getRemainingEstimate()) && !TIME_TRACKING_PATTERN.matcher(getRemainingEstimate()).matches()){
-            return new ValidationInfo("Wrong format in " + mySecondLabel.getMyLabelText() + " field.");
+            return new ValidationInfo("Wrong format in " + mySecondLabel.getText() + " field.");
         }
 
         return null;

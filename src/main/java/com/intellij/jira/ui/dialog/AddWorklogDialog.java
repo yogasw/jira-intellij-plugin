@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.Action;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -28,7 +28,7 @@ public class AddWorklogDialog extends EditWorklogDialog {
     @Override
     protected void doOKAction() {
         if(nonNull(myProject)){
-            new AddWorklogTask(myProject, issueKey, worklogFields, remainingEstimateEditor.getJsonValue()).queue();
+            new AddWorklogTask(myProject, myIssueKey, myWorklogFields, myRemainingEstimateEditor.getJsonValue()).queue();
         }
 
         close(0);

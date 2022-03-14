@@ -10,20 +10,21 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import java.util.Objects;
 
 public class LogWorkFieldEditor extends AbstractFieldEditor<String> {
 
-    protected TimeSpentEditor timeSpentEditor;
-    protected DateTimeFieldEditor startedEditor;
-    protected RemainingEstimateFieldEditor remainingEstimateEditor;
+    protected TimeSpentEditor myTimeSpentEditor;
+    protected DateTimeFieldEditor myStartedEditor;
+    protected RemainingEstimateFieldEditor myRemainingEstimateEditor;
 
-    private JiraIssueTimeTracking timeTracking;
+    private JiraIssueTimeTracking myTimeTracking;
 
-    public LogWorkFieldEditor(String issueKey, String fieldName, JiraIssueTimeTracking timeTracking, boolean required) {
-        super(issueKey, fieldName, null, required);
-        this.timeTracking = timeTracking;
+    public LogWorkFieldEditor(String fieldName, JiraIssueTimeTracking timeTracking, boolean required) {
+        super(fieldName, null, required);
+        myTimeTracking = timeTracking;
     }
 
     @Override
@@ -33,33 +34,33 @@ public class LogWorkFieldEditor extends AbstractFieldEditor<String> {
 
     @Override
     public JComponent createPanel() {
-        this.timeSpentEditor = new TimeSpentEditor(this.issueKey);
-        this.startedEditor = new DateTimeFieldEditor(this.issueKey,"Date Started", false);
-        this.remainingEstimateEditor = new RemainingEstimateTransitionFieldEditor(this.issueKey, "Remaining Estimate", false, this.timeTracking);
+        myTimeSpentEditor = new TimeSpentEditor();
+        myStartedEditor = new DateTimeFieldEditor("Date Started", null, false);
+        myRemainingEstimateEditor = new RemainingEstimateTransitionFieldEditor("Remaining Estimate", false, myTimeTracking);
 
         JPanel myWorkLogPanel = FormBuilder.createFormBuilder()
-                .addComponent(timeSpentEditor.createPanel())
-                .addComponent(startedEditor.createPanel())
-                .addComponent(remainingEstimateEditor.createPanel())
+                .addComponent(myTimeSpentEditor.createPanel())
+                .addComponent(myStartedEditor.createPanel())
+                .addComponent(myRemainingEstimateEditor.createPanel())
                 .getPanel();
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(myLabel, myWorkLogPanel)
+                .addLabeledComponent(myLabel, myWorkLogPanel, true)
                 .getPanel();
     }
 
     @Override
     public JsonElement getJsonValue() {
-        if (StringUtil.isEmpty(StringUtil.trim(timeSpentEditor.getMyTextField().getText()))){
+        if (StringUtil.isEmpty(StringUtil.trim(myTimeSpentEditor.getTextField().getText()))){
             return JsonNull.INSTANCE;
         }
 
         JsonArray array = new JsonArray();
         JsonObject addObject = new JsonObject();
 
-        JsonObject logWork = remainingEstimateEditor.getJsonValue().getAsJsonObject();
-        logWork.add("timeSpentSeconds", timeSpentEditor.getJsonValue());
-        logWork.add("started", startedEditor.getJsonValue());
+        JsonObject logWork = myRemainingEstimateEditor.getJsonValue().getAsJsonObject();
+        logWork.add("timeSpentSeconds", myTimeSpentEditor.getJsonValue());
+        logWork.add("started", myStartedEditor.getJsonValue());
 
         addObject.add("add", logWork);
         array.add(addObject);
@@ -70,16 +71,16 @@ public class LogWorkFieldEditor extends AbstractFieldEditor<String> {
     @Nullable
     @Override
     public ValidationInfo validate() {
-        ValidationInfo info = this.timeSpentEditor.validate();
+        ValidationInfo info = myTimeSpentEditor.validate();
         if(Objects.nonNull(info)) {
             return info;
         }
 
-        info = this.startedEditor.validate();
+        info = this.myStartedEditor.validate();
         if(Objects.nonNull(info)) {
             return info;
         }
 
-        return this.remainingEstimateEditor.validate();
+        return myRemainingEstimateEditor.validate();
     }
 }
