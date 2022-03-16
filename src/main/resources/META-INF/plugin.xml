@@ -10,7 +10,7 @@
             <ul>
                 <li>Fetch issues from server with customizable searchers</li>
                 <li>View issue details</li>
-                <li>Run actions on issue, like transit an issue, assign it, change his priority,...</li>
+                <li>Run actions on issue, like create or transit an issue, assign it, change his priority,...</li>
                 <li>Go to specific issue on list</li>
             </ul>
 

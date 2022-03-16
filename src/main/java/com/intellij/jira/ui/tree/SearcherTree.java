@@ -16,6 +16,7 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 
@@ -110,6 +111,10 @@ public class SearcherTree extends Tree {
             }
 
             JQLSearcher searcher = ((SearcherTreeNode) selectionPath.getLastPathComponent()).getSearcher();
+            if (Objects.isNull(searcher)) {
+                return false;
+            }
+
             JQLSearcherManager.getInstance().setSelected(myProject, searcher);
 
             return true;
