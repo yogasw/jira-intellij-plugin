@@ -53,6 +53,10 @@ public abstract class LoadableFieldEditor<T> extends AbstractFieldEditor<T> {
         myUpdateStatus = status;
     }
 
+    protected void loaded() {
+        changeUpdateStatus(UpdateStatus.LOADED);
+    }
+
     public interface DataProvider<T> {
 
         /**
