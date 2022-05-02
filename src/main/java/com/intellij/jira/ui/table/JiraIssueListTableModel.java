@@ -8,6 +8,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ListTableModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JiraIssueListTableModel extends ListTableModel<JiraIssue> {
@@ -18,7 +19,7 @@ public class JiraIssueListTableModel extends ListTableModel<JiraIssue> {
     }
 
     public void update() {
-       setIssues(getItems());
+       setIssues(new ArrayList<>(getItems()));
     }
 
     public void setIssues(List<JiraIssue> issues) {
