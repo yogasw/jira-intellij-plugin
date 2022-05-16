@@ -188,7 +188,7 @@ public abstract class IssueFilterComponent<Filter extends IssueFilter, Model ext
     protected ListPopup createPopupMenu() {
         return JBPopupFactory.getInstance().
                 createActionGroupPopup(null, createActionGroup(), DataManager.getInstance().getDataContext(this),
-                        JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false);
+                        false, null, 10);
     }
 
     protected Border createUnfocusedBorder() {
