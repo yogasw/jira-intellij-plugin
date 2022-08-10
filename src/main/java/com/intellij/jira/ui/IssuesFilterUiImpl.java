@@ -22,6 +22,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.util.NotNullComputable;
+import com.intellij.ui.ClientProperty;
 import com.intellij.util.Consumer;
 import com.intellij.util.EventDispatcher;
 import com.intellij.util.ui.UIUtil;
@@ -145,7 +146,7 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
             if (vcsLogUi == null) return;
 
             Component actionComponent = UIUtil.uiTraverser(vcsLogUi.getToolbar()).traverse().find(component ->
-                UIUtil.getClientProperty(component, ACTION_KEY) == this
+                    ClientProperty.get(component, ACTION_KEY) == this
             );
 
             if (actionComponent instanceof IssueFilterComponent) {

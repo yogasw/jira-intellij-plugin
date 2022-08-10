@@ -48,6 +48,8 @@ public abstract class AbstractIssuesUi implements IssuesUi {
     private IssuesFilterUi myFilterUi;
     private Issues myIssues = Issues.EMPTY;
 
+    private boolean disposed;
+
     protected AbstractIssuesUi(String id, JiraIssuesData issuesData) {
         myId = id;
         myIssuesData = issuesData;
@@ -102,7 +104,7 @@ public abstract class AbstractIssuesUi implements IssuesUi {
             for (JiraIssuesData.IssuesChangeListener listener : myIssuesChangeListeners) {
                 listener.onIssuesChange(issues);
             }
-        }, o -> Disposer.isDisposed(this));
+        }, o -> isDisposed());
     }
 
     public JiraProgress getProgress() {
@@ -145,6 +147,7 @@ public abstract class AbstractIssuesUi implements IssuesUi {
 
     @Override
     public void dispose() {
+        disposed = true;
         myHighlighters.clear();
         removeIssuesChangeListener(myIssuesChangeListener);
         myVisibleIssuesRefresher.removeVisibleIssueChangeListener(myVisibleIssueChangeListener);
@@ -166,6 +169,10 @@ public abstract class AbstractIssuesUi implements IssuesUi {
         }
 
         getTable().repaint();
+    }
+
+    public boolean isDisposed() {
+        return disposed;
     }
 
     private class MyPropertyChangeListener implements JiraIssueUiProperties.PropertyChangeListener {

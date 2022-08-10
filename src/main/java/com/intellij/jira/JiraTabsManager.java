@@ -71,7 +71,7 @@ public class JiraTabsManager implements Disposable {
 
             Disposer.register(this, searcherIssuesUi);
 
-            Content content = ContentFactory.SERVICE.getInstance().createContent(new JiraTabPanel(searcherIssuesUi), TAB_ISSUES, false);
+            Content content = ContentFactory.getInstance().createContent(new JiraTabPanel(searcherIssuesUi), TAB_ISSUES, false);
             content.setCloseable(false);
 
             ContentsUtil.addContent(contentManager, content, true);
@@ -100,7 +100,7 @@ public class JiraTabsManager implements Disposable {
 
         JComponent component = new JiraServerNotConfiguredPanel(myProject);
 
-        Content content = ContentFactory.SERVICE.getInstance().createContent(component, null, false);
+        Content content = ContentFactory.getInstance().createContent(component, null, false);
         content.setCloseable(false);
 
         ContentsUtil.addContent(contentManager, content, true);
