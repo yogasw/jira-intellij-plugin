@@ -13,15 +13,10 @@ public class JiraIssuesData implements Disposable {
 
     private final Project myProject;
     private final IssuesGetter myIssuesGetter;
-   // private final JiraIssuesRefresherImpl myRefresher;
 
     public JiraIssuesData(@NotNull Project project, @NotNull Disposable parent) {
         myProject = project;
         myIssuesGetter = new IssuesGetter(project);
-
-
-        //myRefresher = new JiraIssuesRefresherImpl(project, progress);
-        //Disposer.register(this, myRefresher);
 
         Disposer.register(parent, this);
     }
@@ -29,8 +24,6 @@ public class JiraIssuesData implements Disposable {
     public Project getProject() {
         return myProject;
     }
-
-
 
 
     public List<JiraIssue> getIssues(String jql) {
@@ -45,5 +38,9 @@ public class JiraIssuesData implements Disposable {
     @Override
     public void dispose() {
 
+    }
+
+    public interface IssuesChangeListener {
+        void onIssuesChange(Issues newIssues);
     }
 }

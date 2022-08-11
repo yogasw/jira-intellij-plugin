@@ -9,6 +9,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.progress.impl.CoreProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.Consumer;
 import com.intellij.vcs.log.data.SingleTaskController;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,19 +22,17 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
 
     private final Project myProject;
     private final JiraProgress myProgress;
+    private Issues myIssues = Issues.EMPTY;
 
-    private final SingleTaskController<RefreshRequest, List<JiraIssue>> mySingleTaskController;
+    private final SingleTaskController<RefreshRequest, Issues> mySingleTaskController;
 
-    private List<VisibleIssueChangeListener> myVisibleIssueChangeListeners = new ArrayList<>();
-
-    public JiraIssuesRefresherImpl(@NotNull Project project, @NotNull JiraProgress progress) {
+    public JiraIssuesRefresherImpl(@NotNull Project project, @NotNull JiraProgress progress, @NotNull Consumer<? super Issues> issuesUpdateHandler) {
         myProject = project;
         myProgress = progress;
 
-        mySingleTaskController = new SingleTaskController<>("", issues -> {
-            for (VisibleIssueChangeListener l : myVisibleIssueChangeListeners) {
-                l.onChange(issues);
-            }
+        mySingleTaskController = new SingleTaskController<>("refresh", issues -> {
+            myIssues = issues;
+            issuesUpdateHandler.consume(issues);
         }, this) {
             @Override
             protected @NotNull SingleTask startNewBackgroundTask() {
@@ -42,6 +41,7 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
         };
     }
 
+
     protected SingleTaskController.SingleTask startNewBackgroundTask(@NotNull final Task.Backgroundable refreshTask) {
         ProgressIndicator indicator = myProgress.createProgressIndicator();
         Future<?> future = ((CoreProgressManager) ProgressManager.getInstance()).runProcessWithProgressAsynchronously(refreshTask, indicator,
@@ -49,14 +49,8 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
         return new SingleTaskController.SingleTaskImpl(future, indicator);
     }
 
-    @Override
-    public void addVisibleIssueChangeListener(VisibleIssueChangeListener listener) {
-        myVisibleIssueChangeListeners.add(listener);
-    }
-
-    @Override
-    public void removeVisibleIssueChangeListener(VisibleIssueChangeListener listener) {
-        myVisibleIssueChangeListeners.remove(listener);
+    public Issues getCurrentIssues() {
+        return myIssues;
     }
 
     @Override
@@ -66,15 +60,11 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
 
     @Override
     public void dispose() {
-        myVisibleIssueChangeListeners.clear();
+
     }
 
     public JiraProgress getProgress() {
         return myProgress;
-    }
-
-    public interface VisibleIssueChangeListener {
-        void onChange(List<JiraIssue> issues);
     }
 
     @NotNull
@@ -82,8 +72,8 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
         return JiraServerManager.getInstance();
     }
 
-    private static class RefreshRequest {
 
+    private static class RefreshRequest {
         private final String jql;
 
         RefreshRequest(@NotNull String jql) {
@@ -104,10 +94,10 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
         @Override
         public void run(@NotNull ProgressIndicator indicator) {
             indicator.setIndeterminate(true);
-            List<JiraIssue> issues = new ArrayList<>();
+            Issues issues = myIssues;
             while (true) {
                 List<RefreshRequest> requests = mySingleTaskController.popRequests();
-                List<String> jqls = requests.stream().map(RefreshRequest::getJql).collect(Collectors.toList());
+                List<String> jqls = requests.stream().map(JiraIssuesRefresherImpl.RefreshRequest::getJql).collect(Collectors.toList());
 
                 if (jqls.isEmpty()) {
                     mySingleTaskController.taskCompleted(issues);
@@ -116,21 +106,21 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
 
                 try {
                     issues = doRefresh(jqls);
-                }
-                catch (ProcessCanceledException e) {
+                    mySingleTaskController.taskCompleted(issues);
+                } catch (ProcessCanceledException e) {
                     mySingleTaskController.taskCompleted(null);
                     throw e;
                 }
             }
         }
 
-        private List<JiraIssue> doRefresh(List<String> jqls) {
+        private Issues doRefresh(List<String> jqls) {
             List<JiraIssue> issues = new ArrayList<>();
             for (String jql : jqls) {
                 issues.addAll(getJiraServerManager().getJiraRestApi(myProject).getIssues(jql));
             }
 
-            return issues;
+            return Issues.of(issues);
         }
     }
 }

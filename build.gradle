@@ -39,6 +39,6 @@ patchPluginXml {
     changeNotes = """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Support 2022.2+</li>
+        <li>New feature: quick issue filters</li>
       </ul>"""
 }

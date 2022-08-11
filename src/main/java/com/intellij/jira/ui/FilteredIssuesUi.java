@@ -1,17 +1,16 @@
 package com.intellij.jira.ui;
 
 import com.intellij.jira.JiraTabsManager;
+import com.intellij.jira.data.Issues;
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.jql.JQLSearcherManager;
 import com.intellij.jira.listener.SearcherListener;
-import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.panels.JiraFilteredIssuesPanel;
 import com.intellij.jira.ui.table.JiraIssueTable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JComponent;
-import java.util.List;
 
 public class FilteredIssuesUi extends AbstractIssuesUi {
 
@@ -55,8 +54,8 @@ public class FilteredIssuesUi extends AbstractIssuesUi {
     }
 
     @Override
-    void setIssues(List<JiraIssue> issues) {
-        myFilteredIssuesPanel.setIssues(issues);
+    void setIssues(Issues issues) {
+        myFilteredIssuesPanel.setIssues(issues.get());
     }
 
     private class MySearcherListener implements SearcherListener {

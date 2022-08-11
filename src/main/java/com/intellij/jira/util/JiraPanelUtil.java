@@ -214,6 +214,8 @@ public class JiraPanelUtil {
 
     private static class Badge extends TagButton {
 
+        private static final int myInsets = JBUI.scale(4);
+
         public Badge(@Nls String text) {
             super(text, null);
             remove(myCloseButton);
@@ -224,7 +226,7 @@ public class JiraPanelUtil {
         protected void layoutButtons() {
             myButton.setMargin(JBUI.emptyInsets());
             Dimension size = myButton.getPreferredSize();
-            Dimension tagSize = new Dimension(size.width - ourInset * 2, size.height);
+            Dimension tagSize = new Dimension(size.width - myInsets * 2, size.height);
             setPreferredSize(tagSize);
             myButton.setBounds(new Rectangle(tagSize));
         }

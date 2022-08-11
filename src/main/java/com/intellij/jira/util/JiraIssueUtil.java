@@ -2,6 +2,7 @@ package com.intellij.jira.util;
 
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.rest.model.JiraIssueUser;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.text.DateFormatUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,14 +23,18 @@ public class JiraIssueUtil {
     @NotNull
     public static String getAssignee(@NotNull JiraIssue jiraIssue) {
         JiraIssueUser assignedUser = jiraIssue.getAssignee();
-        if (isNull(assignedUser) || isNull(assignedUser.getEmailAddress())) {
+        if (isNull(assignedUser)) {
             return EMPTY_TEXT;
         }
 
-        String useremail = assignedUser.getEmailAddress();
-        int index = useremail.lastIndexOf('@');
+        if (nonNull(assignedUser.getEmailAddress())) {
+            String emailAddress = assignedUser.getEmailAddress();
+            int index = emailAddress.lastIndexOf('@');
 
-        return index >= 0 ? useremail.substring(0, index) : EMPTY_TEXT;
+            return index >= 0 ? emailAddress.substring(0, index) : EMPTY_TEXT;
+        }
+
+        return StringUtil.defaultIfEmpty(assignedUser.getDisplayName(), EMPTY_TEXT);
     }
 
     @NotNull
