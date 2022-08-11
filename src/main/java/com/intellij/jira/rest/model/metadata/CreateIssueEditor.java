@@ -15,6 +15,7 @@ import com.intellij.jira.ui.editors.LoadableComboBoxEditor;
 import com.intellij.jira.ui.editors.LoadableFieldEditor;
 import com.intellij.jira.ui.editors.factory.CreateFieldEditorFactory;
 import com.intellij.jira.util.JiraBorders;
+import com.intellij.jira.util.JiraPanelUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.tasks.jira.JiraRepository;
@@ -43,11 +44,10 @@ import static java.util.Objects.nonNull;
 public class CreateIssueEditor implements Editor {
 
     private final Project myProject;
+    private final CreateIssueMetaProvider myCreateIssueMetaProvider;
+    private final ProjectComboBox myProjectCombo;
+    private final IssueTypeComboBox myIssueTypeCombo;
 
-    private CreateIssueMetaProvider myCreateIssueMetaProvider;
-
-    private ProjectComboBox myProjectCombo;
-    private IssueTypeComboBox myIssueTypeCombo;
     private FieldsEditor myFieldsEditor;
     private BorderLayoutPanel myFieldsPanel;
 
@@ -151,7 +151,15 @@ public class CreateIssueEditor implements Editor {
     }
 
     public void onUpdateValues(Set<JiraProject> jiraProjects) {
-        myProjectCombo.onUpdateValues(jiraProjects);
+        if (ContainerUtil.isEmpty(jiraProjects)) {
+            myIssueTypeCombo.loaded();
+            myFieldsPanel.removeAll();
+            myFieldsPanel.addToCenter(JiraPanelUtil.createPlaceHolderPanel("No fields to display"));
+            myFieldsPanel.revalidate();
+            myFieldsPanel.repaint();
+        } else {
+            myProjectCombo.onUpdateValues(jiraProjects);
+        }
     }
 
 
@@ -176,6 +184,11 @@ public class CreateIssueEditor implements Editor {
         public IssueTypeComboBox() {
             super("Issue Type", true);
         }
+
+        public void loaded() {
+            super.loaded();
+        }
+
     }
 
     private class FieldsEditor implements Editor {

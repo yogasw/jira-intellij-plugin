@@ -1,11 +1,19 @@
 package com.intellij.jira.ui;
 
+import com.intellij.jira.data.Issues;
 import com.intellij.jira.data.JiraIssuesData;
 import com.intellij.jira.data.JiraIssuesRefresherImpl;
 import com.intellij.jira.data.JiraProgress;
 import com.intellij.jira.data.JiraProgressImpl;
 import com.intellij.jira.listener.IssueCreatedListener;
-import com.intellij.jira.rest.model.JiraIssue;
+import com.intellij.jira.data.JiraVisibleIssuesRefresher;
+import com.intellij.jira.data.JiraVisibleIssuesRefresherImpl;
+import com.intellij.jira.filter.IssueFilter;
+import com.intellij.jira.filter.IssueFilterCollection;
+import com.intellij.jira.filter.IssueFilterCollectionImpl;
+import com.intellij.jira.filter.IssueFilterer;
+import com.intellij.jira.filter.status.StatusFilterImpl;
+import com.intellij.jira.filter.type.TypeFilterImpl;
 import com.intellij.jira.rest.model.jql.JQLSearcher;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighter;
 import com.intellij.jira.ui.highlighters.JiraIssueHighlighterFactory;
@@ -14,8 +22,10 @@ import com.intellij.jira.ui.table.column.JiraIssueApplicationSettings;
 import com.intellij.jira.ui.table.column.JiraIssueColumnProperties;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +37,39 @@ public abstract class AbstractIssuesUi implements IssuesUi {
     private final String myId;
     protected final JiraIssuesData myIssuesData;
     protected final Map<String, JiraIssueHighlighter> myHighlighters = new HashMap<>();
+    private final MyIssuesChangeListener myIssuesChangeListener;
 
-    private JiraIssuesRefresherImpl myIssuesRefresher;
-    private JiraIssuesRefresherImpl.VisibleIssueChangeListener myVisibleIssueChangeListener;
+    private final JiraIssuesRefresherImpl myRefresher;
+    @NotNull private final List<JiraIssuesData.IssuesChangeListener> myIssuesChangeListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+
+    private JiraVisibleIssuesRefresher myVisibleIssuesRefresher;
+    private JiraVisibleIssuesRefresher.VisibleIssueChangeListener myVisibleIssueChangeListener;
+
+    private IssuesFilterUi myFilterUi;
+    private Issues myIssues = Issues.EMPTY;
+
+    private boolean disposed;
 
     protected AbstractIssuesUi(String id, JiraIssuesData issuesData) {
         myId = id;
         myIssuesData = issuesData;
 
+        // Refresh tab issues
         JiraProgress progress = new JiraProgressImpl(this);
-        myIssuesRefresher = new JiraIssuesRefresherImpl(issuesData.getProject(), progress);
+        myRefresher = new JiraIssuesRefresherImpl(issuesData.getProject(), progress, this::fireIssuesChangeEvent);
+
+        Disposer.register(this, myRefresher);
+
+        // Create filter UI
+        List<IssueFilter> issueFilters = new ArrayList<>();
+        issueFilters.add(new TypeFilterImpl());
+        issueFilters.add(new StatusFilterImpl());
+
+        IssueFilterCollection initialFilters = new IssueFilterCollectionImpl(issueFilters);
+        myFilterUi = new IssuesFilterUiImpl(filters -> applyFilters(filters), initialFilters);
+
+        // Apply filters to issues
+        myVisibleIssuesRefresher = new JiraVisibleIssuesRefresherImpl(issuesData, myIssues, progress, myFilterUi.getFilters(), new IssueFilterer());
 
         myVisibleIssueChangeListener = issues -> {
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -44,27 +77,55 @@ public abstract class AbstractIssuesUi implements IssuesUi {
             });
         };
 
-        myIssuesRefresher.addVisibleIssueChangeListener(myVisibleIssueChangeListener);
+        myIssuesChangeListener = new MyIssuesChangeListener();
+        addIssuesChangeListener(myIssuesChangeListener);
 
         issuesData.getProject().getMessageBus().connect().subscribe(IssueCreatedListener.TOPIC, createdIssue -> refresh());
 
-        Disposer.register(this, myIssuesRefresher);
+        myVisibleIssuesRefresher.addVisibleIssueChangeListener(myVisibleIssueChangeListener);
+
+        Disposer.register(this, myVisibleIssuesRefresher);
 
         ApplicationManager.getApplication().getService(JiraIssueApplicationSettings.class)
                 .addChangeListener(new MyPropertyChangeListener());
     }
 
-    abstract void setIssues(List<JiraIssue> issues);
+    public void addIssuesChangeListener(JiraIssuesData.IssuesChangeListener listener) {
+        myIssuesChangeListeners.add(listener);
+    }
+
+    public void removeIssuesChangeListener(JiraIssuesData.IssuesChangeListener listener) {
+        myIssuesChangeListeners.remove(listener);
+    }
+
+
+    private void fireIssuesChangeEvent(@NotNull final Issues issues) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            for (JiraIssuesData.IssuesChangeListener listener : myIssuesChangeListeners) {
+                listener.onIssuesChange(issues);
+            }
+        }, o -> isDisposed());
+    }
+
+    public JiraProgress getProgress() {
+        return myRefresher.getProgress();
+    }
+
+    abstract void setIssues(Issues issues);
 
     @NotNull
     abstract JQLSearcher getSearcher();
 
-    public JiraIssuesRefresherImpl getRefresher() {
-        return myIssuesRefresher;
+    public JiraVisibleIssuesRefresher getRefresher() {
+        return myVisibleIssuesRefresher;
     }
 
     public void refresh() {
-        myIssuesRefresher.getIssues(getSearcher().getJql());
+       myRefresher.getIssues(getSearcher().getJql());
+    }
+
+    public void applyFilters(IssueFilterCollection filters) {
+        myVisibleIssuesRefresher.onFiltersChange(filters);
     }
 
     @NotNull
@@ -74,8 +135,23 @@ public abstract class AbstractIssuesUi implements IssuesUi {
     }
 
     @Override
+    public IssuesFilterUi getFilterUi() {
+        return myFilterUi;
+    }
+
+    @NotNull
+    @Override
+    public Issues getIssues() {
+        return myIssues;
+    }
+
+    @Override
     public void dispose() {
+        disposed = true;
         myHighlighters.clear();
+        removeIssuesChangeListener(myIssuesChangeListener);
+        myVisibleIssuesRefresher.removeVisibleIssueChangeListener(myVisibleIssueChangeListener);
+        myIssues = Issues.EMPTY;
     }
 
     protected void updateHighlighters() {
@@ -95,6 +171,10 @@ public abstract class AbstractIssuesUi implements IssuesUi {
         getTable().repaint();
     }
 
+    public boolean isDisposed() {
+        return disposed;
+    }
+
     private class MyPropertyChangeListener implements JiraIssueUiProperties.PropertyChangeListener {
 
         @Override
@@ -106,6 +186,16 @@ public abstract class AbstractIssuesUi implements IssuesUi {
                 getTable().createDefaultColumnsFromModel();
                 getTable().updateColumnSizes();
             }
+        }
+    }
+
+    private class MyIssuesChangeListener implements JiraIssuesData.IssuesChangeListener {
+
+        @Override
+        public void onIssuesChange(Issues newIssues) {
+            setIssues(newIssues);
+            myFilterUi.updateIssues(newIssues);
+            myVisibleIssuesRefresher.updateIssues(newIssues);
         }
     }
 

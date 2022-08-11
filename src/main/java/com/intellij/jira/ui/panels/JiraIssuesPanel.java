@@ -71,7 +71,7 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         myIssuesBrowserSplitter.setFirstComponent(toolbarAndTable);
         myIssuesBrowserSplitter.setSecondComponent(myJiraIssueDetailsPanel);
 
-        myUi.getRefresher().getProgress().addProgressListener(new MyProgressListener(), this);
+        myUi.getProgress().addProgressListener(new MyProgressListener(), this);
 
         add(myIssuesBrowserSplitter);
     }
@@ -103,7 +103,12 @@ public class JiraIssuesPanel extends JiraPanel implements DataProvider, Disposab
         DefaultActionGroup toolbarGroup = new DefaultActionGroup();
         toolbarGroup.copyFromGroup((DefaultActionGroup) ActionManager.getInstance().getAction(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_LEFT));
 
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE, toolbarGroup, true);
+        DefaultActionGroup mainGroup = new DefaultActionGroup();
+        mainGroup.add(myUi.getFilterUi().createActionGroup());
+        mainGroup.addSeparator();
+        mainGroup.add(toolbarGroup);
+
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(JiraIssueActionPlaces.JIRA_ISSUES_TOOLBAR_PLACE, mainGroup, true);
         toolbar.setTargetComponent(this);
 
         DefaultActionGroup rightCornerGroup =

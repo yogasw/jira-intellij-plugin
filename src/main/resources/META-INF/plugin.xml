@@ -10,15 +10,15 @@
             <ul>
                 <li>Fetch issues from server with customizable searchers</li>
                 <li>View issue details</li>
-                <li>Run actions on issue, like transit an issue, assign it, change his priority,...</li>
+                <li>Run actions on issue, like create or transit an issue, assign it, change his priority,...</li>
                 <li>Go to specific issue on list</li>
             </ul>
 
         ]]>
     </description>
 
-    <!-- Compatible with Idea platform 2021.1 - 2021.3 -->
-    <idea-version since-build="210" until-build="213.*"/>
+    <!-- Compatible with Idea platform 2022.1 - 2022.3 -->
+    <idea-version since-build="221" until-build="222.*"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>

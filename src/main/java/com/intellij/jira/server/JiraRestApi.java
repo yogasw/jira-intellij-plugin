@@ -379,8 +379,7 @@ public class JiraRestApi {
         try {
             return jiraRestClient.getIssueCreateMeta();
         } catch (Exception e) {
-            // TODO: refactor!!
-            return null;
+            return new JiraIssueCreateMetadata();
         }
 
     }
