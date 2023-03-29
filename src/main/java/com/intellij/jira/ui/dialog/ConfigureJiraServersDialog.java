@@ -190,9 +190,11 @@ public class ConfigureJiraServersDialog extends DialogWrapper {
         int selectedServer = myServersList.getSelectedIndex();
         if(selectedServer > -1){
             ((CollectionListModel) myServersList.getModel()).remove(selectedServer);
+            myEditors.remove(selectedServer);
             myServers.remove(selectedServer);
             myServersList.setSelectedIndex(myServers.getSelectedItemIndex());
         }
+
 
         if(myServers.isEmpty()){
             updateEditorPanel(EMPTY_PANEL_NAME);
