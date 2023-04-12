@@ -23,7 +23,6 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.util.NotNullComputable;
 import com.intellij.ui.ClientProperty;
-import com.intellij.util.Consumer;
 import com.intellij.util.EventDispatcher;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.vcs.log.ui.MainVcsLogUi;
@@ -34,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.JComponent;
 import java.awt.Component;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class IssuesFilterUiImpl implements IssuesFilterUi {
@@ -59,7 +59,7 @@ public class IssuesFilterUiImpl implements IssuesFilterUi {
         FilterModel[] models = {myIssueTypeFilterModel, myPriorityFilterModel, myAssigneeFilterModel, myStatusFilterModel};
         for(FilterModel model : models) {
             model.addSetFilterListener(() -> {
-                filterConsumer.consume(getFilters());
+                filterConsumer.accept(getFilters());
                 myFilterListenerDispatcher.getMulticaster().onFiltersChanged();
             });
         }
