@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
 import java.net.UnknownHostException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -53,11 +54,11 @@ public abstract class JiraServerAuthEditor implements Editor {
     protected JButton myTestButton;
 
     public JiraServerAuthEditor(Project project, JiraServer server, boolean selected, BiConsumer<JiraServer, Boolean> changeListener, Consumer<JiraServer> changeUrlListener) {
-        this.myProject = project;
-        this.myServer = server;
-        this.mySelectedServer = selected;
-        this.myChangeListener = changeListener;
-        this.myChangeUrlListener = changeUrlListener;
+        myProject = project;
+        myServer = server;
+        mySelectedServer = selected;
+        myChangeListener = changeListener;
+        myChangeUrlListener = changeUrlListener;
         init();
     }
 
@@ -73,23 +74,23 @@ public abstract class JiraServerAuthEditor implements Editor {
     }
 
     private void init() {
-        this.myUrlLabel = new JBLabel("Server URL:", 4);
-        this.myUrlField = new JBTextField();
-        this.myUrlField.setText(myServer.getUrl());
-        this.myUrlField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        myUrlLabel = new JBLabel("Server URL:", 4);
+        myUrlField = new JBTextField();
+        myUrlField.setText(myServer.getUrl());
+        myUrlField.setPreferredSize(JBUI.size(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-        this.myDefaultServerCheckbox = new JCheckBox("Set Default");
-        this.myDefaultServerCheckbox.setBorder(JBUI.Borders.emptyRight(4));
-        this.myDefaultServerCheckbox.setSelected(mySelectedServer);
+        myDefaultServerCheckbox = new JCheckBox("Set Default");
+        myDefaultServerCheckbox.setBorder(JBUI.Borders.emptyRight(4));
+        myDefaultServerCheckbox.setSelected(mySelectedServer);
 
-        this.mySharedCheckbox = new JCheckBox("Shared");
-        this.mySharedCheckbox.setBorder(JBUI.Borders.emptyRight(4));
-        this.mySharedCheckbox.setSelected(myServer.isShared());
+        mySharedCheckbox = new JCheckBox("Shared");
+        mySharedCheckbox.setBorder(JBUI.Borders.emptyRight(4));
+        mySharedCheckbox.setSelected(myServer.isShared());
 
-        this.myTestPanel = new JPanel(new BorderLayout());
+        myTestPanel = new JPanel(new BorderLayout());
         myTestPanel.setBorder(MARGIN_BOTTOM);
-        this.myTestButton = new JButton("Test");
-        this.myTestPanel.add(myTestButton, BorderLayout.EAST);
+        myTestButton = new JButton("Test");
+        myTestPanel.add(myTestButton, BorderLayout.EAST);
     }
 
     protected void installListener(JTextField textField) {
@@ -133,7 +134,7 @@ public abstract class JiraServerAuthEditor implements Editor {
     }
 
     protected void apply(){
-        this.myChangeUrlListener.accept(myServer);
+        myChangeUrlListener.accept(myServer);
     }
 
     protected boolean isSharedServer() {
@@ -141,7 +142,7 @@ public abstract class JiraServerAuthEditor implements Editor {
     }
 
     private void defaultServerChanged(){
-        this.myChangeListener.accept(myServer, myDefaultServerCheckbox.isSelected());
+        myChangeListener.accept(myServer, myDefaultServerCheckbox.isSelected());
     }
 
     @Nullable
