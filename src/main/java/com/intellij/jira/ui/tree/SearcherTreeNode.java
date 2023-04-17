@@ -1,8 +1,8 @@
 package com.intellij.jira.ui.tree;
 
 import com.intellij.jira.rest.model.jql.JQLSearcher;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class SearcherTreeNode extends DefaultMutableTreeNode {

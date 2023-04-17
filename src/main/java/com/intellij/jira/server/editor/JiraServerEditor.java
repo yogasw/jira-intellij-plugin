@@ -16,8 +16,6 @@ import java.util.function.Consumer;
 
 public class JiraServerEditor implements Editor {
 
-    private static final int API_TOKEN_TAB = 1;
-
     private final Project myProject;
     private final JiraServer myServer;
     private final boolean mySelectedServer;
@@ -25,9 +23,7 @@ public class JiraServerEditor implements Editor {
     private BiConsumer<JiraServer, Boolean> myChangeListener;
     private Consumer<JiraServer> myChangeUrlListener;
 
-    private JiraTabbedPane myTabbedPane;
-    private JiraServerAuthEditor userAndPassAuthEditor;
-    private JiraServerAuthEditor apiTokenAuthEditor;
+    private JiraServerAuthEditor myServerAuthEditor;
 
     public JiraServerEditor(Project project, JiraServer server, boolean selected, BiConsumer<JiraServer, Boolean> changeListener, Consumer<JiraServer> changeUrlListener) {
         this.myProject = project;
@@ -39,34 +35,18 @@ public class JiraServerEditor implements Editor {
 
     @Override
     public JComponent createPanel(){
-        this.userAndPassAuthEditor = new JiraServerUserAndPassAuthEditor(myProject, myServer, mySelectedServer, myChangeListener, myChangeUrlListener);
-        this.apiTokenAuthEditor = new JiraServerAPITokenAuthEditor(myProject, myServer, mySelectedServer, myChangeListener, myChangeUrlListener);
-
-        this.myTabbedPane = new JiraTabbedPane(JTabbedPane.NORTH);
-        this.myTabbedPane.addTab("User And Pass", userAndPassAuthEditor.createPanel());
-        this.myTabbedPane.addTab("API Token", apiTokenAuthEditor.createPanel());
-
-        if (AuthType.API_TOKEN == myServer.getType()) {
-            this.myTabbedPane.setSelectedIndex(API_TOKEN_TAB);
-        }
+        myServerAuthEditor = new DefaultJiraServerAuthEditor(myProject, myServer, mySelectedServer, myChangeListener, myChangeUrlListener);
 
         return FormBuilder.createFormBuilder()
-                .addComponent(this.myTabbedPane)
+                .addComponent(myServerAuthEditor.createPanel())
                 .getPanel();
     }
 
 
     @Nullable
     public ValidationInfo validate() {
-        if (isApiTokenAuthEditorSelected()) {
-            return this.apiTokenAuthEditor.validate();
-        }
-
-        return this.userAndPassAuthEditor.validate();
+        return myServerAuthEditor.validate();
     }
 
-    private boolean isApiTokenAuthEditorSelected() {
-        return this.myTabbedPane.getSelectedIndex() == API_TOKEN_TAB;
-    }
 
 }

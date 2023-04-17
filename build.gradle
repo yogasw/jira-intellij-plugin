@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.10.0'
+    id 'org.jetbrains.intellij' version '1.13.3'
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -39,6 +39,6 @@ patchPluginXml {
     changeNotes = """
       Version ${pluginVersion}<br>
       <ul>
-        <li>Support 2022.3+</li>
+        <li>Bug fixes</li>
       </ul>"""
 }

@@ -9,13 +9,13 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.progress.impl.CoreProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.Consumer;
 import com.intellij.vcs.log.data.SingleTaskController;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable {
@@ -32,7 +32,7 @@ public class JiraIssuesRefresherImpl implements JiraIssuesRefresher, Disposable 
 
         mySingleTaskController = new SingleTaskController<>("refresh", issues -> {
             myIssues = issues;
-            issuesUpdateHandler.consume(issues);
+            issuesUpdateHandler.accept(issues);
         }, this) {
             @Override
             protected @NotNull SingleTask startNewBackgroundTask() {
