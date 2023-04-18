@@ -35,6 +35,7 @@
         <applicationService serviceImplementation="com.intellij.jira.components.JiraNotificationManager"/>
         <applicationService serviceImplementation="com.intellij.jira.jql.JQLSearcherApplicationManager"/>
         <applicationService serviceImplementation="com.intellij.jira.jql.JQLSearcherManager"/>
+        <applicationService serviceImplementation="com.intellij.jira.settings.branch.BranchSettings"/>
         <applicationService serviceImplementation="com.intellij.jira.settings.ChangelistSettings"/>
         <applicationService serviceImplementation="com.intellij.jira.ui.table.column.JiraIssueApplicationSettings"/>
         <applicationService serviceImplementation="com.intellij.jira.server.JiraServerManager"/>
