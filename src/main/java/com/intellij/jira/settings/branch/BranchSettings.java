@@ -9,13 +9,15 @@ import com.intellij.openapi.components.Storage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 @State(
         name = "BranchSettings",
-        storages = @Storage("branch.xml")
+        storages = @Storage("branchSettings.xml")
 )
 public class BranchSettings implements PersistentStateComponent<BranchSettingsState> {
 
-    private BranchSettingsState myState;
+    private BranchSettingsState myState = BranchSettingsState.getDefault(List.of("feature", "bugfix", "hotfix"));
 
     public static BranchSettings getInstance() {
         return ApplicationManager.getApplication().getService(BranchSettings.class);
