@@ -15,9 +15,9 @@ public class BranchSettingsDialog extends DialogWrapper {
 
     private final BranchSettings myBranchSettings;
 
-    private BranchSettingsEditor myBranchSettingsEditor;
+    private final BranchSettingsEditor myBranchSettingsEditor;
 
-    public BranchSettingsDialog(@Nullable Project project, @NotNull BranchSettings branchSettings) {
+    public BranchSettingsDialog(@NotNull Project project, @NotNull BranchSettings branchSettings) {
         super(project, false);
         myBranchSettings = branchSettings;
         myBranchSettingsEditor = new BranchSettingsEditor(project, branchSettings);
@@ -29,7 +29,6 @@ public class BranchSettingsDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-
         return FormBuilder.createFormBuilder()
                 .addComponent(myBranchSettingsEditor.createPanel())
                 .getPanel();

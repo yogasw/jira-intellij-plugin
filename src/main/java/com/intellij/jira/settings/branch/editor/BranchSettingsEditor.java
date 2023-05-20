@@ -29,11 +29,15 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import java.util.List;
 
 public class BranchSettingsEditor implements Editor {
+
+    private static final int TOOLBAR_WIDTH = 400;
+    private static final int TOOLBAR_HEIGHT = 60;
 
     private final Project myProject;
     private final BranchSettings myBranchSettings;
@@ -47,9 +51,11 @@ public class BranchSettingsEditor implements Editor {
     private ComboBox<Separator> myFieldSeparatorCombo;
     private JLabel myBranchNameLabel;
     private JBList<String> myBranchNameList;
+
+    private JPanel myBranchNameToolbarPanel;
     private JLabel myBranchNameExample;
 
-    public BranchSettingsEditor(@Nullable Project project, BranchSettings branchSettings) {
+    public BranchSettingsEditor(@NotNull Project project, BranchSettings branchSettings) {
         myProject = project;
         myBranchSettings = branchSettings;
     }
@@ -64,64 +70,62 @@ public class BranchSettingsEditor implements Editor {
 
 
         ToolbarDecorator prefixToolbarDecorator = ToolbarDecorator.createDecorator(myBranchPrefixList)
-                                                                    .disableUpDownActions();
-
-        prefixToolbarDecorator.setMinimumSize(JBUI.size(300, 40));
-        prefixToolbarDecorator.setAddAction(anActionButton -> {
-            new AddPrefixDialog(myProject).show();
-        });
-
-        prefixToolbarDecorator.setRemoveAction(anActionButton -> {
-            String prefixToRemove = myBranchPrefixList.getSelectedValue();
-            ((CollectionListModel<String>) myBranchPrefixList.getModel()).remove(prefixToRemove);
-            myBranchPrefixList.doLayout();
-            updateBranchNameExample();
-        });
+            .disableUpDownActions()
+            .setPreferredSize(JBUI.size(TOOLBAR_WIDTH, TOOLBAR_HEIGHT))
+            .setAddAction(anActionButton -> new AddPrefixDialog(myProject).show())
+            .setRemoveAction(anActionButton -> {
+                String prefixToRemove = myBranchPrefixList.getSelectedValue();
+                ((CollectionListModel<String>) myBranchPrefixList.getModel()).remove(prefixToRemove);
+                myBranchPrefixList.doLayout();
+                updateBranchNameExample();
+            });
 
         // Branch name
         myDefaultBranchNameRadio = new JBRadioButton("Creates a branch using {issueKey} as name");
-        if (!myBranchSettings.getState().isCustom()) {
-            myDefaultBranchNameRadio.setSelected(true);
-        }
+        myDefaultBranchNameRadio.addActionListener(event -> toggleDefaultBranchNameRadio(myDefaultBranchNameRadio.isSelected()));
 
         myCustomBranchNameRadio = new JBRadioButton("Creates a branch customizing the name");
-
+        myCustomBranchNameRadio.addActionListener(event -> toggleDefaultBranchNameRadio(!myCustomBranchNameRadio.isSelected()));
 
         myFieldSeparatorLabel = new JBLabel("Separator: ");
         myFieldSeparatorCombo = new ComboBox<>(Separator.values());
 
-        myFieldSeparatorCombo.addActionListener((event) -> {
-            updateBranchNameExample();
-        });
+        myFieldSeparatorCombo.addActionListener((event) -> updateBranchNameExample());
 
         myBranchNameLabel = new JBLabel("Name: ");
         CollectionListModel<String> availableIssueFields = new CollectionListModel<>(myBranchSettings.getState().getFieldNames());
         myBranchNameList = new JBList<>(availableIssueFields);
         myBranchNameList.setEmptyText("No fields");
 
-        if (myBranchSettings.getState().isCustom()) {
-            myCustomBranchNameRadio.setSelected(true);
-            myFieldSeparatorCombo.setSelectedItem(myBranchSettings.getState().getFieldSeparator());
-        }
 
-        ToolbarDecorator branchNameToolbarDecorator = ToolbarDecorator.createDecorator(myBranchNameList)
-                                                                        .disableUpDownActions();
+        myBranchNameToolbarPanel = ToolbarDecorator.createDecorator(myBranchNameList)
+            .disableUpDownActions()
+            .setPreferredSize(JBUI.size(TOOLBAR_WIDTH, TOOLBAR_HEIGHT))
+            .setAddAction(anActionButton -> {
+                DefaultActionGroup group = new DefaultActionGroup();
+                group.add(new AddFieldAction(JiraIssueField.KEY));
+                group.add(new AddFieldAction(JiraIssueField.SUMMARY));
+                group.add(new AddFieldAction(JiraIssueField.PROJECT_KEY));
 
-        branchNameToolbarDecorator.setMinimumSize(JBUI.size(300, 40));
-        branchNameToolbarDecorator.setAddAction(anActionButton -> {
-            DefaultActionGroup group = new DefaultActionGroup();
-            group.add(new AddFieldAction(JiraIssueField.KEY));
-            group.add(new AddFieldAction(JiraIssueField.SUMMARY));
-            group.add(new AddFieldAction("projectKey"));
-
-            JBPopupFactory.getInstance()
-                    .createActionGroupPopup("Add Field", group, DataManager.getInstance().getDataContext(anActionButton.getContextComponent()), JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true)
-                    .show(anActionButton.getPreferredPopupPoint());
-
-        });
+                JBPopupFactory.getInstance()
+                        .createActionGroupPopup("Add Field", group, DataManager.getInstance().getDataContext(anActionButton.getContextComponent()), JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true)
+                        .show(anActionButton.getPreferredPopupPoint());})
+            .setRemoveAction(anActionButton -> {
+                String fieldNameToRemove = myBranchNameList.getSelectedValue();
+                ((CollectionListModel<String>) myBranchNameList.getModel()).remove(fieldNameToRemove);
+                myBranchNameList.doLayout();
+                updateBranchNameExample();
+            }).createPanel();
 
 
         myBranchNameExample = new JBLabel("e.g: " + getBranchNameExample() );
+
+        if (!myBranchSettings.getState().isCustom()) {
+            toggleDefaultBranchNameRadio(true);
+        } else {
+            toggleDefaultBranchNameRadio(false);
+            myFieldSeparatorCombo.setSelectedItem(myBranchSettings.getState().getFieldSeparator());
+        }
 
         return FormBuilder.createFormBuilder()
                 .addComponent(SeparatorFactory.createSeparator("Prefix", null))
@@ -130,7 +134,7 @@ public class BranchSettingsEditor implements Editor {
                 .addComponent(myDefaultBranchNameRadio)
                 .addComponent(myCustomBranchNameRadio)
                 .addLabeledComponent(myFieldSeparatorLabel, myFieldSeparatorCombo)
-                .addLabeledComponent(myBranchNameLabel, branchNameToolbarDecorator.createPanel())
+                .addLabeledComponent(myBranchNameLabel, myBranchNameToolbarPanel)
                 .addComponentToRightColumn(myBranchNameExample)
                 .getPanel();
     }
@@ -171,6 +175,17 @@ public class BranchSettingsEditor implements Editor {
         myBranchNameExample.setText("e.g: " + getBranchNameExample());
     }
 
+    private void toggleDefaultBranchNameRadio(boolean enable) {
+        myDefaultBranchNameRadio.setSelected(enable);
+        myCustomBranchNameRadio.setSelected(!enable);
+        myFieldSeparatorLabel.setEnabled(!enable);
+        myFieldSeparatorCombo.setEnabled(!enable);
+        myBranchNameLabel.setEnabled(!enable);
+        myBranchNameExample.setEnabled(!enable);
+        myBranchNameToolbarPanel.setEnabled(!enable);
+    }
+
+
     private class AddFieldAction extends IconWithTextAction implements DumbAware {
 
         private final String field;
@@ -182,10 +197,13 @@ public class BranchSettingsEditor implements Editor {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            ((CollectionListModel<String>) myBranchNameList.getModel()).add(field);
-            myBranchNameList.setSelectedIndex(myBranchNameList.getModel().getSize() - 1);
-            myBranchNameList.doLayout();
-            updateBranchNameExample();
+            CollectionListModel<String> model = (CollectionListModel<String>) myBranchNameList.getModel();
+            if (!model.contains(field)) {
+                model.add(field);
+                myBranchNameList.setSelectedIndex(myBranchNameList.getModel().getSize() - 1);
+                myBranchNameList.doLayout();
+                updateBranchNameExample();
+            }
         }
     }
 
@@ -229,8 +247,11 @@ public class BranchSettingsEditor implements Editor {
         @Override
         protected void doOKAction() {
             String prefix = StringUtil.trim(myPrefixField.getText());
-            ((CollectionListModel<String>) myBranchPrefixList.getModel()).add(prefix);
-            myBranchPrefixList.doLayout();
+            CollectionListModel<String> model = (CollectionListModel<String>) myBranchPrefixList.getModel();
+            if (!model.contains(prefix)) {
+                model.add(prefix);
+                myBranchPrefixList.doLayout();
+            }
 
             super.doOKAction();
         }
