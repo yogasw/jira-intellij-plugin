@@ -2,11 +2,13 @@ package com.intellij.jira.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.jira.JiraDataKeys;
+import com.intellij.jira.components.JiraNotificationManager;
 import com.intellij.jira.rest.model.JiraIssue;
 import com.intellij.jira.settings.branch.BranchSettings;
 import com.intellij.jira.settings.branch.BranchSettingsState;
 import com.intellij.jira.util.provider.ProviderFactory;
 import com.intellij.jira.util.provider.ProviderFactoryImpl;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -103,9 +105,13 @@ public class BranchActionGroup extends DefaultActionGroup {
 
 
             GitRepository gitRepository = GitBranchUtil.guessRepositoryForOperation(project, e.getDataContext());
-            GitBrancher gitBrancher = GitBrancher.getInstance(project);
+            if (Objects.nonNull(gitRepository)) {
+                GitBrancher.getInstance(project).createBranch(myBranchName, Map.of(gitRepository, HEAD));
+            } else {
+                Notifications.Bus.notify(JiraNotificationManager.getInstance().createNotificationError("Branch creation failed", "Repository not found"));
+            }
 
-            gitBrancher.createBranch(myBranchName, Map.of(gitRepository, HEAD));
+
 
         }
 
