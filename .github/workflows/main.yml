@@ -30,8 +30,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: build/libs/*  # Replace with the path to your release artifacts
-        # tag_name: v1.0.0 # Ganti dengan tag versi yang sesuai
-        # release_name: Release 1.0.0 # Ganti dengan nama rilis yang sesuai
+        tag_name: v1.0.0 # Ganti dengan tag versi yang sesuai
+        name: Release 1.0.0 # Ganti dengan nama rilis yang sesuai
         # body: Release notes for version 1.0.0 # Ganti dengan catatan rilis yang sesuai
         draft: false
         prerelease: false
