@@ -29,6 +29,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    - name: show env
+      run: printenv
+      
     - name: Create Release using softprops/action-gh-release
       id: create_release
       uses: softprops/action-gh-release@v1
