@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - auto-build # Ganti dengan nama branch yang Anda inginkan
-
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
