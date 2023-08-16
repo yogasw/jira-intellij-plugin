@@ -3,11 +3,11 @@ name: Gradle Build and Release
 on:
   push:
     branches:
-      - auto-build # Ganti dengan nama branch yang Anda inginkan
+      - master # Ganti dengan nama branch yang Anda inginkan
  
 jobs:
   build:
-    runs-on: master
+    runs-on: ubuntu-latest
 
     permissions:
       contents: write
